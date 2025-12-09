@@ -7,30 +7,31 @@
 # server process.
 
 # Basic Site Settings
+# Site Settings
 locale                   : "en-US"
-site_theme               : "default" # Currently available options are "default", "air"
-title                    : "Your Name / Site Title"
+title                    : "Qingze Zhu"
 title_separator          : "-"
-name                     : &name "Your Name"
-description              : &description "Your Name's academic portfolio"   # Update this with a general description of your site, this is the default if not overridden by a page
-url                      : https://academicpages.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
-                                                           # or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
-baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "academicpages/academicpages.github.io"
+name                     : &name "Qingze Zhu"
+description              : &description "Statistics @ UW–Madison · Rural China, supply chains, and development"
+url                      : "https://ZQZ0630.github.io"
+baseurl                  : "/QingzeZhu-Personal-Webpage"
+repository               : "ZQZ0630/QingzeZhu-Personal-Webpage"
 
-# Site Author - The following control what appear as part of the author content on the side bar.
-#               If a field is blank the icon and link will not appear, otherwise it will be shown.
-#               Additional customization can be done by editing /_includes/author-profile.html
+# Site Author
+# The following control what appear as part of the author content on the side bar.
 author:
-  # Biographic information
-  avatar           : "profile.png"
-  name             : "Your Sidebar Name"
-  pronouns         : # example: "she/her"  
-  bio              : "Short biography for the left-hand sidebar"
-  location         : "Earth"
-  employer         : "Red Brick University"
-  uri              : # URL
-  email            : "none@example.org" 
+  name             : *name
+  avatar           : "profile.jpg"   # 之后你可以把头像命名为 profile.jpg 上传到 images/ 里
+  bio              : "Undergraduate in Statistics at UW–Madison, studying how supply chains and market intermediaries shape farmers’ income and risk in rural China."
+  location         : "Madison, WI · Zigui County, China"
+  employer         : "University of Wisconsin–Madison"
+  email            : "qzhu237@wisc.edu"
+  github           : "ZQZ0630"
+  linkedin         : ""
+  google_scholar   : ""
+  orcid            : ""
+  website          : ""
+
 
   # Academic websites
   academia         : # URL
