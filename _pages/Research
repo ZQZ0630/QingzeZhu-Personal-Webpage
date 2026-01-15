@@ -1,0 +1,52 @@
+---
+layout: single
+title: "Research"
+permalink: /research/
+author_profile: true
+---
+
+## Research Experience
+
+### Faculty-Supervised Research: Teaching Technology & Reproducible Research  
+*University of Wisconsin–Madison, Madison, WI · 09/2025–12/2025*  
+**Supervisor:** Prof. Bo Yang  
+
+- Developed interactive teaching tools in JavaScript and Python, including an animated derivation from discrete random walks to Brownian motion and a clickable probability knowledge map linking to notes and examples.  
+- Standardized R Markdown/Quarto outputs for course materials, adding chunk options, code-folding, and show/hide controls to improve HTML readability and reproducibility.  
+- Built a Brownian-motion–based classroom model to illustrate income volatility for smallholder farmers under different intermediary and price regimes, using visualizations to prompt discussion about rural risk and inequality.  
+
+---
+
+### Independent Research: Agricultural Supply Chain & Processing  
+*University of Wisconsin–Madison, Madison, WI · 05/2025–09/2025*  
+**Supervisor:** Prof. Sinan Tas  
+
+- Studied how processing-location decisions affect smallholder participation in cross-border agricultural value chains, using China→US konjac trade as a motivating case.  
+- Constructed an arrival-rate-conserving network-flow model to formalize trade-offs between converting “fresh” to “processed” at origin versus at destination under different logistics costs and loss structures.  
+- Showed that processing near origin ports can reduce total landed cost by about **52.8%** (from \$20,119 to \$9,492) and effective loss by about **62.4%**, and derived simple threshold rules that match the optimizer’s recommendation in roughly **96%** of simulated cases.  
+- Produced a working paper and a fully reproducible code/data package, which was shared with partner cooperatives to inform their strategy discussions on near-origin processing and farmer income stability.  
+
+---
+
+### Data Analysis Project: Agricultural Development Patterns & Farmers’ Income  
+*University of Wisconsin–Madison, Madison, WI · 07/2025–09/2025*  
+
+- Assembled a multi-decade panel (≈30 years) for **266** World Bank economies, focusing on farmers’ incomes and related agricultural indicators; harmonized series and handled missing values for cross-country comparison.  
+- Built an interactive dashboard with maps, time-series plots, and dumbbell charts to compare top vs. bottom performers and the ratio of farmers’ income to national averages.  
+- Analyzed how mechanization, agricultural value-added, and structural change relate to farmers’ incomes, highlighting cases where rising aggregate value or mechanization does **not** translate into proportional gains for farm households.  
+
+---
+
+### Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot  
+*Majiaba Village, Zigui County, Hubei, China · 07/2021–08/2022*  
+
+**Year 1 – Rural livelihoods and marketing channels**
+
+- Led mixed-methods research on income drivers among roughly **200** citrus-farming households using stratified surveys and semi-structured interviews; produced anonymized datasets and interview transcripts.  
+- Identified dependence on single sales channels and long intermediary chains as key constraints on bargaining power, price realization, and income stability.  
+- Interviewed Supply & Marketing Cooperative staff and township officials to compile a ~30-year oral history of marketing-channel changes and shifting forms of state and cooperative support.  
+
+**Year 2 – Direct-sales pilot and inventory practices**
+
+- Designed and implemented the *“Orange Warms the Countryside”* WeChat Mini Program to pilot direct sales and basic vendor-managed inventory for local households.  
+- Introduced ABC supplier tiering and simple stock-management practices; over about six months, reduced spoilage by ~25% and helped 10 farmers achieve a collective income increase of approximately ¥100,000.  
