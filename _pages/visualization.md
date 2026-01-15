@@ -10,7 +10,7 @@ This page collects some of my interactive visualization projects related to prob
 ## Probability Distributions Map
 
 <figure style="text-align: center;">
-  <a href="{{ site.baseurl }}/probability-map/">
+  <a href="{{ site.baseurl }}/probability_map/">
     <img src="{{ site.baseurl }}/images/probability-map-preview.png"
          alt="Preview of the Probability Distributions Map interface"
          style="max-width: 100%; border: 1px solid #ddd; border-radius: 6px;">
@@ -28,7 +28,7 @@ The **Probability Distributions Map** is an interactive tool that helps students
 
 The map organizes distributions (e.g., Bernoulli, Binomial, Poisson, Normal, etc.) as nodes and links, so that students can see how they are related (for example, Bernoulli as a building block for Binomial, or Poisson as a limiting case).
 
-👉 [Open the Probability Distributions Map]({{ site.baseurl }}/probability-map/){: .btn .btn--primary}
+👉 [Open the Probability Distributions Map]({{ site.baseurl }}/probability_map/){: .btn .btn--primary}
 
 Each node links to a minimal HTML module that contains:
 
