@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Lognormal — Minimal Interactive Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#0ea5e9; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:#0b6ea8; color:#fff; font-weight:600}
+    .wrap{max-width:1000px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; gap:10px; margin:6px 0; flex-wrap:wrap}
+    label{min-width:22px; color:#333; font-weight:600}
+    input[type="range"]{width:160px}
+    input[type="number"]{width:90px; padding:6px 8px; border:1px solid var(--border); border-radius:8px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+    .note{color:var(--muted); font-size:13px}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    .plot h3{margin:0 0 6px 0; font-size:14px}
+    canvas{width:100%; height:280px; display:block; background:#fafafa; border-radius:8px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} }
+  </style>
+</head>
+<body>
+<header>Lognormal</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label for="mu">μ</label>
+      <input id="mu" type="range" min="-1.0" max="1.5" step="0.05" value="0.00">
+      <input id="muNum" type="number" min="-1.0" max="1.5" step="0.05" value="0.00">
+      <span class="note">(location, underlying normal mean)</span>
+    </div>
+    <div class="row">
+      <label for="sigma">σ</label>
+      <input id="sigma" type="range" min="0.20" max="1.20" step="0.05" value="0.50">
+      <input id="sigmaNum" type="number" min="0.20" max="1.20" step="0.05" value="0.50">
+      <span class="note">(scale, underlying normal sd)</span>
+    </div>
+
+    <div class="kblock">
+      <div class="note">Key facts</div>
+      <ul class="note" style="margin:6px 0 0 16px">
+        <li>Support: x &gt; 0</li>
+        <li>PDF: f(x;μ,σ) = [1/(xσ√(2π))] exp{ −(ln x − μ)² / (2σ²) }</li>
+        <li>If Y ~ N(μ,σ²) then X = exp(Y) ~ Lognormal(μ,σ²)</li>
+        <li>Mean: E[X] = exp(μ + σ²/2)</li>
+        <li>Variance: Var[X] = (exp(σ²)−1) exp(2μ + σ²)</li>
+      </ul>
+    </div>
+
+    <div class="kblock">
+      <div class="note">Parameters</div>
+      <div class="note">
+        μ = <span id="muOut">0.00</span>,
+        σ = <span id="sigmaOut">0.50</span>
+      </div>
+      <div class="note">
+        E[X] = <span id="meanOut">1.133</span>,
+        Var[X] = <span id="varOut">0.364</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="plot">
+      <h3>PDF</h3>
+      <canvas id="pdf"></canvas>
+    </div>
+  </section>
+</main>
+
+<script>
+const muSlider = document.getElementById('mu');
+const muNum = document.getElementById('muNum');
+const sigmaSlider = document.getElementById('sigma');
+const sigmaNum = document.getElementById('sigmaNum');
+
+const muOut = document.getElementById('muOut');
+const sigmaOut = document.getElementById('sigmaOut');
+const meanOutL = document.getElementById('meanOut');
+const varOutL = document.getElementById('varOut');
+const pdfCanvas = document.getElementById('pdf');
+
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function lognormalPdf(x, mu, sigma){
+  if(x <= 0 || sigma <= 0) return 0;
+  const z = Math.log(x);
+  const a = (z - mu) / sigma;
+  return (1 / (x * sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * a * a);
+}
+
+function drawLognormal(mu, sigma){
+  const ctx = setupCanvas(pdfCanvas);
+  const rect = pdfCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 10, T = 10, B = 24;
+  const plotW = w - L - R;
+  const plotH = h - T - B;
+  const yBase = h - B;
+
+  let xmin = 0;
+  let xmax = Math.exp(mu + 4 * sigma);
+  if(!Number.isFinite(xmax) || xmax <= 0) xmax = 10;
+  xmax = Math.min(xmax, 500); // cap for plotting
+
+  const N = 400;
+
+  let ymax = 0;
+  for(let i = 0; i < N; i++){
+    const x = xmin + (xmax - xmin) * i / (N - 1);
+    const y = lognormalPdf(x, mu, sigma);
+    if(y > ymax) ymax = y;
+  }
+  if(ymax <= 0) ymax = 1;
+  ymax *= 1.1;
+
+  function toXY(x, y){
+    const tx = L + (x - xmin) * plotW / (xmax - xmin);
+    const ty = yBase - y * plotH / ymax;
+    return [tx, ty];
+  }
+
+  // axes
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, yBase); ctx.lineTo(w - 10, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(40, 10); ctx.lineTo(40, h - 10); ctx.stroke();
+
+  // curve
+  ctx.strokeStyle = '#0ea5e9';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let first = true;
+  for(let i = 0; i < N; i++){
+    const x = xmin + (xmax - xmin) * i / (N - 1);
+    const y = lognormalPdf(x, mu, sigma);
+    const xy = toXY(x, y);
+    if(first){
+      ctx.moveTo(xy[0], xy[1]);
+      first = false;
+    } else {
+      ctx.lineTo(xy[0], xy[1]);
+    }
+  }
+  ctx.stroke();
+
+  // x ticks
+  ctx.fillStyle = '#777';
+  ctx.font = '12px system-ui, sans-serif';
+  const k = 5;
+  for(let j = 0; j <= k; j++){
+    const x = xmin + (xmax - xmin) * j / k;
+    const xy = toXY(x, 0);
+    const label = (x >= 10 ? x.toFixed(0) : x.toFixed(1));
+    ctx.fillText(label, xy[0] - 8, h - 6);
+  }
+}
+
+function syncLognormal(mu, sigma){
+  mu = parseFloat(mu);
+  sigma = parseFloat(sigma);
+
+  if(!Number.isFinite(mu)) mu = 0;
+  if(!Number.isFinite(sigma)) sigma = 0.5;
+
+  if(mu < -1.0) mu = -1.0;
+  if(mu > 1.5) mu = 1.5;
+  if(sigma < 0.20) sigma = 0.20;
+  if(sigma > 1.20) sigma = 1.20;
+
+  muSlider.value = mu.toFixed(2);
+  muNum.value = mu.toFixed(2);
+  sigmaSlider.value = sigma.toFixed(2);
+  sigmaNum.value = sigma.toFixed(2);
+
+  muOut.textContent = mu.toFixed(2);
+  sigmaOut.textContent = sigma.toFixed(2);
+
+  const mean = Math.exp(mu + 0.5 * sigma * sigma);
+  const variance = (Math.exp(sigma * sigma) - 1) * Math.exp(2 * mu + sigma * sigma);
+  meanOutL.textContent = mean.toFixed(3);
+  varOutL.textContent = variance.toFixed(3);
+
+  drawLognormal(mu, sigma);
+}
+
+muSlider.addEventListener('input', e => syncLognormal(e.target.value, sigmaSlider.value));
+muNum.addEventListener('input', e => syncLognormal(e.target.value, sigmaSlider.value));
+sigmaSlider.addEventListener('input', e => syncLognormal(muSlider.value, e.target.value));
+sigmaNum.addEventListener('input', e => syncLognormal(muSlider.value, e.target.value));
+
+window.addEventListener('resize', () => syncLognormal(muSlider.value, sigmaSlider.value));
+
+// initial
+syncLognormal(0.0, 0.5);
+</script>
+</body>
+</html>

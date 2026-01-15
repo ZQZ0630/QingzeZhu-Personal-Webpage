@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Standard Uniform → Exponential</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #f59e0b; --accent2: #f97316; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] { width: 70px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 200px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .transform-box { text-align: center; padding: 20px; background: #fffbeb; border-radius: 10px; margin: 20px 0; font-size: 22px; color: #92400e; }
+    .explanation-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #92400e; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #b45309; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Standard Uniform → Exponential</h1>
+  <nav class="nav-links">
+    <a href="../probability-map.html">← Back to Map</a>
+    <a href="../modules2/standarduniform_minimal.html">Std Uniform</a>
+    <a href="../modules2/exponential_minimal.html">Exponential</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Inverse Transform Method</h2>
+    <div class="relation-formula">
+      If U ~ Uniform(0,1), then X = -ln(U)/λ ~ Exponential(λ)
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">U ~ Standard Uniform(0,1)</div>
+      <div class="control-row">
+        <label>λ</label>
+        <input type="range" id="lambda" min="0.5" max="3" step="0.1" value="1">
+        <input type="number" id="lambdaNum" min="0.5" max="3" step="0.1" value="1">
+        <span class="param-note">(rate for Exp)</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="unifChart"></canvas>
+      </div>
+      <div class="stats">
+        U ~ Uniform(0,1): E[U] = 0.5, Var[U] = 1/12
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">X = -ln(U)/λ ~ Exponential(λ)</div>
+      <div class="chart-container">
+        <canvas id="expChart"></canvas>
+      </div>
+      <div class="stats">
+        E[X] = 1/λ = <strong id="expMean">1.000</strong>, Var[X] = 1/λ² = <strong id="expVar">1.000</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="transform-box">
+    X = −ln(U) / λ
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Inverse Transform Method</h3>
+    <p>
+      This is a fundamental technique for generating random samples. If U is uniformly distributed on (0,1), 
+      and F is a CDF with inverse F⁻¹, then X = F⁻¹(U) has CDF F.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>For Exponential(λ):</strong> The CDF is F(x) = 1 - e^(-λx). 
+      Solving U = 1 - e^(-λX) gives X = -ln(1-U)/λ. Since 1-U ~ U, we can use X = -ln(U)/λ.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Applications:</strong> Monte Carlo simulation, random variate generation in software.
+    </p>
+  </div>
+</div>
+
+<script>
+let lambda = 1;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function drawUnif() {
+  const canvas = document.getElementById('unifChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 20, T = 20, B = 25;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  const x0 = L + 0.15 * plotW;
+  const x1 = L + 0.85 * plotW;
+  const yTop = yBase - 0.7 * plotH;
+
+  ctx.fillStyle = 'rgba(245, 158, 11, 0.3)';
+  ctx.fillRect(x0, yTop, x1 - x0, yBase - yTop);
+
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(L, yBase); ctx.lineTo(x0, yBase);
+  ctx.moveTo(x0, yBase); ctx.lineTo(x0, yTop);
+  ctx.lineTo(x1, yTop); ctx.lineTo(x1, yBase);
+  ctx.lineTo(w - R, yBase);
+  ctx.stroke();
+
+  ctx.fillStyle = '#666';
+  ctx.font = '11px system-ui';
+  ctx.fillText('0', x0 - 3, h - 8);
+  ctx.fillText('1', x1 - 3, h - 8);
+}
+
+function drawExp() {
+  const canvas = document.getElementById('expChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 10, B = 25;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const xMax = 5 / lambda;
+  const ymax = lambda * 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const pdf = lambda * Math.exp(-lambda * xVal);
+    const y = yBase - pdf / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(249, 115, 22, 0.3)';
+  ctx.fill();
+
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const pdf = lambda * Math.exp(-lambda * xVal);
+    const y = yBase - pdf / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#f97316';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function update() {
+  drawUnif();
+  drawExp();
+  document.getElementById('expMean').textContent = (1/lambda).toFixed(3);
+  document.getElementById('expVar').textContent = (1/(lambda*lambda)).toFixed(3);
+}
+
+document.getElementById('lambda').addEventListener('input', e => { lambda = parseFloat(e.target.value); document.getElementById('lambdaNum').value = lambda; update(); });
+document.getElementById('lambdaNum').addEventListener('change', e => { lambda = parseFloat(e.target.value); document.getElementById('lambda').value = lambda; update(); });
+window.addEventListener('resize', update);
+
+update();
+</script>
+</body>
+</html>

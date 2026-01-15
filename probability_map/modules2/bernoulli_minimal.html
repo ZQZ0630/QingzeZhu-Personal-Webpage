@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Bernoulli(p) — Minimal Interactive Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#0ea5e9; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:#0b6ea8; color:#fff; font-weight:600}
+    .wrap{max-width:1000px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; gap:10px; margin:6px 0}
+    label{min-width:20px; color:#333; font-weight:600}
+    input[type="range"]{width:180px}
+    input[type="number"]{width:90px; padding:6px 8px; border:1px solid var(--border); border-radius:8px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+    .note{color:var(--muted); font-size:13px}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    .plot h3{margin:0 0 6px 0; font-size:14px}
+    canvas{width:100%; height:260px; display:block; background:#fafafa; border-radius:8px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} }
+  </style>
+</head>
+<body>
+<header>Bernoulli(p)</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row"><label for="p">p</label>
+      <input id="p" type="range" min="0" max="1" step="0.01" value="0.50">
+      <input id="pNum" type="number" min="0" max="1" step="0.01" value="0.50">
+    </div>
+    <div class="kblock">
+      <div class="note">Key facts</div>
+      <ul class="note" style="margin:6px 0 0 16px">
+        <li>Support: k ∈ {0, 1}</li>
+        <li>PMF: P(X=1)=p, P(X=0)=1−p</li>
+        <li>Mean: E[X] = p</li>
+        <li>Variance: Var[X] = p(1−p)</li>
+      </ul>
+    </div>
+    <div class="kblock">
+      <div class="note">Parameters</div>
+      <div class="note">p = <span id="pOut">0.50</span></div>
+      <div class="note">E[X] = <span id="meanOut">0.50</span>, Var[X] = <span id="varOut">0.25</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="plot">
+      <h3>PMF</h3>
+      <canvas id="pmf"></canvas>
+    </div>
+  </section>
+</main>
+
+<script>
+const pSlider = document.getElementById('p');
+const pNum = document.getElementById('pNum');
+const pOut = document.getElementById('pOut');
+const meanOut = document.getElementById('meanOut');
+const varOut = document.getElementById('varOut');
+const pmfCanvas = document.getElementById('pmf');
+
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+
+function drawPMF(p){
+  const ctx = setupCanvas(pmfCanvas);
+  const rect = pmfCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  // axes
+  ctx.strokeStyle='#e6e6e6'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(40,h-24); ctx.lineTo(w-10,h-24); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,h-10); ctx.stroke();
+  // bars
+  const probs = [1-p, p];
+  const labels = ['0','1'];
+  const L=50,R=10,T=10,B=24;
+  const plotW = w - L - R, plotH = h - T - B;
+  const barW = Math.min(80, plotW/4);
+  for(let i=0;i<2;i++){
+    const x = L + (i+1)*plotW/3 - barW/2;
+    const y = (h - B) - probs[i]*plotH;
+    ctx.fillStyle = '#0ea5e9';
+    ctx.fillRect(x, y, barW, probs[i]*plotH);
+    // value label
+    ctx.fillStyle = '#333'; ctx.font='12px system-ui, sans-serif';
+    ctx.fillText(probs[i].toFixed(3), x+barW/2-10, y-6);
+    // x tick
+    ctx.fillStyle = '#777';
+    ctx.fillText(labels[i], x+barW/2-3, h-6);
+  }
+}
+
+function sync(p){
+  p = Math.max(0, Math.min(1, p));
+  pSlider.value = p.toFixed(2);
+  pNum.value = p.toFixed(2);
+  pOut.textContent = p.toFixed(2);
+  meanOut.textContent = p.toFixed(3);
+  varOut.textContent = (p*(1-p)).toFixed(3);
+  drawPMF(p);
+}
+pSlider.addEventListener('input', e => sync(parseFloat(e.target.value)));
+pNum.addEventListener('input', e => sync(parseFloat(e.target.value)));
+window.addEventListener('resize', () => sync(parseFloat(pSlider.value)));
+sync(0.50);
+</script>
+</body>
+</html>

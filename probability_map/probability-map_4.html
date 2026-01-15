@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Probability Distributions Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    overflow: hidden;
+    height: 100vh;
+  }
+  
+  header {
+    background: white;
+    padding: 16px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-bottom: 3px solid #3498db;
+    position: relative;
+    z-index: 100;
+  }
+  
+  h1 {
+    font-size: 26px;
+    color: #2c3e50;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 5px;
+  }
+  
+  #main-canvas {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 80px);
+    overflow: hidden;
+    background: white;
+  }
+  
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: all;
+  }
+  
+  #nodes-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .node {
+    position: absolute;
+    padding: 12px 18px;
+    background: white;
+    border: 2.5px solid #2c3e50;
+    pointer-events: auto;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    font-weight: 600;
+    font-size: 13px;
+    color: #2c3e50;
+    white-space: nowrap;
+    user-select: none;
+    transform: translate(-50%, -50%);
+  }
+  
+  .node:hover {
+    transform: translate(-50%, -50%) translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    border-color: #e74c3c;
+    z-index: 100;
+  }
+  
+  .node.highlighted {
+    background: #fff9e6;
+    border-color: #f39c12;
+    border-width: 3px;
+    box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.25), 0 6px 20px rgba(0,0,0,0.2);
+    z-index: 99;
+  }
+  
+  .node.dimmed {
+    opacity: 0.15;
+  }
+  
+  .node.discrete {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-color: #1976d2;
+  }
+  
+  .node.discrete:hover,
+  .node.discrete.highlighted {
+    border-color: #1976d2;
+  }
+  
+  .node.continuous {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffccbc 100%);
+    border-color: #e64a19;
+  }
+  
+  .node.continuous:hover,
+  .node.continuous.highlighted {
+    border-color: #e64a19;
+  }
+  
+  .connection-line {
+    fill: none;
+    stroke: #34495e;
+    stroke-width: 2.5;
+    opacity: 0.3;
+    transition: all 0.25s ease;
+  }
+  
+  .connection-line.solid {
+    stroke-dasharray: none;
+  }
+  
+  .connection-line.dashed {
+    stroke-dasharray: 12 8;
+  }
+  
+  .connection-line.dotted {
+    stroke-dasharray: 3 8;
+  }
+  
+  .connection-line.highlighted {
+    stroke: #e74c3c;
+    stroke-width: 3.5;
+    opacity: 1;
+  }
+  
+  .connection-line.hovering {
+    stroke: #9333ea;
+    stroke-width: 4;
+    opacity: 1;
+  }
+  
+  .connection-hit-area {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 25;
+    cursor: pointer;
+  }
+  
+  .connection-line.clickable {
+    cursor: pointer;
+  }
+  
+  .connection-line.hovering {
+    stroke: #9333ea;
+    stroke-width: 4;
+    opacity: 1;
+  }
+  
+  .connection-label.hovering {
+    fill: #9333ea;
+    font-weight: 700;
+  }
+  
+  .connection-label {
+    fill: #2c3e50;
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  
+  .connection-label.visible {
+    opacity: 0.8;
+  }
+  
+  .connection-label.highlighted {
+    opacity: 1;
+    fill: #e74c3c;
+    font-weight: 700;
+  }
+  
+  .label-bg {
+    fill: white;
+    opacity: 0.95;
+    rx: 4;
+  }
+  
+  .controls {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn {
+    padding: 10px 14px;
+    background: white;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    color: #2c3e50;
+  }
+  
+  .btn:hover {
+    background: #ecf0f1;
+    transform: translateY(-1px);
+  }
+  
+  .legend {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+    max-width: 250px;
+  }
+  
+  .legend-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 14px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    font-size: 12px;
+    color: #34495e;
+  }
+  
+  .legend-line-sample {
+    width: 35px;
+    height: 2.5px;
+    background: #34495e;
+  }
+  
+  .legend-line-sample.dashed {
+    background: repeating-linear-gradient(
+      to right,
+      #34495e 0px,
+      #34495e 12px,
+      transparent 12px,
+      transparent 20px
+    );
+  }
+  
+  .legend-line-sample.dotted {
+    background: repeating-linear-gradient(
+      to right,
+      #34495e 0px,
+      #34495e 3px,
+      transparent 3px,
+      transparent 11px
+    );
+  }
+  
+  .type-badge {
+    position: fixed;
+    top: 100px;
+    left: 20px;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+  }
+  
+  .type-badge-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 14px;
+  }
+  
+  .type-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    font-size: 12px;
+  }
+  
+  .type-sample {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid;
+  }
+  
+  .type-sample.discrete {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-color: #1976d2;
+  }
+  
+  .type-sample.continuous {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffccbc 100%);
+    border-color: #e64a19;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1><span>📊</span> Probability Distributions Map</h1>
+    <div class="subtitle">Click node to highlight · Double-click node for details · Double-click connection (🔗) for relationship</div>
+  </header>
+  
+  <div id="main-canvas">
+    <svg id="connections-svg"></svg>
+    <div id="nodes-layer"></div>
+  </div>
+  
+  <div class="controls">
+    <button class="btn" onclick="resetView()">🔄 Reset</button>
+    <button class="btn" onclick="toggleAllLabels()">🏷️ Labels</button>
+  </div>
+  
+  <div class="type-badge">
+    <div class="type-badge-title">Distribution Types</div>
+    <div class="type-item">
+      <div class="type-sample discrete"></div>
+      <span>Discrete</span>
+    </div>
+    <div class="type-item">
+      <div class="type-sample continuous"></div>
+      <span>Continuous</span>
+    </div>
+  </div>
+  
+  <div class="legend">
+    <div class="legend-title">Relationships</div>
+    <div class="legend-item">
+      <div class="legend-line-sample"></div>
+      <span>Direct derivation</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-line-sample dashed"></div>
+      <span>Limiting case</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-line-sample dotted"></div>
+      <span>Special case</span>
+    </div>
+  </div>
+
+<script>
+// Distribution positions using percentage-based layout to fit everything on one screen
+const distributions = [
+  // Discrete (left side) - reorganized to reduce crossings
+  { id: 'bernoulli', name: 'Bernoulli(p)', type: 'discrete', xPercent: 12, yPercent: 18 },
+  { id: 'binomial', name: 'Binomial(n, p)', type: 'discrete', xPercent: 30, yPercent: 18 },
+  { id: 'geometric', name: 'Geometric(p)', type: 'discrete', xPercent: 12, yPercent: 42 },
+  { id: 'negative_binomial', name: 'Negative Binomial(r, p)', type: 'discrete', xPercent: 30, yPercent: 42 },
+  { id: 'hypergeometric', name: 'Hypergeometric(N, K, n)', type: 'discrete', xPercent: 12, yPercent: 66 },
+  { id: 'poisson', name: 'Poisson(λ)', type: 'discrete', xPercent: 30, yPercent: 66 },
+  
+  // Continuous (right side) - reorganized
+  { id: 'weibull', name: 'Weibull(k, λ)', type: 'continuous', xPercent: 50, yPercent: 18 },
+  { id: 'uniform', name: 'Uniform(a, b)', type: 'continuous', xPercent: 70, yPercent: 18 },
+  { id: 'standard_uniform', name: 'Standard Uniform', type: 'continuous', xPercent: 90, yPercent: 18 },
+  { id: 'normal', name: 'Normal(μ, σ²)', type: 'continuous', xPercent: 50, yPercent: 42 },
+  { id: 'standard_normal', name: 'Standard Normal', type: 'continuous', xPercent: 70, yPercent: 42 },
+  { id: 'lognormal', name: 'Lognormal(μ, σ²)', type: 'continuous', xPercent: 90, yPercent: 42 },
+  { id: 'ged', name: 'GED(μ, α, β)', type: 'continuous', xPercent: 50, yPercent: 66 },
+  { id: 'exponential', name: 'Exponential(λ)', type: 'continuous', xPercent: 70, yPercent: 66 },
+  { id: 'gamma', name: 'Gamma(α, β)', type: 'continuous', xPercent: 90, yPercent: 66 },
+  { id: 'chi_squared', name: 'Chi-Squared(ν)', type: 'continuous', xPercent: 80, yPercent: 88 }
+];
+
+// Connections with labels and relation page links
+const connections = [
+  // Discrete relationships
+  { from: 'bernoulli', to: 'binomial', type: 'solid', label: 'sum of n Bernoulli', link: 'relationship/bernoulli_to_binomial.html' },
+  { from: 'geometric', to: 'negative_binomial', type: 'solid', label: 'sum of r Geometric', link: 'relationship/geometric_to_negativebinomial.html' },
+  { from: 'hypergeometric', to: 'binomial', type: 'dashed', label: 'N→∞, K/N→p', link: 'relationship/hypergeometric_to_binomial.html' },
+  { from: 'binomial', to: 'poisson', type: 'dashed', label: 'n→∞, p→0, np=λ', link: 'relationship/binomial_to_poisson.html' },
+  
+  // Discrete to Continuous (CLT)
+  { from: 'binomial', to: 'normal', type: 'dashed', label: 'n large (CLT)', link: 'relationship/binomial_to_normal.html' },
+  { from: 'poisson', to: 'normal', type: 'dashed', label: 'λ→∞', link: 'relationship/poisson_to_normal.html' },
+  
+  // Poisson-Exponential duality
+  { from: 'poisson', to: 'exponential', type: 'dotted', label: 'waiting time', link: 'relationship/poisson_to_exponential.html' },
+  
+  // Continuous relationships
+  { from: 'weibull', to: 'exponential', type: 'dotted', label: 'k=1', link: 'relationship/weibull_to_exponential.html' },
+  { from: 'exponential', to: 'gamma', type: 'solid', label: 'sum of k Exp(λ)', link: 'relationship/exponential_to_gamma.html' },
+  { from: 'gamma', to: 'chi_squared', type: 'dotted', label: 'α=ν/2, β=1/2', link: 'relationship/gamma_to_chisquared.html' },
+  { from: 'gamma', to: 'exponential', type: 'dotted', label: 'α=1', link: 'relationship/gamma_to_exponential.html' },
+  { from: 'chi_squared', to: 'standard_normal', type: 'solid', label: 'sum of Z²ᵢ', link: 'relationship/chisquared_to_standardnormal.html' },
+  
+  // Normal family
+  { from: 'normal', to: 'standard_normal', type: 'dotted', label: 'Z=(X-μ)/σ', link: 'relationship/normal_to_standardnormal.html' },
+  { from: 'normal', to: 'lognormal', type: 'solid', label: 'Y=exp(X)', link: 'relationship/normal_to_lognormal.html' },
+  { from: 'normal', to: 'ged', type: 'dotted', label: 'β=2', link: 'relationship/normal_to_ged.html' },
+  
+  // Uniform family
+  { from: 'uniform', to: 'standard_uniform', type: 'dotted', label: 'a=0, b=1', link: 'relationship/uniform_to_standarduniform.html' }
+];
+
+// File links mapping (distribution ID -> filename)
+const fileLinks = {
+  'bernoulli': 'bernoulli_minimal.html',
+  'binomial': 'binomial_minimal_demo.html',
+  'chi_squared': 'chisquare_minimal.html',
+  'exponential': 'exponential_minimal.html',
+  'gamma': 'gamma_rate_latest.html',
+  'hypergeometric': 'hypergeometric_minimal.html',
+  'lognormal': 'lognormal_minimal.html',
+  'negative_binomial': 'negativebinomial_minimal.html',
+  'geometric': 'geometric_minimal.html',
+  'poisson': 'poisson_minimal.html',
+  'weibull': 'weibull_minimal.html',
+  'uniform': 'uniform_minimal.html',
+  'standard_uniform': 'standarduniform_minimal.html',
+  'normal': 'normal_minimal.html',
+  'standard_normal': 'standardnormal_minimal.html',
+  'ged': 'ged_minimal.html'
+};
+
+// State
+let activeNode = null;
+let showAllLabels = false;
+const nodeElements = new Map();
+let canvasWidth = 0;
+let canvasHeight = 0;
+
+// Setup SVG
+const svg = document.getElementById('connections-svg');
+const nodesLayer = document.getElementById('nodes-layer');
+
+function setupCanvas() {
+  const canvas = document.getElementById('main-canvas');
+  canvasWidth = canvas.offsetWidth;
+  canvasHeight = canvas.offsetHeight;
+  svg.setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
+  svg.style.width = canvasWidth + 'px';
+  svg.style.height = canvasHeight + 'px';
+}
+
+// Create nodes
+function createNodes() {
+  nodesLayer.innerHTML = '';
+  nodeElements.clear();
+  
+  distributions.forEach(dist => {
+    const node = document.createElement('div');
+    node.className = `node ${dist.type}`;
+    node.textContent = dist.name;
+    
+    const x = (canvasWidth * dist.xPercent) / 100;
+    const y = (canvasHeight * dist.yPercent) / 100;
+    
+    node.style.left = x + 'px';
+    node.style.top = y + 'px';
+    node.dataset.id = dist.id;
+    
+    node.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (activeNode === dist.id) {
+        resetView();
+      } else {
+        activeNode = dist.id;
+        highlightNode(dist.id);
+      }
+    });
+    
+    // 双击跳转到详情页
+    node.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      const fileName = fileLinks[dist.id];
+      if (fileName) {
+        window.location.href = './modules2/' + fileName;
+      }
+    });
+    
+    node.addEventListener('mouseenter', () => {
+      if (!activeNode) {
+        previewNode(dist.id);
+      }
+    });
+    
+    node.addEventListener('mouseleave', () => {
+      if (!activeNode) {
+        clearPreview();
+      }
+    });
+    
+    nodesLayer.appendChild(node);
+    nodeElements.set(dist.id, node);
+  });
+}
+
+// Get node center position
+function getNodeCenter(nodeId) {
+  const node = nodeElements.get(nodeId);
+  if (!node) return null;
+  
+  const rect = node.getBoundingClientRect();
+  const canvasRect = document.getElementById('main-canvas').getBoundingClientRect();
+  
+  return {
+    x: rect.left + rect.width / 2 - canvasRect.left,
+    y: rect.top + rect.height / 2 - canvasRect.top
+  };
+}
+
+// Draw connections
+function drawConnections(highlightSet = null) {
+  svg.innerHTML = '';
+  
+  connections.forEach(conn => {
+    const fromPos = getNodeCenter(conn.from);
+    const toPos = getNodeCenter(conn.to);
+    
+    if (!fromPos || !toPos) return;
+    
+    const isHighlighted = highlightSet && 
+      highlightSet.has(conn.from) && highlightSet.has(conn.to);
+    
+    // Create group for connection
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    const dx = toPos.x - fromPos.x;
+    const dy = toPos.y - fromPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    // Control point for smooth curve
+    const curvature = Math.min(dist * 0.25, 60);
+    const midX = (fromPos.x + toPos.x) / 2;
+    const midY = (fromPos.y + toPos.y) / 2;
+    
+    // Perpendicular offset
+    const offsetX = -dy / dist * curvature;
+    const offsetY = dx / dist * curvature;
+    
+    const d = `M ${fromPos.x} ${fromPos.y} Q ${midX + offsetX} ${midY + offsetY} ${toPos.x} ${toPos.y}`;
+    
+    // Create visible path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    let className = `connection-line ${conn.type}`;
+    if (isHighlighted) className += ' highlighted';
+    if (conn.link) className += ' clickable';
+    path.setAttribute('class', className);
+    g.appendChild(path);
+    
+    // Create wider invisible hit area for clicking
+    if (conn.link) {
+      const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hitArea.setAttribute('d', d);
+      hitArea.setAttribute('class', 'connection-hit-area');
+      
+      // Double-click to navigate
+      hitArea.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        window.location.href = conn.link;
+      });
+      
+      // Hover effects
+      hitArea.addEventListener('mouseenter', () => {
+        path.classList.add('hovering');
+        text.classList.add('visible');
+        bg.style.opacity = '0.95';
+      });
+      
+      hitArea.addEventListener('mouseleave', () => {
+        path.classList.remove('hovering');
+        if (!showAllLabels && !isHighlighted) {
+          text.classList.remove('visible');
+          bg.style.opacity = '0';
+        }
+      });
+      
+      g.appendChild(hitArea);
+    }
+    
+    svg.appendChild(g);
+    
+    // Add label
+    const labelX = midX + offsetX;
+    const labelY = midY + offsetY;
+    
+    // Background for label
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('class', 'label-bg');
+    g.appendChild(bg);
+    
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.textContent = conn.link ? '🔗 ' + conn.label : conn.label;
+    text.setAttribute('x', labelX);
+    text.setAttribute('y', labelY);
+    
+    let labelClass = 'connection-label';
+    if (showAllLabels) labelClass += ' visible';
+    if (isHighlighted) labelClass += ' highlighted visible';
+    text.setAttribute('class', labelClass);
+    g.appendChild(text);
+    
+    // Size background to text
+    requestAnimationFrame(() => {
+      const bbox = text.getBBox();
+      bg.setAttribute('x', bbox.x - 4);
+      bg.setAttribute('y', bbox.y - 2);
+      bg.setAttribute('width', bbox.width + 8);
+      bg.setAttribute('height', bbox.height + 4);
+      
+      if (!showAllLabels && !isHighlighted) {
+        bg.style.opacity = '0';
+      }
+    });
+  });
+}
+
+// Highlight node
+function highlightNode(nodeId) {
+  const related = getRelatedNodes(nodeId);
+  
+  nodeElements.forEach((el, id) => {
+    if (related.has(id)) {
+      el.classList.add('highlighted');
+      el.classList.remove('dimmed');
+    } else {
+      el.classList.remove('highlighted');
+      el.classList.add('dimmed');
+    }
+  });
+  
+  drawConnections(related);
+}
+
+// Preview on hover
+function previewNode(nodeId) {
+  const related = getRelatedNodes(nodeId);
+  
+  nodeElements.forEach((el, id) => {
+    if (related.has(id)) {
+      el.classList.add('highlighted');
+    }
+  });
+  
+  drawConnections(related);
+}
+
+function clearPreview() {
+  nodeElements.forEach(el => {
+    el.classList.remove('highlighted');
+  });
+  drawConnections();
+}
+
+// Get related nodes
+function getRelatedNodes(nodeId) {
+  const related = new Set([nodeId]);
+  connections.forEach(conn => {
+    if (conn.from === nodeId) related.add(conn.to);
+    if (conn.to === nodeId) related.add(conn.from);
+  });
+  return related;
+}
+
+// Reset view
+function resetView() {
+  activeNode = null;
+  nodeElements.forEach(el => {
+    el.classList.remove('highlighted', 'dimmed');
+  });
+  drawConnections();
+}
+
+// Toggle labels
+function toggleAllLabels() {
+  showAllLabels = !showAllLabels;
+  if (activeNode) {
+    highlightNode(activeNode);
+  } else {
+    drawConnections();
+  }
+}
+
+// Click outside to reset
+document.getElementById('main-canvas').addEventListener('click', (e) => {
+  if (e.target.id === 'main-canvas' || e.target.id === 'connections-svg') {
+    resetView();
+  }
+});
+
+// Initialize and handle resize
+function init() {
+  setupCanvas();
+  createNodes();
+  drawConnections();
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => {
+  setupCanvas();
+  createNodes();
+  if (activeNode) {
+    highlightNode(activeNode);
+  } else {
+    drawConnections();
+  }
+});
+</script>
+</body>
+</html>

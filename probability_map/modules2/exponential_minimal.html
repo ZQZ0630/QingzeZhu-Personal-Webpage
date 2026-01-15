@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Exponential(λ) — Minimal Interactive Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#0ea5e9; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:#0ea5e9; color:#fff; font-weight:600}
+    .wrap{max-width:1100px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 340px 1fr; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; gap:10px; margin:6px 0}
+    label{min-width:20px; color:#333; font-weight:600}
+    input[type="range"]{width:200px}
+    input[type="number"]{width:100px; padding:6px 8px; border:1px solid var(--border); border-radius:8px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+    .note{color:var(--muted); font-size:13px}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    .plot h3{margin:0 0 6px 0; font-size:14px}
+    canvas{width:100%; height:260px; display:block; background:#fafafa; border-radius:8px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} .grid2{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+<header>Exponential(λ)</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label for="lam">λ</label>
+      <input id="lam" type="range" min="0.2" max="5" step="0.1" value="1.0">
+      <input id="lamNum" type="number" min="0.01" step="0.1" value="1.0">
+    </div>
+
+    <div class="kblock">
+      <div class="note">Key facts</div>
+      <ul class="note" style="margin:6px 0 0 18px">
+        <li>Support: x ≥ 0</li>
+        <li>PDF: f(x) = λ e<sup>−λx</sup></li>
+        <li>CDF: F(x) = 1 − e<sup>−λx</sup></li>
+        <li>Mean: E[X] = 1/λ</li>
+        <li>Variance: Var[X] = 1/λ²</li>
+        <li>Memoryless: P(X&gt;s+t | X&gt;s) = P(X&gt;t)</li>
+      </ul>
+    </div>
+
+    <div class="kblock">
+      <div class="note">Quick probability</div>
+      <div class="row"><label for="a">a</label><input id="a" type="number" step="0.1" value="0.5"></div>
+      <div class="row"><label for="b">b</label><input id="b" type="number" step="0.1" value="2.0"></div>
+      <div class="row"><button id="calc">Compute P(a ≤ X ≤ b)</button></div>
+      <div id="probOut" class="note">Enter a, b and click compute.</div>
+    </div>
+
+    <div class="kblock">
+      <div class="note">Parameters</div>
+      <div class="note">λ = <span id="lamOut">1.00</span>,  E[X] = <span id="meanOut">1.00</span>,  Var[X] = <span id="varOut">1.00</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="grid2">
+      <div class="plot"><h3>PDF</h3><canvas id="pdf"></canvas></div>
+      <div class="plot"><h3>CDF</h3><canvas id="cdf"></canvas></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const lamSlider = document.getElementById('lam');
+const lamNum = document.getElementById('lamNum');
+const lamOut = document.getElementById('lamOut');
+const meanOut = document.getElementById('meanOut');
+const varOut = document.getElementById('varOut');
+const pdfCanvas = document.getElementById('pdf');
+const cdfCanvas = document.getElementById('cdf');
+const aEl = document.getElementById('a'), bEl = document.getElementById('b'), probOut = document.getElementById('probOut');
+
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+function drawAxes(ctx,w,h){
+  ctx.strokeStyle = '#e6e6e6'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40,h-24); ctx.lineTo(w-10,h-24); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,h-10); ctx.stroke();
+}
+function drawCurve(canvas, fn, xmin, xmax){
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect(), w=rect.width, h=rect.height;
+  drawAxes(ctx,w,h);
+  const N = Math.max(250, Math.floor(w));
+  const L=50,R=10,T=10,B=24, plotW=w-L-R, plotH=h-T-B;
+  let ymin=Infinity,ymax=-Infinity;
+  const xs = new Array(N), ys = new Array(N);
+  for(let i=0;i<N;i++){ const x=xmin+(xmax-xmin)*i/(N-1); const y=fn(x); xs[i]=x; ys[i]=y; if(y<ymin)ymin=y; if(y>ymax)ymax=y; }
+  const pad=(ymax-ymin)*0.1 || 1e-6; ymin -= pad; ymax += pad;
+  function toXY(x,y){ const tx=L+(x-xmin)*plotW/(xmax-xmin); const ty=(h-B)-(y-ymin)*plotH/(ymax-ymin); return [tx,ty]; }
+  ctx.strokeStyle='#0ea5e9'; ctx.lineWidth=2; ctx.beginPath();
+  let [x0,y0]=toXY(xs[0],ys[0]); ctx.moveTo(x0,y0);
+  for(let i=1;i<N;i++){ const [xi,yi]=toXY(xs[i],ys[i]); ctx.lineTo(xi,yi); } ctx.stroke();
+  ctx.fillStyle='#777'; ctx.font='12px system-ui, sans-serif';
+  const k=5; for(let j=0;j<=k;j++){ const x=xmin+j*(xmax-xmin)/k; const [tx,ty]=toXY(x,ymin); ctx.fillText(x.toFixed(2), tx-10, h-6); }
+}
+function pdf(x, lam){ return x<0?0: lam*Math.exp(-lam*x); }
+function cdf(x, lam){ return x<0?0: 1 - Math.exp(-lam*x); }
+
+function redraw(){
+  let lam = Math.max(0.0001, parseFloat(lamSlider.value));
+  lamNum.value = lam.toFixed(2);
+  lamOut.textContent = lam.toFixed(2);
+  meanOut.textContent = (1/lam).toFixed(2);
+  varOut.textContent = (1/(lam*lam)).toFixed(2);
+  const xmax = Math.max(8, 6/lam);
+  drawCurve(pdfCanvas, (x)=>pdf(x,lam), 0, xmax);
+  drawCurve(cdfCanvas, (x)=>cdf(x,lam), 0, xmax);
+}
+lamSlider.addEventListener('input', redraw);
+lamNum.addEventListener('input', (e)=>{ lamSlider.value = Math.max(0.0001, parseFloat(e.target.value)||1); redraw(); });
+window.addEventListener('resize', redraw);
+
+document.getElementById('calc').addEventListener('click', ()=>{
+  const lam = Math.max(0.0001, parseFloat(lamSlider.value));
+  const a = parseFloat(aEl.value), b = parseFloat(bEl.value);
+  if(!isFinite(a) || !isFinite(b)) { probOut.textContent = 'Please enter valid numbers for a and b.'; return; }
+  const lo = Math.min(a,b), hi = Math.max(a,b);
+  const p = Math.max(0, Math.min(1, (1-Math.exp(-lam*hi)) - (1-Math.exp(-lam*lo)) ));
+  probOut.textContent = `P(${lo} ≤ X ≤ ${hi}) = ${p.toFixed(6)}`;
+});
+
+redraw();
+</script>
+</body>
+</html>

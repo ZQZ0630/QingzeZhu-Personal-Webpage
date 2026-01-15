@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Geometric → Negative Binomial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #8b5cf6; --accent2: #059669; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .controls { margin-bottom: 16px; }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] { width: 70px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .explanation-box { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border: 1px solid #c084fc; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #6b21a8; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #7e22ce; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Geometric → Negative Binomial</h1>
+  <nav class="nav-links">
+    <a href="../probability-map.html">← Back to Map</a>
+    <a href="../modules2/geometric_minimal.html">Geometric</a>
+    <a href="../modules2/negativebinomial_minimal.html">Neg. Binomial</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Sum of r Independent Geometric Random Variables</h2>
+    <div class="relation-formula">
+      X₁ + X₂ + ... + Xᵣ ~ NegBinomial(r, p) where Xᵢ ~ Geometric(p)
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">Geometric(p) — Failures before first success</div>
+      <div class="controls">
+        <div class="control-row">
+          <label>p</label>
+          <input type="range" id="p" min="0.1" max="0.8" step="0.05" value="0.4">
+          <input type="number" id="pNum" min="0.1" max="0.8" step="0.01" value="0.4">
+          <span class="param-note">(success prob)</span>
+        </div>
+        <div class="control-row">
+          <label>r</label>
+          <input type="range" id="r" min="1" max="10" step="1" value="3">
+          <input type="number" id="rNum" min="1" max="10" step="1" value="3">
+          <span class="param-note">(# of successes needed)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="geomChart"></canvas>
+      </div>
+      <div class="stats">
+        E[Xᵢ] = <strong id="geomMean">1.500</strong>, Var[Xᵢ] = <strong id="geomVar">3.750</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Y = X₁ + ... + Xᵣ ~ NegBinomial(r, p)</div>
+      <div class="chart-container">
+        <canvas id="nbChart"></canvas>
+      </div>
+      <div class="stats">
+        E[Y] = r(1-p)/p = <strong id="nbMean">4.500</strong>, Var[Y] = r(1-p)/p² = <strong id="nbVar">11.250</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <p>
+      The <strong>Geometric(p)</strong> distribution counts the number of failures before the first success.
+      If we sum <strong>r independent</strong> Geometric(p) random variables, we get the total failures before achieving r successes.
+    </p>
+    <p style="margin-top: 10px;">
+      This sum follows a <strong>Negative Binomial(r, p)</strong> distribution. The Geometric distribution is 
+      the special case where r = 1.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Properties:</strong><br>
+      • E[Y] = r · E[Xᵢ] = r(1-p)/p<br>
+      • Var[Y] = r · Var[Xᵢ] = r(1-p)/p² (by independence)
+    </p>
+  </div>
+</div>
+
+<script>
+let p = 0.4, r = 3;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function geomPmf(k, p) { return k < 0 ? 0 : Math.pow(1-p, k) * p; }
+
+function comb(n, k) {
+  if (k < 0 || k > n) return 0;
+  k = Math.min(k, n - k);
+  let res = 1;
+  for (let i = 0; i < k; i++) res = res * (n - i) / (i + 1);
+  return res;
+}
+
+function nbPmf(k, r, p) {
+  if (k < 0) return 0;
+  return comb(k + r - 1, k) * Math.pow(1-p, k) * Math.pow(p, r);
+}
+
+function drawGeom() {
+  const canvas = document.getElementById('geomChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 10, T = 10, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const Kmax = Math.min(20, Math.ceil((1-p)/p + 4*Math.sqrt((1-p)/(p*p))));
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= Kmax; k++) {
+    const val = geomPmf(k, p);
+    probs.push(val);
+    if (val > maxP) maxP = val;
+  }
+  const ymax = maxP * 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w-R, yBase); ctx.stroke();
+
+  const barW = Math.min(18, plotW / ((Kmax+1) * 1.4));
+  for (let k = 0; k <= Kmax; k++) {
+    const xc = L + (k + 0.5) * plotW / (Kmax + 1);
+    const bh = probs[k] / ymax * plotH;
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillRect(xc - barW/2, yBase - bh, barW, bh);
+    if (k % 2 === 0) {
+      ctx.fillStyle = '#777';
+      ctx.font = '11px system-ui';
+      ctx.fillText(String(k), xc - 4, h - 10);
+    }
+  }
+}
+
+function drawNB() {
+  const canvas = document.getElementById('nbChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 10, T = 10, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const mean = r * (1-p) / p;
+  const variance = r * (1-p) / (p*p);
+  const Kmax = Math.min(40, Math.ceil(mean + 4*Math.sqrt(variance)));
+  
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= Kmax; k++) {
+    const val = nbPmf(k, r, p);
+    probs.push(val);
+    if (val > maxP) maxP = val;
+  }
+  const ymax = maxP * 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w-R, yBase); ctx.stroke();
+
+  const barW = Math.min(18, plotW / ((Kmax+1) * 1.4));
+  for (let k = 0; k <= Kmax; k++) {
+    const xc = L + (k + 0.5) * plotW / (Kmax + 1);
+    const bh = probs[k] / ymax * plotH;
+    ctx.fillStyle = '#059669';
+    ctx.fillRect(xc - barW/2, yBase - bh, barW, bh);
+    if (k % 3 === 0) {
+      ctx.fillStyle = '#777';
+      ctx.font = '11px system-ui';
+      ctx.fillText(String(k), xc - 4, h - 10);
+    }
+  }
+}
+
+function update() {
+  drawGeom();
+  drawNB();
+  document.getElementById('geomMean').textContent = ((1-p)/p).toFixed(3);
+  document.getElementById('geomVar').textContent = ((1-p)/(p*p)).toFixed(3);
+  document.getElementById('nbMean').textContent = (r*(1-p)/p).toFixed(3);
+  document.getElementById('nbVar').textContent = (r*(1-p)/(p*p)).toFixed(3);
+}
+
+document.getElementById('p').addEventListener('input', e => { p = parseFloat(e.target.value); document.getElementById('pNum').value = p; update(); });
+document.getElementById('pNum').addEventListener('change', e => { p = parseFloat(e.target.value); document.getElementById('p').value = p; update(); });
+document.getElementById('r').addEventListener('input', e => { r = parseInt(e.target.value); document.getElementById('rNum').value = r; update(); });
+document.getElementById('rNum').addEventListener('change', e => { r = parseInt(e.target.value); document.getElementById('r').value = r; update(); });
+window.addEventListener('resize', update);
+
+update();
+</script>
+</body>
+</html>

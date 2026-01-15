@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Chi-square (χ²) — Minimal Interactive Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#0ea5e9; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:#374151; color:#fff; font-weight:600}
+    .wrap{max-width:1000px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; gap:10px; margin:6px 0}
+    label{min-width:22px; color:#333; font-weight:600}
+    input[type="number"], input[type="range"]{padding:6px 8px; border:1px solid var(--border); border-radius:8px}
+    input[type="number"]{width:100px}
+    input[type="range"]{width:180px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+    .note{color:var(--muted); font-size:13px}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    .plot h3{margin:0 0 6px 0; font-size:14px}
+    canvas{width:100%; height:280px; display:block; background:#fafafa; border-radius:8px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} }
+  </style>
+</head>
+<body>
+<header>Chi-square (χ²)</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label for="nu">ν</label>
+      <input id="nu" type="range" min="1" max="50" step="1" value="5">
+      <input id="nuNum" type="number" min="1" max="200" step="1" value="5">
+      <span class="note">(degrees of freedom)</span>
+    </div>
+    <div class="kblock">
+      <div class="note">Key facts</div>
+      <ul class="note" style="margin:6px 0 0 16px">
+        <li>Support: x ≥ 0</li>
+        <li>PDF: f(x;ν) = [1/(2^{ν/2} Γ(ν/2))] x^{ν/2 − 1} e^{−x/2}</li>
+        <li>Mean: E[X] = ν</li>
+        <li>Variance: Var[X] = 2ν</li>
+        <li>Relation: If Zᵢ ~ N(0,1) i.i.d., then Σ Zᵢ² ~ χ²(ν)</li>
+      </ul>
+    </div>
+    <div class="kblock">
+      <div class="note">Parameters</div>
+      <div class="note">ν = <span id="nuOut">5</span>,  E[X] = <span id="meanOut">5</span>,  Var[X] = <span id="varOut">10</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="plot">
+      <h3>PDF</h3>
+      <canvas id="pdf"></canvas>
+    </div>
+  </section>
+</main>
+
+<script>
+const nuSlider = document.getElementById('nu');
+const nuNum = document.getElementById('nuNum');
+const nuOut = document.getElementById('nuOut');
+const meanOut = document.getElementById('meanOut');
+const varOut = document.getElementById('varOut');
+const pdfCanvas = document.getElementById('pdf');
+
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+
+// Lanczos approximation for Gamma function (good enough for the PDF)
+function gamma(z){
+  const g = 7;
+  const p = [
+    0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+    771.32342877765313, -176.61502916214059, 12.507343278686905,
+    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+  ];
+  if(z < 0.5){
+    // reflection formula
+    return Math.PI / (Math.sin(Math.PI*z) * gamma(1 - z));
+  } else {
+    z -= 1;
+    let x = p[0];
+    for (let i = 1; i < p.length; i++) x += p[i] / (z + i);
+    const t = z + g + 0.5;
+    return Math.sqrt(2*Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+  }
+}
+
+function chisqPdf(x, nu){
+  if(x <= 0) return 0;
+  const k = nu;
+  const c = Math.pow(2, -k/2) / gamma(k/2);
+  return c * Math.pow(x, k/2 - 1) * Math.exp(-x/2);
+}
+
+function drawPDF(nu){
+  const ctx = setupCanvas(pdfCanvas);
+  const rect = pdfCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  // axes
+  ctx.strokeStyle = '#e6e6e6'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, h-24); ctx.lineTo(w-10, h-24); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(40, 10); ctx.lineTo(40, h-10); ctx.stroke();
+
+  // x-range heuristic: [0, nu + 5*sqrt(2nu)]
+  const xmax = Math.max(8, nu + 5*Math.sqrt(2*nu));
+  const xmin = 0;
+  const N = Math.max(300, Math.floor(w));
+  const L=50,R=10,T=10,B=24;
+  const plotW = w - L - R, plotH = h - T - B;
+
+  // find ymax
+  let ymax = 0;
+  for(let i=0;i<N;i++){
+    const x = xmin + (xmax-xmin)*i/(N-1);
+    const y = chisqPdf(x, nu);
+    if(y>ymax) ymax = y;
+  }
+  const pad = ymax*0.1 || 1e-6; ymax += pad;
+
+  function toXY(x,y){
+    const tx = L + (x - xmin) * plotW / (xmax - xmin);
+    const ty = (h - B) - y * plotH / ymax;
+    return [tx, ty];
+  }
+
+  // curve
+  ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  let [x0,y0] = toXY(0, chisqPdf(0.0001, nu)); // tiny >0 to start
+  ctx.moveTo(x0,y0);
+  for(let i=1;i<N;i++){
+    const x = xmin + (xmax-xmin)*i/(N-1);
+    const y = chisqPdf(x, nu);
+    const [xi, yi] = toXY(x,y);
+    ctx.lineTo(xi, yi);
+  }
+  ctx.stroke();
+
+  // x ticks
+  ctx.fillStyle = '#777'; ctx.font = '12px system-ui, sans-serif';
+  const k = 5;
+  for(let j=0;j<=k;j++){
+    const x = xmin + j*(xmax-xmin)/k;
+    const [tx, ty] = toXY(x, 0);
+    ctx.fillText(x.toFixed(0), tx-8, h-6);
+  }
+}
+
+function sync(nu){
+  nu = Math.max(1, Math.round(nu));
+  nuSlider.value = nu;
+  nuNum.value = nu;
+  nuOut.textContent = nu.toString();
+  meanOut.textContent = nu.toString();
+  varOut.textContent = (2*nu).toString();
+  drawPDF(nu);
+}
+
+nuSlider.addEventListener('input', e => sync(parseInt(e.target.value,10)));
+nuNum.addEventListener('input', e => sync(parseInt(e.target.value,10)));
+window.addEventListener('resize', () => sync(parseInt(nuSlider.value,10)));
+sync(5);
+</script>
+</body>
+</html>

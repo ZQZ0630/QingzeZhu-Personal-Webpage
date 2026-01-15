@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Poisson → Normal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #6366f1; --accent2: #ef4444; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .limit-badge { display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; }
+    input[type="range"] { flex: 1; max-width: 250px; }
+    .param-value { font-weight: 600; color: var(--accent); min-width: 50px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; }
+    canvas { width: 100%; height: 300px; display: block; }
+    .legend { display: flex; justify-content: center; gap: 24px; margin-top: 10px; font-size: 13px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 12px; background: #f8fafc; border-radius: 6px; margin-top: 12px; }
+    .explanation-box { background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 1px solid #a5b4fc; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #3730a3; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #4338ca; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Poisson → Normal <span class="limit-badge">λ → ∞</span></h1>
+  <nav class="nav-links">
+    <a href="../probability-map.html">← Back to Map</a>
+    <a href="../modules2/poisson_minimal.html">Poisson</a>
+    <a href="../modules2/normal_minimal.html">Normal</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Normal Approximation to Poisson</h2>
+    <div class="relation-formula">
+      As λ → ∞: Poisson(λ) ≈ Normal(λ, λ)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parameter</div>
+    <div class="control-row">
+      <label>λ</label>
+      <input type="range" id="lambda" min="1" max="100" step="1" value="20">
+      <span class="param-value" id="lambdaVal">20</span>
+      <span class="param-note">(rate parameter)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">PMF/PDF Comparison</div>
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #6366f1;"></div>
+        <span>Poisson(λ)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ef4444;"></div>
+        <span>Normal(λ, λ)</span>
+      </div>
+    </div>
+    <div class="stats">
+      E[X] = λ = <strong id="mean">20</strong>, 
+      Var[X] = λ = <strong id="variance">20</strong>,
+      σ = √λ = <strong id="std">4.47</strong>
+    </div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Normal Approximation</h3>
+    <p>
+      For <strong>large λ</strong>, the Poisson(λ) distribution is well-approximated by 
+      Normal(μ = λ, σ² = λ).
+    </p>
+    <p style="margin-top: 10px;">
+      This follows from the Central Limit Theorem: a Poisson(λ) can be viewed as the sum of 
+      λ independent Poisson(1) random variables. As λ → ∞, this sum converges to a normal distribution.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Rule of thumb:</strong> The approximation is reasonable when λ ≥ 10, and good when λ ≥ 20.
+    </p>
+  </div>
+</div>
+
+<script>
+let lambda = 20;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function factorial(n) {
+  if (n <= 1) return 1;
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function poissonPmf(k, lam) {
+  if (k < 0) return 0;
+  return Math.exp(k * Math.log(lam) - lam - Math.log(factorial(k)));
+}
+
+function normalPdf(x, mu, sigma) {
+  const z = (x - mu) / sigma;
+  return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+}
+
+function draw() {
+  const canvas = document.getElementById('chart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 20, T = 20, B = 40;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const sigma = Math.sqrt(lambda);
+  const xMin = Math.max(0, lambda - 4 * sigma);
+  const xMax = lambda + 4 * sigma;
+
+  const kMin = Math.floor(xMin), kMax = Math.ceil(xMax);
+  let maxP = 0;
+  const poissonProbs = [];
+  for (let k = kMin; k <= kMax; k++) {
+    const val = poissonPmf(k, lambda);
+    poissonProbs.push({ k, val });
+    if (val > maxP) maxP = val;
+  }
+  
+  const normalMax = normalPdf(lambda, lambda, sigma);
+  maxP = Math.max(maxP, normalMax);
+  const ymax = maxP * 1.15;
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  // X labels
+  ctx.font = '11px system-ui';
+  ctx.fillStyle = '#6b7280';
+  const step = Math.max(1, Math.ceil((kMax - kMin) / 10));
+  for (let k = kMin; k <= kMax; k += step) {
+    const x = L + (k - xMin) / (xMax - xMin) * plotW;
+    ctx.fillText(String(k), x - 6, h - 15);
+  }
+
+  // Poisson bars
+  const barW = Math.max(2, plotW / (kMax - kMin + 1) * 0.7);
+  poissonProbs.forEach(({ k, val }) => {
+    const x = L + (k - xMin) / (xMax - xMin) * plotW;
+    const bh = val / ymax * plotH;
+    ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
+    ctx.fillRect(x - barW/2, yBase - bh, barW, bh);
+  });
+
+  // Normal curve
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMin + (xMax - xMin) * i / 200;
+    const x = L + (xVal - xMin) / (xMax - xMin) * plotW;
+    const y = yBase - normalPdf(xVal, lambda, sigma) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function update() {
+  draw();
+  document.getElementById('lambdaVal').textContent = lambda;
+  document.getElementById('mean').textContent = lambda;
+  document.getElementById('variance').textContent = lambda;
+  document.getElementById('std').textContent = Math.sqrt(lambda).toFixed(2);
+}
+
+document.getElementById('lambda').addEventListener('input', e => { lambda = parseInt(e.target.value); update(); });
+window.addEventListener('resize', update);
+
+update();
+</script>
+</body>
+</html>
