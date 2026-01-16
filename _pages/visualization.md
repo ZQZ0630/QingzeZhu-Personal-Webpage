@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "Visualization Projects"
+title: "Interactive Visualization Showcase "
 permalink: /visualization/
 author_profile: true
 ---
