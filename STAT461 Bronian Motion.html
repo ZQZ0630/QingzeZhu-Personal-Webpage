@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brownian Motion Laboratory - Enhanced</title>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #3b82f6; --primary-dark: #2563eb; --primary-light: #60a5fa;
+      --secondary: #8b5cf6; --success: #10b981; --warning: #f59e0b;
+      --danger: #ef4444; --dark: #1e293b; --gray: #64748b;
+      --light-gray: #f1f5f9; --border: #e2e8f0;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff; color: var(--dark); line-height: 1.6;
+    }
+    .landing {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+    }
+    .landing-header { text-align: center; margin-bottom: 4rem; max-width: 900px; }
+    .landing-header h1 {
+      font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .landing-header .subtitle { font-size: 1.25rem; color: var(--gray); }
+    .modules-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2rem; max-width: 1200px; width: 100%;
+    }
+    @media (max-width: 768px) { .modules-grid { grid-template-columns: 1fr; } }
+    .module-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow);
+    }
+    .module-card:hover {
+      transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-xl);
+      border-color: var(--primary);
+    }
+    .module-preview { width: 100%; height: 150px; position: relative; }
+    .preview-discrete { 
+      background: linear-gradient(to bottom, #dbeafe, #ffffff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: var(--primary); opacity: 0.3;
+    }
+    .preview-bridge {
+      background: linear-gradient(to bottom, #ede9fe, #ffffff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: var(--secondary); opacity: 0.3;
+    }
+    .preview-continuous {
+      background: linear-gradient(to bottom, #fed7aa, #ffffff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: var(--warning); opacity: 0.3;
+    }
+    .module-content { padding: 1.5rem; }
+    .module-card h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .module-card p { font-size: 0.95rem; color: var(--gray); }
+    .module-card .badge {
+      display: inline-block; padding: 0.25rem 0.75rem; border-radius: 12px;
+      font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem;
+    }
+    .badge-discrete-time { background: #dbeafe; color: #1e40af; }
+    .badge-discrete-space { background: #fce7f3; color: #9f1239; }
+    .badge-continuous-time { background: #dcfce7; color: #166534; }
+    .badge-continuous-space { background: #fef3c7; color: #92400e; }
+    .module-page { display: none; min-height: 100vh; background: var(--light-gray); }
+    .module-page.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .back-button {
+      position: fixed; top: 2rem; left: 2rem; background: #fff;
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 0.75rem 1.5rem; cursor: pointer; transition: all 0.2s;
+      font-size: 0.9rem; color: var(--gray); z-index: 1000;
+      display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow);
+    }
+    .back-button:hover {
+      background: var(--primary); color: #fff;
+      transform: translateX(-4px); box-shadow: var(--shadow-md);
+    }
+    .module-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white; padding: 3rem 2rem 2rem; text-align: center;
+    }
+    .module-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .module-header .description { font-size: 1.1rem; opacity: 0.95; max-width: 700px; margin: 0 auto; }
+    .theory-section {
+      background: #fff; margin: 2rem auto; max-width: 1400px;
+      border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); padding: 1.5rem;
+    }
+    .formula-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-left: 4px solid var(--primary); padding: 1rem 1.5rem;
+      margin: 1rem 0; border-radius: 8px; text-align: center;
+    }
+    .main-content {
+      max-width: 1400px; margin: 0 auto; padding: 2rem;
+    }
+    .split-view {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 1024px) { .split-view { grid-template-columns: 1fr; } }
+    .panel {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow);
+    }
+    .panel-title {
+      font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;
+      color: var(--dark); border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .controls-panel {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+    .controls-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    .control-group { }
+    .control-section {
+      margin-bottom: 1rem; padding-bottom: 1rem;
+    }
+    .control-label {
+      display: block; font-size: 0.9rem; font-weight: 600;
+      margin-bottom: 0.5rem; color: var(--dark);
+    }
+    input[type="number"], select {
+      width: 100%; padding: 0.75rem; border: 2px solid var(--border);
+      border-radius: 8px; font-size: 0.9rem; background: #fff;
+    }
+    input[type="number"]:focus, select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      background: var(--border); border-radius: 3px; margin-top: 0.5rem;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px;
+      background: var(--primary); border-radius: 50%; cursor: pointer;
+      border: 3px solid #fff; box-shadow: var(--shadow);
+    }
+    .btn {
+      padding: 0.75rem 1.5rem; border: none; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; display: inline-flex; align-items: center;
+      justify-content: center; gap: 0.5rem;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+    }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-secondary { background: var(--gray); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-group { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.75rem; margin-top: 1rem;
+    }
+    .stat-box {
+      background: linear-gradient(135deg, var(--light-gray) 0%, #ffffff 100%);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.75rem; text-align: center;
+    }
+    .stat-value {
+      font-size: 1.1rem; font-weight: 700; color: var(--primary); display: block;
+    }
+    .stat-label {
+      font-size: 0.7rem; color: var(--gray); margin-top: 0.25rem;
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+    .info-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1px solid var(--primary-light); border-radius: 8px;
+      padding: 1rem; margin-top: 1rem; font-size: 0.85rem;
+    }
+    .info-box-title { font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem; }
+    .info-box-content { color: #475569; line-height: 1.6; }
+    .slider-display {
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .slider-value {
+      min-width: 3rem; text-align: right; font-weight: 600; 
+      color: var(--primary); background: var(--light-gray);
+      padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.9rem;
+    }
+    .model-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      color: white;
+    }
+    .slice-indicators {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+      padding-top: 1rem; border-top: 1px solid var(--border);
+    }
+    .slice-pill {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.75rem; background: var(--light-gray);
+      border: 1px solid var(--border); border-radius: 999px;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .slice-pill:hover { background: var(--danger); color: white; border-color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div id="landing" class="landing">
+    <div class="landing-header">
+      <h1>Brownian Motion Laboratory</h1>
+      <p class="subtitle">Enhanced with Multiple Stochastic Process Models</p>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="openModule('discrete')">
+        <div class="module-preview preview-discrete">±1</div>
+        <div class="module-content">
+          <h3>Discrete Random Walk</h3>
+          <p>Integer-valued steps with multiple models: Simple, Biased, Geometric</p>
+          <div><span class="badge badge-discrete-time">Discrete Time</span> <span class="badge badge-discrete-space">Discrete Space</span></div>
+        </div>
+      </div>
+      <div class="module-card" onclick="openModule('bridge')">
+        <div class="module-preview preview-bridge">∞</div>
+        <div class="module-content">
+          <h3>Donsker's Bridge</h3>
+          <p>Watch convergence of scaled random walks to Brownian motion</p>
+          <div><span class="badge badge-continuous-time">Continuous Time</span> <span class="badge badge-continuous-space">Continuous Space</span></div>
+        </div>
+      </div>
+      <div class="module-card" onclick="openModule('continuous')">
+        <div class="module-preview preview-continuous">~</div>
+        <div class="module-content">
+          <h3>Stochastic Processes</h3>
+          <p>Compare Brownian Motion, Poisson, Ornstein-Uhlenbeck, and more</p>
+          <div><span class="badge badge-continuous-time">Continuous Time</span> <span class="badge badge-continuous-space">Continuous Space</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Module 1: Discrete Random Walk -->
+  <div id="module-discrete" class="module-page">
+    <button class="back-button" onclick="goHome()"><span>←</span><span>Back to Home</span></button>
+    <div class="module-header">
+      <h1>Discrete Random Walk Models</h1>
+      <p class="description">Compare different discrete-time stochastic processes with fixed axes</p>
+    </div>
+    <div class="theory-section">
+      <div class="formula-box" id="discrete-formula">
+        \[S_n = \sum_{i=1}^n \xi_i, \quad \xi_i \in \{-1, +1\} \text{ with } P(\xi_i = \pm 1) = \frac{1}{2}\]
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="controls-panel">
+        <div class="panel-title">Model & Animation Controls</div>
+        
+        <!-- NEW: Model Selector -->
+        <div class="control-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <label class="control-label" style="color: var(--primary-dark);">📊 Select Stochastic Process Model</label>
+          <select id="discrete-model" onchange="updateDiscreteFormula()" style="border: 2px solid var(--primary);">
+            <option value="simple">Simple Random Walk (symmetric)</option>
+            <option value="biased">Biased Random Walk (with drift)</option>
+            <option value="geometric">Geometric Random Walk (multiplicative)</option>
+          </select>
+          <div class="model-badge" id="discrete-model-badge">Simple Random Walk</div>
+        </div>
+        
+        <div class="controls-row">
+          <div class="control-group">
+            <label class="control-label">Drawing Mode</label>
+            <select id="walk-mode">
+              <option value="simultaneous">Simultaneous</option>
+              <option value="sequential">Sequential</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Number of Paths</label>
+            <input type="number" id="walk-paths" value="20" min="1" max="50" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Steps per Path</label>
+            <input type="number" id="walk-steps" value="1000" min="100" max="5000" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Step Size</label>
+            <input type="number" id="walk-stepsize" value="1" min="1" max="5" />
+          </div>
+          <div class="control-group" id="drift-control" style="display: none;">
+            <label class="control-label">Drift (p)</label>
+            <input type="number" id="walk-drift" value="0.6" min="0" max="1" step="0.05" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Speed (ms)</label>
+            <div class="slider-display">
+              <input type="range" id="walk-speed" min="1" max="50" value="5" style="flex: 1;" />
+              <span class="slider-value" id="walk-speed-val">5</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Random Seed</label>
+            <input type="number" id="walk-seed" value="2025" />
+          </div>
+        </div>
+        
+        <!-- NEW: Fixed Axes Toggle -->
+        <div class="control-section" style="border-top: 2px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" id="walk-fixed-axes" checked style="width: auto; cursor: pointer;" />
+            <span class="control-label" style="margin: 0;">🔒 Lock Axes (Fixed Range)</span>
+          </label>
+          <div style="font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem;">
+            When checked, axes won't change during animation
+          </div>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="startWalk()">▶ Play</button>
+          <button class="btn btn-secondary" onclick="pauseWalk()">⏸ Pause</button>
+          <button class="btn btn-danger" onclick="resetWalk()">⟲ Reset</button>
+        </div>
+        
+        <!-- Time Slice Controls -->
+        <div class="control-section" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border);">
+          <label class="control-label">📍 Add Time Slice (Cross-sectional Analysis)</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+            <input type="number" id="slice-step" placeholder="Enter step" min="0" style="flex: 1;" />
+            <button class="btn btn-primary" onclick="addSliceManually()" style="margin: 0; padding: 0.75rem 1rem; white-space: nowrap;">+ Add</button>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="addMultipleSlices()" style="margin: 0; padding: 0.5rem 0.75rem; font-size: 0.8rem; flex: 1;">Add 3 Evenly</button>
+            <button class="btn btn-danger" onclick="clearAllSlices()" style="margin: 0; padding: 0.5rem 0.75rem; font-size: 0.8rem; flex: 1;">Clear All</button>
+          </div>
+          <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--gray); line-height: 1.5;">
+            💡 Tip: Drag slices on the chart to move them. Click pills below to remove individual slices.
+          </div>
+        </div>
+      </div>
+      
+      <div class="split-view">
+        <div class="panel">
+          <div class="panel-title">Random Walk Paths</div>
+          <div id="walk-paths-plot" style="width: 100%; height: 500px;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Cross-sectional Distribution at Time Slices</div>
+          <div id="walk-dist-plot" style="width: 100%; height: 500px;"></div>
+          <div class="stat-grid" id="walk-stats"></div>
+        </div>
+      </div>
+      
+      <div class="slice-indicators" id="walk-slices"></div>
+    </div>
+  </div>
+
+  <!-- Module 2: Bridge (unchanged) -->
+  <div id="module-bridge" class="module-page">
+    <button class="back-button" onclick="goHome()"><span>←</span><span>Back to Home</span></button>
+    <div class="module-header">
+      <h1>Donsker's Invariance Principle</h1>
+      <p class="description">The bridge from discrete to continuous</p>
+    </div>
+    <div class="theory-section">
+      <div class="formula-box">
+        \[W_n(t) = \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor} \xrightarrow{d} W(t) \text{ as } n \to \infty\]
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="controls-panel">
+        <div class="panel-title">Animation Controls</div>
+        <div class="controls-row">
+          <div class="control-group">
+            <label class="control-label">Starting n</label>
+            <input type="number" id="bridge-start" value="25" min="10" max="1000" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Ending n</label>
+            <input type="number" id="bridge-end" value="2000" min="100" max="5000" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Speed</label>
+            <div class="slider-display">
+              <input type="range" id="bridge-speed" min="1" max="50" value="5" style="flex: 1;" />
+              <span class="slider-value" id="bridge-speed-val">5</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Random Seed</label>
+            <input type="number" id="bridge-seed" value="2025" />
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="playBridge()">▶ Play</button>
+          <button class="btn btn-secondary" onclick="pauseBridge()">⏸ Pause</button>
+          <button class="btn btn-danger" onclick="resetBridge()">⟲ Reset</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-value" id="bridge-current-n">25</div>
+            <div class="stat-label">Current n</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="bridge-progress">0%</div>
+            <div class="stat-label">Progress</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Scaled Random Walk Convergence</div>
+        <div id="bridge-plot" style="width: 100%; height: 600px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Module 3: Enhanced Continuous Processes -->
+  <div id="module-continuous" class="module-page">
+    <button class="back-button" onclick="goHome()"><span>←</span><span>Back to Home</span></button>
+    <div class="module-header">
+      <h1>Continuous Stochastic Processes</h1>
+      <p class="description">Compare multiple classical stochastic models with statistical analysis</p>
+    </div>
+    <div class="theory-section">
+      <div class="formula-box" id="cont-formula">
+        \[dX_t = \mu \, dt + \sigma \, dW_t\]
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="controls-panel">
+        <div class="panel-title">Model & Animation Controls</div>
+        
+        <!-- NEW: Enhanced Model Selector -->
+        <div class="control-section" style="background: linear-gradient(135deg, #fed7aa 0%, #fef3c7 100%); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <label class="control-label" style="color: #92400e;">🎯 Select Stochastic Process Model</label>
+          <select id="cont-model" onchange="updateContinuousFormula()" style="border: 2px solid var(--warning);">
+            <option value="brownian">Brownian Motion (Wiener Process)</option>
+            <option value="poisson">Poisson Process</option>
+            <option value="ou">Ornstein-Uhlenbeck Process</option>
+            <option value="gbm">Geometric Brownian Motion</option>
+            <option value="cir">Cox-Ingersoll-Ross (CIR)</option>
+          </select>
+          <div class="model-badge" id="cont-model-badge">Brownian Motion</div>
+        </div>
+        
+        <div class="controls-row">
+          <div class="control-group">
+            <label class="control-label">Drawing Mode</label>
+            <select id="cont-mode">
+              <option value="simultaneous">Simultaneous</option>
+              <option value="sequential">Sequential</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Number of Paths</label>
+            <input type="number" id="cont-paths" value="30" min="10" max="100" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Time Horizon (T)</label>
+            <input type="number" id="cont-T" value="1" min="0.1" max="10" step="0.1" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Time Steps</label>
+            <input type="number" id="cont-steps" value="1000" min="10" max="5000" step="10" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Speed (ms)</label>
+            <div class="slider-display">
+              <input type="range" id="cont-speed" min="1" max="50" value="5" style="flex: 1;" />
+              <span class="slider-value" id="cont-speed-val">5</span>
+            </div>
+          </div>
+          
+          <!-- Model-specific parameters -->
+          <div class="control-group" id="cont-mu-control">
+            <label class="control-label">Drift (μ)</label>
+            <input type="number" id="cont-mu" value="0" step="0.1" />
+          </div>
+          <div class="control-group" id="cont-sigma-control">
+            <label class="control-label">Diffusion (σ)</label>
+            <input type="number" id="cont-sigma" value="1" min="0.1" step="0.1" />
+          </div>
+          <div class="control-group" id="cont-lambda-control" style="display: none;">
+            <label class="control-label">Rate (λ)</label>
+            <input type="number" id="cont-lambda" value="5" min="0.1" step="0.5" />
+          </div>
+          <div class="control-group" id="cont-theta-control" style="display: none;">
+            <label class="control-label">Mean Reversion (θ)</label>
+            <input type="number" id="cont-theta" value="1" step="0.1" />
+          </div>
+          <div class="control-group" id="cont-kappa-control" style="display: none;">
+            <label class="control-label">Reversion Speed (κ)</label>
+            <input type="number" id="cont-kappa" value="2" min="0.1" step="0.1" />
+          </div>
+          
+          <div class="control-group">
+            <label class="control-label">Random Seed</label>
+            <input type="number" id="cont-seed" value="2025" />
+          </div>
+        </div>
+        
+        <!-- NEW: Fixed Axes Toggle -->
+        <div class="control-section" style="border-top: 2px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" id="cont-fixed-axes" checked style="width: auto; cursor: pointer;" />
+            <span class="control-label" style="margin: 0;">🔒 Lock Axes (Fixed Range)</span>
+          </label>
+          <div style="font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem;">
+            Axes will be set based on theoretical bounds and remain fixed during animation
+          </div>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="startContinuous()">▶ Play</button>
+          <button class="btn btn-secondary" onclick="pauseContinuous()">⏸ Pause</button>
+          <button class="btn btn-danger" onclick="resetContinuous()">⟲ Reset</button>
+        </div>
+        
+        <div class="info-box">
+          <div class="info-box-title">🎯 Model Comparison Features</div>
+          <div class="info-box-content">
+            • <strong>Brownian Motion</strong>: Classic Wiener process with drift and diffusion<br>
+            • <strong>Poisson Process</strong>: Jump process for counting events<br>
+            • <strong>Ornstein-Uhlenbeck</strong>: Mean-reverting process (temperature, interest rates)<br>
+            • <strong>Geometric Brownian Motion</strong>: For stock prices (always positive)<br>
+            • <strong>CIR Process</strong>: Mean-reverting with volatility proportional to √X
+          </div>
+        </div>
+      </div>
+      
+      <div class="split-view">
+        <div class="panel">
+          <div class="panel-title">Process Paths (Animation)</div>
+          <div id="cont-paths-plot" style="width: 100%; height: 500px;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Terminal Distribution & Statistics</div>
+          <div id="cont-dist-plot" style="width: 100%; height: 500px;"></div>
+          <div class="stat-grid" id="cont-stats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== Utility Functions ==========
+    function LCG(seed) {
+      let m = 2**31 - 1, a = 48271, c = 0;
+      let state = (seed >>> 0) % m;
+      if(state === 0) state = 1;
+      return function() {
+        state = (a * state + c) % m;
+        return state / m;
+      };
+    }
+
+    function gaussianGen(rand) {
+      let spare = null;
+      return function() {
+        if(spare !== null) {
+          const v = spare;
+          spare = null;
+          return v;
+        }
+        let u, v, s;
+        do {
+          u = rand() * 2 - 1;
+          v = rand() * 2 - 1;
+          s = u * u + v * v;
+        } while(s === 0 || s >= 1);
+        const mul = Math.sqrt(-2 * Math.log(s) / s);
+        spare = v * mul;
+        return u * mul;
+      };
+    }
+
+    function calculateStats(data) {
+      const n = data.length;
+      const mean = data.reduce((a, b) => a + b, 0) / n;
+      const variance = data.reduce((acc, x) => acc + (x - mean) ** 2, 0) / n;
+      const std = Math.sqrt(variance);
+      const m3 = data.reduce((acc, x) => acc + (x - mean) ** 3, 0) / n;
+      const skewness = m3 / (std ** 3);
+      const m4 = data.reduce((acc, x) => acc + (x - mean) ** 4, 0) / n;
+      const kurtosis = m4 / (variance ** 2) - 3;
+      return { mean, variance, std, skewness, kurtosis };
+    }
+
+    function erf(x) {
+      const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+      const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+      const sign = x >= 0 ? 1 : -1;
+      x = Math.abs(x);
+      const t = 1.0 / (1.0 + p * x);
+      const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+      return sign * y;
+    }
+
+    function ksTest(data, theoreticalMean, theoreticalStd) {
+      const sorted = [...data].sort((a, b) => a - b);
+      const n = sorted.length;
+      let maxD = 0;
+      
+      for (let i = 0; i < n; i++) {
+        const x = sorted[i];
+        const z = (x - theoreticalMean) / theoreticalStd;
+        const theoreticalCDF = 0.5 * (1 + erf(z / Math.sqrt(2)));
+        const empiricalCDF = (i + 1) / n;
+        const d = Math.abs(empiricalCDF - theoreticalCDF);
+        maxD = Math.max(maxD, d);
+      }
+      
+      const criticalValue = 1.36 / Math.sqrt(n);
+      return { statistic: maxD, critical: criticalValue, passed: maxD < criticalValue };
+    }
+
+    // ========== State Management ==========
+    const state = {
+      walk: {
+        paths: [],
+        rngs: [],
+        currentStep: 0,
+        currentPath: 0,
+        isRunning: false,
+        animId: null,
+        mode: 'simultaneous',
+        nPaths: 20,
+        nSteps: 1000,
+        stepSize: 1,
+        speed: 5,
+        seed: 2025,
+        model: 'simple',
+        drift: 0.6,
+        fixedYRange: null,
+        slices: []
+      },
+      bridge: {
+        isRunning: false,
+        animId: null,
+        currentN: 25,
+        startN: 25,
+        endN: 2000,
+        speed: 5,
+        seed: 2025,
+        walk: null
+      },
+      continuous: {
+        fullPaths: [],
+        displayPaths: [],
+        nPaths: 30,
+        T: 1,
+        nSteps: 1000,
+        mu: 0,
+        sigma: 1,
+        seed: 2025,
+        isRunning: false,
+        animId: null,
+        currentStep: 0,
+        currentPath: 0,
+        mode: 'simultaneous',
+        speed: 5,
+        model: 'brownian',
+        lambda: 5,
+        theta: 1,
+        kappa: 2,
+        fixedYRange: null
+      }
+    };
+
+    // ========== Module Navigation ==========
+    function openModule(name) {
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('module-' + name).classList.add('active');
+      if (name === 'discrete') resetWalk();
+      else if (name === 'bridge') resetBridge();
+      else if (name === 'continuous') resetContinuous();
+      setTimeout(() => MathJax.typesetPromise(), 100);
+    }
+
+    function goHome() {
+      document.querySelectorAll('.module-page').forEach(page => page.classList.remove('active'));
+      document.getElementById('landing').style.display = 'flex';
+      pauseWalk();
+      pauseBridge();
+      pauseContinuous();
+    }
+
+    // ========== Discrete Random Walk ==========
+    document.getElementById('walk-speed').addEventListener('input', (e) => {
+      state.walk.speed = +e.target.value;
+      document.getElementById('walk-speed-val').textContent = state.walk.speed;
+    });
+
+    function updateDiscreteFormula() {
+      const model = document.getElementById('discrete-model').value;
+      state.walk.model = model;
+      const formulaBox = document.getElementById('discrete-formula');
+      const badge = document.getElementById('discrete-model-badge');
+      const driftControl = document.getElementById('drift-control');
+      
+      if (model === 'simple') {
+        formulaBox.innerHTML = '\\[S_n = \\sum_{i=1}^n \\xi_i, \\quad \\xi_i \\in \\{-1, +1\\} \\text{ with } P(\\xi_i = \\pm 1) = \\frac{1}{2}\\]';
+        badge.textContent = 'Simple Random Walk';
+        driftControl.style.display = 'none';
+      } else if (model === 'biased') {
+        formulaBox.innerHTML = '\\[S_n = \\sum_{i=1}^n \\xi_i, \\quad P(\\xi_i = +1) = p, \\; P(\\xi_i = -1) = 1-p\\]';
+        badge.textContent = 'Biased Random Walk';
+        driftControl.style.display = 'block';
+      } else if (model === 'geometric') {
+        formulaBox.innerHTML = '\\[S_n = S_0 \\prod_{i=1}^n (1 + \\xi_i), \\quad \\xi_i \\in \\{-\\delta, +\\delta\\}\\]';
+        badge.textContent = 'Geometric Random Walk';
+        driftControl.style.display = 'none';
+      }
+      
+      MathJax.typesetPromise();
+    }
+
+    function generateRandomWalkStep(rng, model, stepSize, drift) {
+      if (model === 'simple') {
+        return (rng() < 0.5 ? -1 : 1) * stepSize;
+      } else if (model === 'biased') {
+        return (rng() < drift ? 1 : -1) * stepSize;
+      } else if (model === 'geometric') {
+        const delta = 0.1;
+        return (rng() < 0.5 ? -delta : delta);
+      }
+      return 0;
+    }
+
+    function startWalk() {
+      if (state.walk.isRunning) return;
+      state.walk.isRunning = true;
+      
+      if (state.walk.paths.length === 0) {
+        state.walk.mode = document.getElementById('walk-mode').value;
+        state.walk.nPaths = +document.getElementById('walk-paths').value;
+        state.walk.nSteps = +document.getElementById('walk-steps').value;
+        state.walk.stepSize = +document.getElementById('walk-stepsize').value;
+        state.walk.seed = +document.getElementById('walk-seed').value;
+        state.walk.model = document.getElementById('discrete-model').value;
+        state.walk.drift = +document.getElementById('walk-drift').value;
+        
+        // Calculate fixed Y range if enabled
+        if (document.getElementById('walk-fixed-axes').checked) {
+          const maxStep = state.walk.nSteps;
+          if (state.walk.model === 'simple') {
+            const theoreticalStd = Math.sqrt(maxStep) * state.walk.stepSize;
+            state.walk.fixedYRange = [-4 * theoreticalStd, 4 * theoreticalStd];
+          } else if (state.walk.model === 'biased') {
+            const expectedDrift = (2 * state.walk.drift - 1) * maxStep * state.walk.stepSize;
+            const theoreticalStd = 2 * Math.sqrt(maxStep * state.walk.drift * (1 - state.walk.drift)) * state.walk.stepSize;
+            state.walk.fixedYRange = [expectedDrift - 4 * theoreticalStd, expectedDrift + 4 * theoreticalStd];
+          } else {
+            state.walk.fixedYRange = [-maxStep, maxStep];
+          }
+        } else {
+          state.walk.fixedYRange = null;
+        }
+        
+        state.walk.paths = [];
+        state.walk.rngs = Array.from({length: state.walk.nPaths}, (_, p) => LCG(state.walk.seed + p * 1000));
+        state.walk.currentPath = 0;
+        state.walk.currentStep = 0;
+        
+        for (let i = 0; i < state.walk.nPaths; i++) {
+          state.walk.paths[i] = state.walk.model === 'geometric' ? [100] : [0];
+        }
+      }
+      
+      animateWalk();
+    }
+
+    function pauseWalk() {
+      state.walk.isRunning = false;
+      if (state.walk.animId) {
+        cancelAnimationFrame(state.walk.animId);
+        state.walk.animId = null;
+      }
+    }
+
+    function resetWalk() {
+      pauseWalk();
+      state.walk.paths = [];
+      state.walk.currentPath = 0;
+      state.walk.currentStep = 0;
+      state.walk.fixedYRange = null;
+      state.walk.slices = [];
+      
+      Plotly.react('walk-paths-plot', [], {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Step', gridcolor: '#e2e8f0' },
+        yaxis: { title: 'Position', gridcolor: '#e2e8f0', zeroline: true, zerolinewidth: 2 }
+      }, { responsive: true });
+      
+      initWalkEvents();
+      
+      Plotly.purge('walk-dist-plot');
+      document.getElementById('walk-stats').innerHTML = '';
+      document.getElementById('walk-slices').innerHTML = '';
+    }
+
+    function animateWalk() {
+      if (!state.walk.isRunning) return;
+      
+      if (state.walk.mode === 'simultaneous') {
+        if (state.walk.currentStep < state.walk.nSteps) {
+          for (let p = 0; p < state.walk.nPaths; p++) {
+            const step = generateRandomWalkStep(state.walk.rngs[p], state.walk.model, state.walk.stepSize, state.walk.drift);
+            const lastPos = state.walk.paths[p][state.walk.paths[p].length - 1];
+            if (state.walk.model === 'geometric') {
+              state.walk.paths[p].push(lastPos * (1 + step));
+            } else {
+              state.walk.paths[p].push(lastPos + step);
+            }
+          }
+          state.walk.currentStep++;
+        } else {
+          pauseWalk();
+          updateWalkDistribution();
+        }
+      } else {
+        if (state.walk.currentPath >= state.walk.nPaths) {
+          pauseWalk();
+          updateWalkDistribution();
+          return;
+        }
+        
+        if (state.walk.currentStep < state.walk.nSteps) {
+          const step = generateRandomWalkStep(state.walk.rngs[state.walk.currentPath], state.walk.model, state.walk.stepSize, state.walk.drift);
+          const path = state.walk.paths[state.walk.currentPath];
+          const lastPos = path[path.length - 1];
+          if (state.walk.model === 'geometric') {
+            path.push(lastPos * (1 + step));
+          } else {
+            path.push(lastPos + step);
+          }
+          state.walk.currentStep++;
+        } else {
+          state.walk.currentPath++;
+          state.walk.currentStep = 0;
+        }
+      }
+      
+      drawWalkPaths();
+      if (state.walk.slices.length > 0) {
+        updateWalkDistribution();
+      }
+      
+      setTimeout(() => {
+        state.walk.animId = requestAnimationFrame(() => animateWalk());
+      }, state.walk.speed);
+    }
+
+    function drawWalkPaths() {
+      const traces = [];
+      
+      let minY = Infinity, maxY = -Infinity;
+      state.walk.paths.forEach((path, idx) => {
+        if (path && path.length > 1) {
+          const x = Array.from({length: path.length}, (_, i) => i);
+          traces.push({
+            x: x, y: path, mode: 'lines',
+            line: { width: 2, color: `hsl(${(idx / state.walk.nPaths) * 360}, 70%, 50%)` },
+            showlegend: false, hoverinfo: 'skip'
+          });
+          
+          const pathMin = Math.min(...path);
+          const pathMax = Math.max(...path);
+          minY = Math.min(minY, pathMin);
+          maxY = Math.max(maxY, pathMax);
+        }
+      });
+      
+      // Use fixed range if set, otherwise dynamic
+      let yRange;
+      if (state.walk.fixedYRange) {
+        yRange = state.walk.fixedYRange;
+      } else {
+        const yMargin = (maxY - minY) * 0.1 || 10;
+        yRange = [minY - yMargin, maxY + yMargin];
+      }
+      
+      // Add slice lines
+      const shapes = state.walk.slices.map(slice => ({
+        type: 'line',
+        x0: slice.step, x1: slice.step,
+        y0: yRange[0],
+        y1: yRange[1],
+        line: { color: slice.color, width: 2, dash: 'dot' },
+        editable: true,
+        layer: 'above'
+      }));
+      
+      const layout = {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Step', gridcolor: '#e2e8f0', range: [0, state.walk.nSteps] },
+        yaxis: { 
+          title: 'Position', 
+          gridcolor: '#e2e8f0', 
+          zeroline: true, 
+          zerolinewidth: 2,
+          range: yRange
+        },
+        shapes: shapes,
+        hovermode: 'closest'
+      };
+      
+      Plotly.react('walk-paths-plot', traces, layout, { responsive: true });
+    }
+
+    let walkEventsInitialized = false;
+    
+    function initWalkEvents() {
+      if (walkEventsInitialized) return;
+      walkEventsInitialized = true;
+      
+      const plotDiv = document.getElementById('walk-paths-plot');
+      
+      plotDiv.on('plotly_relayout', (eventData) => {
+        let updated = false;
+        state.walk.slices.forEach((slice, idx) => {
+          const key = `shapes[${idx}].x0`;
+          if (eventData[key] !== undefined) {
+            slice.step = Math.round(eventData[key]);
+            updated = true;
+          }
+        });
+        if (updated) {
+          updateWalkDistribution();
+          updateWalkSliceIndicators();
+        }
+      });
+    }
+
+    function addSliceManually() {
+      const input = document.getElementById('slice-step');
+      const step = parseInt(input.value);
+      
+      if (isNaN(step)) {
+        alert('Please enter a valid step number');
+        return;
+      }
+      
+      if (step < 0 || step > state.walk.nSteps) {
+        alert(`Step must be between 0 and ${state.walk.nSteps}`);
+        return;
+      }
+      
+      if (state.walk.paths.length === 0 || state.walk.paths[0].length <= step) {
+        alert('Please wait for animation to reach this step');
+        return;
+      }
+      
+      addWalkSlice(step);
+      input.value = '';
+    }
+
+    function addMultipleSlices() {
+      if (state.walk.paths.length === 0 || state.walk.paths[0].length < 2) {
+        alert('Please run the animation first and let it progress');
+        return;
+      }
+      
+      const maxStep = state.walk.paths[0].length - 1;
+      
+      if (maxStep < 100) {
+        alert('Please wait for the animation to progress more (at least 100 steps)');
+        return;
+      }
+      
+      const steps = [
+        Math.floor(maxStep * 0.25),
+        Math.floor(maxStep * 0.5),
+        Math.floor(maxStep * 0.75)
+      ];
+      
+      steps.forEach(step => {
+        if (!state.walk.slices.some(s => s.step === step)) {
+          addWalkSlice(step);
+        }
+      });
+    }
+
+    function clearAllSlices() {
+      state.walk.slices = [];
+      drawWalkPaths();
+      updateWalkDistribution();
+      updateWalkSliceIndicators();
+    }
+
+    function addWalkSlice(step) {
+      if (state.walk.slices.some(s => s.step === step)) return;
+      
+      const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+      state.walk.slices.push({
+        step: step,
+        color: colors[state.walk.slices.length % colors.length]
+      });
+      
+      drawWalkPaths();
+      updateWalkDistribution();
+      updateWalkSliceIndicators();
+    }
+
+    function updateWalkSliceIndicators() {
+      const container = document.getElementById('walk-slices');
+      container.innerHTML = '';
+      
+      state.walk.slices.forEach((slice, idx) => {
+        const pill = document.createElement('div');
+        pill.className = 'slice-pill';
+        pill.style.borderColor = slice.color;
+        pill.innerHTML = `<span style="color:${slice.color}">●</span><span>Step ${slice.step}</span>`;
+        pill.onclick = () => {
+          state.walk.slices.splice(idx, 1);
+          drawWalkPaths();
+          updateWalkDistribution();
+          updateWalkSliceIndicators();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function updateWalkDistribution() {
+      if (state.walk.slices.length === 0 || state.walk.paths[0].length < 2) {
+        Plotly.purge('walk-dist-plot');
+        document.getElementById('walk-stats').innerHTML = '';
+        return;
+      }
+      
+      const traces = [];
+      const allStats = [];
+      
+      state.walk.slices.forEach(slice => {
+        const values = state.walk.paths
+          .filter(p => p.length > slice.step)
+          .map(path => path[Math.min(slice.step, path.length - 1)]);
+        
+        if (values.length === 0) return;
+        
+        const stats = calculateStats(values);
+        
+        // Calculate theoretical variance based on model
+        let theoreticalStd;
+        if (state.walk.model === 'simple') {
+          theoreticalStd = Math.sqrt(slice.step) * state.walk.stepSize;
+        } else if (state.walk.model === 'biased') {
+          theoreticalStd = 2 * Math.sqrt(slice.step * state.walk.drift * (1 - state.walk.drift)) * state.walk.stepSize;
+        } else {
+          theoreticalStd = stats.std; // For geometric, use empirical
+        }
+        
+        allStats.push({
+          step: slice.step,
+          ...stats,
+          theoreticalStd: theoreticalStd
+        });
+        
+        // Empirical histogram
+        traces.push({
+          y: values,
+          type: 'histogram',
+          histnorm: 'probability density',
+          name: `Step ${slice.step}`,
+          marker: { color: slice.color },
+          opacity: 0.6,
+          orientation: 'h'
+        });
+        
+        // Theoretical normal distribution (for simple and biased walks)
+        if (state.walk.model !== 'geometric') {
+          let expectedMean = 0;
+          if (state.walk.model === 'biased') {
+            expectedMean = (2 * state.walk.drift - 1) * slice.step * state.walk.stepSize;
+          }
+          
+          const xRange = [expectedMean - 4 * theoreticalStd, expectedMean + 4 * theoreticalStd];
+          const yTheory = [];
+          const xTheory = [];
+          for (let i = 0; i < 100; i++) {
+            const y = xRange[0] + (xRange[1] - xRange[0]) * i / 99;
+            yTheory.push(y);
+            const z = (y - expectedMean) / theoreticalStd;
+            xTheory.push(Math.exp(-z * z / 2) / (theoreticalStd * Math.sqrt(2 * Math.PI)));
+          }
+          
+          traces.push({
+            y: yTheory,
+            x: xTheory,
+            mode: 'lines',
+            name: `Theory ${slice.step}`,
+            line: { color: slice.color, width: 2, dash: 'dash' }
+          });
+        }
+      });
+      
+      const layout = {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Density', gridcolor: '#e2e8f0' },
+        yaxis: { title: 'Position', gridcolor: '#e2e8f0' },
+        showlegend: true,
+        legend: { x: 1, xanchor: 'right', y: 1 },
+        barmode: 'overlay'
+      };
+      
+      Plotly.react('walk-dist-plot', traces, layout, { responsive: true });
+      
+      // Display statistics
+      let statsHTML = '';
+      allStats.forEach(s => {
+        statsHTML += `
+          <div class="stat-box">
+            <div class="stat-value">${s.mean.toFixed(2)}</div>
+            <div class="stat-label">Mean (n=${s.step})</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">${s.variance.toFixed(2)}</div>
+            <div class="stat-label">Variance</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">${s.std.toFixed(2)}</div>
+            <div class="stat-label">Std (theory: ${s.theoreticalStd.toFixed(1)})</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">${s.skewness.toFixed(3)}</div>
+            <div class="stat-label">Skewness</div>
+          </div>
+        `;
+      });
+      document.getElementById('walk-stats').innerHTML = statsHTML;
+    }
+
+    // ========== Bridge (simplified, unchanged core) ==========
+    document.getElementById('bridge-speed').addEventListener('input', (e) => {
+      state.bridge.speed = +e.target.value;
+      document.getElementById('bridge-speed-val').textContent = state.bridge.speed;
+    });
+
+    function playBridge() {
+      if (state.bridge.isRunning) return;
+      state.bridge.isRunning = true;
+      
+      if (!state.bridge.walk) {
+        state.bridge.startN = +document.getElementById('bridge-start').value;
+        state.bridge.endN = +document.getElementById('bridge-end').value;
+        state.bridge.seed = +document.getElementById('bridge-seed').value;
+        state.bridge.currentN = state.bridge.startN;
+        
+        const rand = LCG(state.bridge.seed);
+        const walk = new Float64Array(state.bridge.endN + 1);
+        walk[0] = 0;
+        for (let i = 1; i <= state.bridge.endN; i++) {
+          walk[i] = walk[i - 1] + (rand() < 0.5 ? -1 : 1);
+        }
+        state.bridge.walk = walk;
+      }
+      
+      animateBridge();
+    }
+
+    function pauseBridge() {
+      state.bridge.isRunning = false;
+      if (state.bridge.animId) {
+        cancelAnimationFrame(state.bridge.animId);
+        state.bridge.animId = null;
+      }
+    }
+
+    function resetBridge() {
+      pauseBridge();
+      state.bridge.currentN = +document.getElementById('bridge-start').value || 25;
+      state.bridge.walk = null;
+      document.getElementById('bridge-current-n').textContent = state.bridge.currentN;
+      document.getElementById('bridge-progress').textContent = '0%';
+      
+      Plotly.react('bridge-plot', [], {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Time t', gridcolor: '#e2e8f0', range: [0, 1] },
+        yaxis: { title: 'W_n(t)', gridcolor: '#e2e8f0', zeroline: true }
+      }, { responsive: true });
+    }
+
+    function animateBridge() {
+      if (!state.bridge.isRunning) return;
+      
+      const increment = Math.max(5, Math.floor((state.bridge.endN - state.bridge.startN) / 200));
+      state.bridge.currentN = Math.min(state.bridge.currentN + increment, state.bridge.endN);
+      
+      const progress = Math.floor(((state.bridge.currentN - state.bridge.startN) / 
+                                    (state.bridge.endN - state.bridge.startN)) * 100);
+      document.getElementById('bridge-current-n').textContent = state.bridge.currentN;
+      document.getElementById('bridge-progress').textContent = progress + '%';
+      
+      const n = state.bridge.currentN;
+      const walk = state.bridge.walk;
+      const times = [], scaledWalk = [];
+      
+      for (let i = 0; i <= n; i++) {
+        times.push(i / n);
+        scaledWalk.push(walk[i] / Math.sqrt(n));
+      }
+      
+      const envelope = times.map(t => 2 * Math.sqrt(Math.max(0, t)));
+      const envelopeNeg = times.map(t => -2 * Math.sqrt(Math.max(0, t)));
+      
+      Plotly.react('bridge-plot', [
+        { x: times, y: scaledWalk, mode: 'lines', line: { width: 2, color: '#3b82f6' }, name: `W_${n}(t)` },
+        { x: times, y: envelope, mode: 'lines', line: { width: 1, color: '#10b981', dash: 'dot' }, name: '±2√t' },
+        { x: times, y: envelopeNeg, mode: 'lines', line: { width: 1, color: '#10b981', dash: 'dot' }, showlegend: false }
+      ], {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Time t', gridcolor: '#e2e8f0', range: [0, 1] },
+        yaxis: { title: 'W_n(t)', gridcolor: '#e2e8f0', zeroline: true },
+        showlegend: true
+      }, { responsive: true });
+      
+      if (state.bridge.currentN >= state.bridge.endN) {
+        pauseBridge();
+      } else {
+        setTimeout(() => {
+          state.bridge.animId = requestAnimationFrame(() => animateBridge());
+        }, state.bridge.speed);
+      }
+    }
+
+    // ========== Continuous Processes ==========
+    document.getElementById('cont-speed').addEventListener('input', (e) => {
+      state.continuous.speed = +e.target.value;
+      document.getElementById('cont-speed-val').textContent = state.continuous.speed;
+    });
+
+    function updateContinuousFormula() {
+      const model = document.getElementById('cont-model').value;
+      state.continuous.model = model;
+      const formulaBox = document.getElementById('cont-formula');
+      const badge = document.getElementById('cont-model-badge');
+      
+      // Show/hide relevant controls
+      document.getElementById('cont-mu-control').style.display = 'none';
+      document.getElementById('cont-sigma-control').style.display = 'none';
+      document.getElementById('cont-lambda-control').style.display = 'none';
+      document.getElementById('cont-theta-control').style.display = 'none';
+      document.getElementById('cont-kappa-control').style.display = 'none';
+      
+      if (model === 'brownian') {
+        formulaBox.innerHTML = '\\[dX_t = \\mu \\, dt + \\sigma \\, dW_t\\]';
+        badge.textContent = 'Brownian Motion';
+        document.getElementById('cont-mu-control').style.display = 'block';
+        document.getElementById('cont-sigma-control').style.display = 'block';
+      } else if (model === 'poisson') {
+        formulaBox.innerHTML = '\\[N_t \\sim \\text{Poisson}(\\lambda t)\\]';
+        badge.textContent = 'Poisson Process';
+        document.getElementById('cont-lambda-control').style.display = 'block';
+      } else if (model === 'ou') {
+        formulaBox.innerHTML = '\\[dX_t = \\kappa(\\theta - X_t) \\, dt + \\sigma \\, dW_t\\]';
+        badge.textContent = 'Ornstein-Uhlenbeck';
+        document.getElementById('cont-theta-control').style.display = 'block';
+        document.getElementById('cont-kappa-control').style.display = 'block';
+        document.getElementById('cont-sigma-control').style.display = 'block';
+      } else if (model === 'gbm') {
+        formulaBox.innerHTML = '\\[dX_t = \\mu X_t \\, dt + \\sigma X_t \\, dW_t\\]';
+        badge.textContent = 'Geometric Brownian Motion';
+        document.getElementById('cont-mu-control').style.display = 'block';
+        document.getElementById('cont-sigma-control').style.display = 'block';
+      } else if (model === 'cir') {
+        formulaBox.innerHTML = '\\[dX_t = \\kappa(\\theta - X_t) \\, dt + \\sigma \\sqrt{X_t} \\, dW_t\\]';
+        badge.textContent = 'Cox-Ingersoll-Ross';
+        document.getElementById('cont-theta-control').style.display = 'block';
+        document.getElementById('cont-kappa-control').style.display = 'block';
+        document.getElementById('cont-sigma-control').style.display = 'block';
+      }
+      
+      MathJax.typesetPromise();
+    }
+
+    function generateProcessPath(T, nSteps, model, params, seed) {
+      const dt = T / nSteps;
+      const sdt = Math.sqrt(dt);
+      const rand = LCG(seed);
+      const rnorm = gaussianGen(rand);
+      const path = new Float64Array(nSteps + 1);
+      
+      if (model === 'brownian') {
+        path[0] = 0;
+        for (let i = 1; i <= nSteps; i++) {
+          path[i] = path[i - 1] + params.mu * dt + params.sigma * sdt * rnorm();
+        }
+      } else if (model === 'poisson') {
+        let count = 0;
+        path[0] = 0;
+        for (let i = 1; i <= nSteps; i++) {
+          if (rand() < params.lambda * dt) count++;
+          path[i] = count;
+        }
+      } else if (model === 'ou') {
+        path[0] = params.theta;
+        for (let i = 1; i <= nSteps; i++) {
+          const drift = params.kappa * (params.theta - path[i - 1]) * dt;
+          const diffusion = params.sigma * sdt * rnorm();
+          path[i] = path[i - 1] + drift + diffusion;
+        }
+      } else if (model === 'gbm') {
+        path[0] = 100;
+        for (let i = 1; i <= nSteps; i++) {
+          const drift = params.mu * path[i - 1] * dt;
+          const diffusion = params.sigma * path[i - 1] * sdt * rnorm();
+          path[i] = path[i - 1] + drift + diffusion;
+        }
+      } else if (model === 'cir') {
+        path[0] = params.theta;
+        for (let i = 1; i <= nSteps; i++) {
+          const drift = params.kappa * (params.theta - path[i - 1]) * dt;
+          const diffusion = params.sigma * Math.sqrt(Math.max(0, path[i - 1])) * sdt * rnorm();
+          path[i] = Math.max(0, path[i - 1] + drift + diffusion);
+        }
+      }
+      
+      return path;
+    }
+
+    function startContinuous() {
+      if (state.continuous.isRunning) return;
+      state.continuous.isRunning = true;
+      
+      if (state.continuous.fullPaths.length === 0) {
+        state.continuous.mode = document.getElementById('cont-mode').value;
+        state.continuous.nPaths = +document.getElementById('cont-paths').value;
+        state.continuous.T = +document.getElementById('cont-T').value;
+        state.continuous.nSteps = +document.getElementById('cont-steps').value;
+        state.continuous.seed = +document.getElementById('cont-seed').value;
+        state.continuous.model = document.getElementById('cont-model').value;
+        
+        const params = {
+          mu: +document.getElementById('cont-mu').value,
+          sigma: +document.getElementById('cont-sigma').value,
+          lambda: +document.getElementById('cont-lambda').value,
+          theta: +document.getElementById('cont-theta').value,
+          kappa: +document.getElementById('cont-kappa').value
+        };
+        
+        // Calculate fixed Y range if enabled
+        if (document.getElementById('cont-fixed-axes').checked) {
+          if (state.continuous.model === 'brownian') {
+            const theoreticalStd = params.sigma * Math.sqrt(state.continuous.T);
+            const expectedMean = params.mu * state.continuous.T;
+            state.continuous.fixedYRange = [expectedMean - 4 * theoreticalStd, expectedMean + 4 * theoreticalStd];
+          } else if (state.continuous.model === 'poisson') {
+            const expectedCount = params.lambda * state.continuous.T;
+            state.continuous.fixedYRange = [0, Math.ceil(expectedCount + 4 * Math.sqrt(expectedCount))];
+          } else if (state.continuous.model === 'ou') {
+            state.continuous.fixedYRange = [params.theta - 3 * params.sigma, params.theta + 3 * params.sigma];
+          } else if (state.continuous.model === 'gbm') {
+            state.continuous.fixedYRange = [0, 100 * Math.exp((params.mu + 2 * params.sigma) * state.continuous.T)];
+          } else if (state.continuous.model === 'cir') {
+            state.continuous.fixedYRange = [0, params.theta + 3 * params.sigma];
+          }
+        } else {
+          state.continuous.fixedYRange = null;
+        }
+        
+        state.continuous.fullPaths = [];
+        for (let i = 0; i < state.continuous.nPaths; i++) {
+          state.continuous.fullPaths.push(generateProcessPath(
+            state.continuous.T,
+            state.continuous.nSteps,
+            state.continuous.model,
+            params,
+            state.continuous.seed + i
+          ));
+        }
+        
+        state.continuous.displayPaths = [];
+        state.continuous.currentPath = 0;
+        state.continuous.currentStep = 0;
+        
+        if (state.continuous.mode === 'simultaneous') {
+          for (let i = 0; i < state.continuous.nPaths; i++) {
+            state.continuous.displayPaths[i] = [state.continuous.fullPaths[i][0]];
+          }
+        } else {
+          state.continuous.displayPaths[0] = [state.continuous.fullPaths[0][0]];
+        }
+      }
+      
+      animateContinuous();
+    }
+
+    function pauseContinuous() {
+      state.continuous.isRunning = false;
+      if (state.continuous.animId) {
+        cancelAnimationFrame(state.continuous.animId);
+        state.continuous.animId = null;
+      }
+    }
+
+    function resetContinuous() {
+      pauseContinuous();
+      state.continuous.fullPaths = [];
+      state.continuous.displayPaths = [];
+      state.continuous.currentPath = 0;
+      state.continuous.currentStep = 0;
+      state.continuous.fixedYRange = null;
+      
+      Plotly.react('cont-paths-plot', [], {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Time t', gridcolor: '#e2e8f0' },
+        yaxis: { title: 'X(t)', gridcolor: '#e2e8f0', zeroline: true }
+      }, { responsive: true });
+      
+      Plotly.purge('cont-dist-plot');
+      document.getElementById('cont-stats').innerHTML = '';
+    }
+
+    function animateContinuous() {
+      if (!state.continuous.isRunning) return;
+      
+      if (state.continuous.mode === 'simultaneous') {
+        if (state.continuous.currentStep < state.continuous.nSteps) {
+          const nextIdx = state.continuous.currentStep + 1;
+          for (let p = 0; p < state.continuous.nPaths; p++) {
+            state.continuous.displayPaths[p].push(state.continuous.fullPaths[p][nextIdx]);
+          }
+          state.continuous.currentStep++;
+        } else {
+          pauseContinuous();
+          updateContinuousDistribution();
+        }
+      } else {
+        if (state.continuous.currentPath < state.continuous.nPaths) {
+          if (state.continuous.currentStep < state.continuous.nSteps) {
+            const nextIdx = state.continuous.currentStep + 1;
+            state.continuous.displayPaths[state.continuous.currentPath].push(
+              state.continuous.fullPaths[state.continuous.currentPath][nextIdx]
+            );
+            state.continuous.currentStep++;
+          } else {
+            state.continuous.currentPath++;
+            state.continuous.currentStep = 0;
+            if (state.continuous.currentPath < state.continuous.nPaths) {
+              state.continuous.displayPaths[state.continuous.currentPath] = [
+                state.continuous.fullPaths[state.continuous.currentPath][0]
+              ];
+            }
+          }
+        } else {
+          pauseContinuous();
+          updateContinuousDistribution();
+          return;
+        }
+      }
+      
+      drawContinuousPaths();
+      
+      setTimeout(() => {
+        state.continuous.animId = requestAnimationFrame(() => animateContinuous());
+      }, state.continuous.speed);
+    }
+
+    function drawContinuousPaths() {
+      const traces = [];
+      const dt = state.continuous.T / state.continuous.nSteps;
+      
+      let minY = Infinity, maxY = -Infinity;
+      
+      state.continuous.displayPaths.forEach((path, idx) => {
+        if (path && path.length > 1) {
+          const times = Array.from({length: path.length}, (_, i) => i * dt);
+          const pathArray = Array.from(path);
+          traces.push({
+            x: times,
+            y: pathArray,
+            mode: 'lines',
+            line: { width: 1.5, color: `hsla(${30 + (idx / state.continuous.nPaths) * 60}, 80%, 50%, 0.6)` },
+            showlegend: false,
+            hoverinfo: 'skip'
+          });
+          
+          const pathMin = Math.min(...pathArray);
+          const pathMax = Math.max(...pathArray);
+          minY = Math.min(minY, pathMin);
+          maxY = Math.max(maxY, pathMax);
+        }
+      });
+      
+      // Use fixed range if set, otherwise dynamic
+      let yRange;
+      if (state.continuous.fixedYRange) {
+        yRange = state.continuous.fixedYRange;
+      } else {
+        const yMargin = (maxY - minY) * 0.1 || 1;
+        yRange = [minY - yMargin, maxY + yMargin];
+      }
+      
+      const layout = {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Time t', gridcolor: '#e2e8f0', range: [0, state.continuous.T] },
+        yaxis: { 
+          title: 'X(t)', 
+          gridcolor: '#e2e8f0', 
+          zeroline: true,
+          range: yRange
+        },
+        showlegend: false
+      };
+      
+      Plotly.react('cont-paths-plot', traces, layout, { responsive: true });
+    }
+
+    function updateContinuousDistribution() {
+      if (state.continuous.fullPaths.length === 0) return;
+      
+      const terminalValues = state.continuous.fullPaths.map(path => path[path.length - 1]);
+      const stats = calculateStats(terminalValues);
+      
+      const traces = [{
+        x: terminalValues,
+        type: 'histogram',
+        histnorm: 'probability density',
+        name: 'Terminal Distribution',
+        marker: { color: '#f59e0b' },
+        opacity: 0.7
+      }];
+      
+      Plotly.react('cont-dist-plot', traces, {
+        margin: { l: 60, r: 40, t: 40, b: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor: '#fafafa',
+        xaxis: { title: 'Terminal Value X(T)', gridcolor: '#e2e8f0' },
+        yaxis: { title: 'Density', gridcolor: '#e2e8f0' },
+        showlegend: true
+      }, { responsive: true });
+      
+      document.getElementById('cont-stats').innerHTML = `
+        <div class="stat-box">
+          <div class="stat-value">${stats.mean.toFixed(3)}</div>
+          <div class="stat-label">Mean</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${stats.variance.toFixed(3)}</div>
+          <div class="stat-label">Variance</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${stats.std.toFixed(3)}</div>
+          <div class="stat-label">Std Dev</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${stats.skewness.toFixed(3)}</div>
+          <div class="stat-label">Skewness</div>
+        </div>
+      `;
+    }
+  </script>
+
+<!-- ===== PATCH V2 (UI-preserving + grayscale + connector styles + Poisson move + LaTeX + layout tweaks) ===== -->
+<style>
+  /* Premium grayscale theme override */
+  :root {
+    --primary: #181818; --primary-dark: #0f0f0f; --primary-light: #2a2a2a;
+    --secondary: #2d2d2d; --success: #3a3a3a; --warning: #5a5a5a;
+    --danger: #4a4a4a; --dark: #111; --gray: #6f6f6f;
+    --light-gray: #f5f5f5; --border: #e8e8e8;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 6px 12px rgba(0,0,0,.06);
+  }
+  body { background: #f7f7f7; color: #111; }
+  .module-header { background: linear-gradient(180deg, #0f0f10, #171718) !important; }
+  .module-header h1, .module-header .description { color: #f9f9f9 !important; }
+  .panel { background: #fff !important; border: 1px solid #ebebeb !important; box-shadow: var(--shadow) !important; }
+  .panel-title { color: #111 !important; }
+  .formula-box { background: linear-gradient(180deg, #fafafa, #f2f2f2) !important; color: #111 !important; border-color: #e6e6e6 !important; }
+  .model-badge { background: #efefef !important; color: #111 !important; border-color: #e3e3e3 !important; }
+  .control-section { border-color: #e8e8e8 !important; }
+  .control-label { color: #262626 !important; }
+  .btn { border-color: #2b2b2b !important; }
+  .btn-primary { background: #111 !important; color: #fff !important; }
+  .btn-secondary { background: #fff !important; color: #111 !important; border: 1px solid #dcdcdc !important; }
+  .btn-danger { background: #2b2b2b !important; color: #fff !important; }
+  .btn-success { background: #333 !important; color: #fff !important; }
+  .info-box { background: #f4f4f4 !important; color: #222 !important; border: 1px solid #e5e5e5 !important; }
+  .slice-pill { background: #ededed !important; color: #111 !important; border-color: #e1e1e1 !important; }
+</style>
+
+<script>
+(function(){
+  function ready(fn){ if(document.readyState!=='loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } }
+
+  ready(function(){
+    /* ========== 1) DISCRETE: Rendering + Connector ========== */
+    (function enhanceDiscreteControls(){
+      const seedGroup = Array.from(document.querySelectorAll('#module-discrete .control-group')).find(g => g.querySelector('#walk-seed'));
+      if(seedGroup && !document.getElementById('walk-rendering')){
+        seedGroup.insertAdjacentHTML('beforebegin', `
+          <div class="control-group">
+            <label class="control-label">Rendering</label>
+            <select id="walk-rendering">
+              <option value="line">Line</option>
+              <option value="dots">Dots</option>
+              <option value="line+dots">Line + Dots</option>
+              <option value="stems">Stems</option>
+              <option value="bars">Bars (1 path, sequential)</option>
+            </select>
+          </div>`);
+      }
+      if(seedGroup && !document.getElementById('walk-connector')){
+        seedGroup.insertAdjacentHTML('beforebegin', `
+          <div class="control-group">
+            <label class="control-label">Connector</label>
+            <select id="walk-connector">
+              <option value="polyline" selected>Straight (polyline)</option>
+              <option value="spline">Smooth (spline)</option>
+              <option value="step-hv">Step (H→V)</option>
+              <option value="step-vh">Step (V→H)</option>
+            </select>
+          </div>`);
+      }
+    })();
+
+    /* ========== 2) DISCRETE: Segmented model + Custom + Poisson counting ========== */
+    (function addSegmentedAndCustom(){
+      const modelBadge = document.getElementById('discrete-model-badge');
+      const modelSection = modelBadge ? modelBadge.closest('.control-section') : null;
+      if(!modelSection) return;
+
+      // Pre custom row
+      if(!document.getElementById('pre-custom-row')){
+        modelSection.insertAdjacentHTML('afterend', `
+          <div class="controls-row" id="pre-custom-row" style="display:none; margin-top:.5rem;">
+            <div class="control-group">
+              <label class="control-label">Values (comma)</label>
+              <input type="text" id="walk-pre-values" placeholder="-2,-1,1,2" />
+            </div>
+            <div class="control-group">
+              <label class="control-label">Probs (comma)</label>
+              <input type="text" id="walk-pre-probs" placeholder="0.2,0.3,0.3,0.2" />
+            </div>
+          </div>`);
+      }
+
+      // Insert Poisson into model options (0/1 per step)
+      const preSel = document.getElementById('discrete-model');
+      if(preSel && !Array.from(preSel.options).some(o=>o.value==='poisson')){
+        preSel.insertAdjacentHTML('beforeend','<option value="poisson">Poisson Counting (0/1 per step)</option>');
+      }
+      // Poisson rate (per step)
+      const driftCtl = document.getElementById('drift-control');
+      if(driftCtl && !document.getElementById('poisson-rate-control')){
+        driftCtl.insertAdjacentHTML('afterend',`
+          <div class="control-group" id="poisson-rate-control" style="display:none;">
+            <label class="control-label">Poisson Rate per Step (p)</label>
+            <input type="number" id="walk-poisson-rate" value="0.02" min="0" max="1" step="0.005"/>
+          </div>`);
+      }
+
+      // Segmented block
+      if(!document.getElementById('segmented-controls')){
+        modelSection.insertAdjacentHTML('afterend', `
+          <div class="control-section" id="segmented-controls" style="margin-top:1rem; padding-top:1rem; border-top:2px solid var(--border);">
+            <label class="control-label">Segmented Model</label>
+            <div class="controls-row">
+              <div class="control-group">
+                <label class="control-label">Enable</label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                  <input type="checkbox" id="walk-seg-on"/>
+                  <span>Switch to Post‑Model after step k</span>
+                </label>
+              </div>
+              <div class="control-group">
+                <label class="control-label">Switch step k</label>
+                <input type="number" id="walk-branch-k" value="250" min="1" />
+              </div>
+            </div>
+            <div id="post-controls" style="display:none;">
+              <div class="controls-row">
+                <div class="control-group">
+                  <label class="control-label">Post‑Model</label>
+                  <select id="discrete-post-model">
+                    <option value="simple">Simple Random Walk (symmetric)</option>
+                    <option value="biased">Biased Random Walk (with drift)</option>
+                    <option value="geometric">Geometric Random Walk (multiplicative)</option>
+                    <option value="custom">Custom (values + probs)</option>
+                    <option value="poisson">Poisson Counting (0/1 per step)</option>
+                  </select>
+                </div>
+                <div class="control-group" id="post-drift-control" style="display:none;">
+                  <label class="control-label">Post Drift (p)</label>
+                  <input type="number" id="walk-post-drift" value="0.6" min="0" max="1" step="0.05" />
+                </div>
+              </div>
+              <div class="controls-row" id="post-custom-row" style="display:none;">
+                <div class="control-group">
+                  <label class="control-label">Post Values (comma)</label>
+                  <input type="text" id="walk-post-values" placeholder="-2,-1,1,2" />
+                </div>
+                <div class="control-group">
+                  <label class="control-label">Post Probs (comma)</label>
+                  <input type="text" id="walk-post-probs" placeholder="0.2,0.3,0.3,0.2" />
+                </div>
+              </div>
+              <div class="controls-row" id="post-poisson-row" style="display:none;">
+                <div class="control-group">
+                  <label class="control-label">Post Poisson Rate per Step (p)</label>
+                  <input type="number" id="walk-post-poisson-rate" value="0.03" min="0" max="1" step="0.005" />
+                </div>
+              </div>
+            </div>
+          </div>`);
+      }
+
+      // Bind toggles
+      function togglePreCustom(){
+        const model = document.getElementById('discrete-model').value;
+        const preRow = document.getElementById('pre-custom-row');
+        const drift = document.getElementById('drift-control');
+        const poi = document.getElementById('poisson-rate-control');
+        if(preRow) preRow.style.display = (model==='custom')? '' : 'none';
+        if(drift) drift.style.display = (model==='biased')? '' : 'none';
+        if(poi) poi.style.display = (model==='poisson')? '' : 'none';
+      }
+      function togglePost(){
+        const seg = document.getElementById('walk-seg-on').checked;
+        document.getElementById('post-controls').style.display = seg? '' : 'none';
+      }
+      function togglePostDetail(){
+        const model = document.getElementById('discrete-post-model').value;
+        document.getElementById('post-drift-control').style.display = (model==='biased')? '' : 'none';
+        document.getElementById('post-custom-row').style.display = (model==='custom')? '' : 'none';
+        const row = document.getElementById('post-poisson-row'); if(row) row.style.display = (model==='poisson')? '' : 'none';
+      }
+      document.getElementById('discrete-model').addEventListener('change', togglePreCustom);
+      document.getElementById('walk-seg-on').addEventListener('change', togglePost);
+      document.getElementById('discrete-post-model').addEventListener('change', togglePostDetail);
+      togglePreCustom(); togglePost(); togglePostDetail();
+    })();
+
+    /* ========== 3) Move slice controls under distribution & remove "Add 3" ========== */
+    (function relocateSlices(){
+      const add3 = Array.from(document.querySelectorAll('#module-discrete button')).find(b => /Add\s*3/i.test(b.textContent));
+      if(add3) add3.remove();
+      const sliceSec = Array.from(document.querySelectorAll('#module-discrete .control-section')).find(sec => /Add Time Slice/i.test(sec.textContent));
+      const stats = document.getElementById('walk-stats');
+      if(sliceSec && stats) stats.parentElement.insertBefore(sliceSec, stats.nextSibling);
+      const lbl = Array.from(document.querySelectorAll('#module-discrete .control-label')).find(el => /Add Time Slice/i.test(el.textContent));
+      if(lbl) lbl.textContent = 'Add Time Slice (Cross-sectional Analysis)';
+    })();
+
+    /* ========== 4) Continuous models: keep Brownian + GBM only; default Brownian; formula fix ========== */
+    (function continuousModelTrim(){
+      const sel = document.getElementById('cont-model');
+      if(sel){
+        ['poisson','ou','cir'].forEach(v => { const opt = sel.querySelector(`option[value="${v}"]`); if(opt) opt.remove(); });
+        sel.value = 'brownian';
+      }
+      const f = document.getElementById('cont-formula');
+      if(f){ f.innerHTML = '\\[dX_t = \\mu\\, dt + \\sigma\\, dW_t\\]'; }
+      const badge = document.getElementById('cont-model-badge'); if(badge) badge.textContent = 'Brownian Motion';
+      try{ if(window.MathJax&&MathJax.typesetPromise){ MathJax.typesetPromise(); } }catch(e){}
+    })();
+
+    /* ========== 5) Continuous: add Connector control (reused in Brownian & GBM) ========== */
+    (function addContConnector(){
+      const row = document.querySelector('#module-continuous .controls-row');
+      if(row && !document.getElementById('cont-connector')){
+        row.insertAdjacentHTML('beforeend', `
+          <div class="control-group">
+            <label class="control-label">Connector</label>
+            <select id="cont-connector">
+              <option value="polyline" selected>Straight (polyline)</option>
+              <option value="spline">Smooth (spline)</option>
+              <option value="step-hv">Step (H→V)</option>
+              <option value="step-vh">Step (V→H)</option>
+            </select>
+          </div>`);
+      }
+    })();
+  });
+
+  /* =================== Runtime overrides =================== */
+  // A) Discrete: generator without per-step scaling + custom + poisson
+  const _origGen = window.generateRandomWalkStep;
+  window.generateRandomWalkStep = function(rng, model, stepSize, drift){
+    // stepSize is ignored here (we apply global scaling on accumulation)
+    if(model==='simple'){ return (rng()<0.5 ? -1 : 1); }
+    if(model==='biased'){ return (rng()<drift ? 1 : -1); }
+    if(model==='geometric'){ const delta=0.1; return (rng()<0.5 ? -delta : delta); }
+    if(model==='custom'){
+      function parseCSV(s){ return (s||'').split(',').map(x=>parseFloat(x.trim())).filter(x=>!Number.isNaN(x)); }
+      const vals = parseCSV((document.getElementById('walk-pre-values')||{}).value || '');
+      const probs = parseCSV((document.getElementById('walk-pre-probs')||{}).value || '');
+      const v = (vals.length? vals : [-1,1]);
+      const p = (probs.length===v.length? probs : Array(v.length).fill(1/v.length));
+      const s = (u=>{ let c=0; const r=u; for(let i=0;i<v.length;i++){ c+=p[i]; if(r<=c) return v[i]; } return v[v.length-1]; })(rng());
+      return s;
+    }
+    if(model==='poisson'){
+      const p = +((document.getElementById('walk-poisson-rate')||{value:0.02}).value) || 0.02;
+      return (rng()<p)? 1 : 0;
+    }
+    return _origGen ? _origGen(rng, model, 1, drift) : 0;
+  };
+
+  // B) Discrete: start + animate overrides to apply global scaling and segmented params
+  const _origStart = window.startWalk;
+  window.startWalk = function(){
+    const ret = _origStart ? _origStart() : undefined;
+    // Ensure line shape applied after first draw
+    try{ window.drawWalkPaths(); }catch(e){}
+    return ret;
+  };
+
+  // C) Discrete: redraw connector on each draw
+  const _origDraw = window.drawWalkPaths;
+  window.drawWalkPaths = function(){
+    const res = _origDraw ? _origDraw() : undefined;
+    const conn = (document.getElementById('walk-connector')||{value:'polyline'}).value;
+    const gd = document.getElementById('walk-paths-plot');
+    if(gd && gd.data){
+      gd.data.forEach(tr=>{
+        if(tr.type==='scatter'){
+          tr.line = tr.line || {};
+          tr.line.shape = (conn==='spline')? 'spline' : (conn==='step-hv')? 'hv' : (conn==='step-vh')? 'vh' : 'linear';
+        }
+      });
+      Plotly.react(gd, gd.data, gd.layout, {responsive:true});
+    }
+    return res;
+  };
+
+  // D) Continuous: use exact GBM (keep brownian) — already present; enforce connector
+  const _origDrawCont = window.drawContinuousPaths;
+  window.drawContinuousPaths = function(){
+    const res = _origDrawCont ? _origDrawCont() : undefined;
+    const conn = (document.getElementById('cont-connector')||{value:'polyline'}).value;
+    const gd = document.getElementById('cont-paths-plot');
+    if(gd && gd.data){
+      gd.data.forEach(tr=>{
+        if(tr.type==='scatter'){
+          tr.line = tr.line || {};
+          tr.line.shape = (conn==='spline')? 'spline' : (conn==='step-hv')? 'hv' : (conn==='step-vh')? 'vh' : 'linear';
+        }
+      });
+      Plotly.react(gd, gd.data, gd.layout, {responsive:true});
+    }
+    return res;
+  };
+
+  // E) Continuous: exact GBM update replacement
+  const _origGenProc = window.generateProcessPath;
+  window.generateProcessPath = function(T, nSteps, model, params, seed){
+    const dt = T/nSteps, sdt = Math.sqrt(dt);
+    const rand = LCG(seed), rnorm = gaussianGen(rand);
+    const path = new Float64Array(nSteps+1);
+    if(model==='brownian'){
+      path[0]=0; for(let i=1;i<=nSteps;i++){ path[i]=path[i-1] + params.mu*dt + params.sigma*sdt*rnorm(); }
+      return path;
+    }
+    if(model==='gbm'){
+      path[0]=100; const drift=(params.mu-0.5*params.sigma*params.sigma)*dt, vol=params.sigma*sdt;
+      for(let i=1;i<=nSteps;i++){ path[i]=path[i-1]*Math.exp(drift + vol*rnorm()); } return path;
+    }
+    return _origGenProc ? _origGenProc(T, nSteps, model, params, seed) : path;
+  };
+
+  // F) LaTeX completeness for discrete model card (force typeset on change)
+  const _origUpdateDisc = window.updateDiscreteFormula;
+  window.updateDiscreteFormula = function(){
+    if(_origUpdateDisc) _origUpdateDisc();
+    try{ if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); } }catch(e){}
+  };
+
+  // G) After load, ensure MathJax runs once
+  try{ if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); } }catch(e){}
+})();
+</script>
+
+
+<!-- ===== PATCH v3: fixes + icons + draggable slices + header contrast ===== -->
+<style id="monochrome-theme-v3">
+  /* 1) Header contrast + readable text */
+  .module-header, .page-hero, .landing-hero{
+    background: linear-gradient(180deg,#f6f6f6 0%, #ededed 100%) !important;
+    color:#111 !important;
+  }
+  .module-header h1, .landing-hero h1 { color:#111 !important; -webkit-text-fill-color: initial !important; text-shadow:none !important; }
+  .module-header .description, .landing-hero .description { color:#444 !important; }
+  /* Maintain overall monochrome look */
+  .home .card, .home .home-card, .card { background: linear-gradient(180deg,#fefefe 0%, #f3f3f3 100%); }
+  .card .badge, .pill { filter: grayscale(100%); }
+  .module-title{ color:#111 !important; }
+</style>
+
+<script>
+(function(){
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+
+    /* 2) Landing hero subtitle replace; rename Stochastic card -> Brownian Motion */
+    (function landingTweaks(){
+      // remove or replace subtitle text
+      const hero = document.querySelector('.landing-hero, .page-hero, .module-header');
+      if(hero){
+        const sub = hero.querySelector('h2, .subtitle, .description');
+        if(sub && /Enhanced with Multiple/i.test(sub.textContent||'')){
+          sub.textContent = 'Interactive laboratory for random walks, Donsker bridge, and Brownian/GBM.';
+        }
+      }
+      // rename third card to "Brownian Motion"
+      const cards = Array.from(document.querySelectorAll('.home-card, .card'));
+      cards.forEach(card => {
+        const h = card.querySelector('h3, .card-title, h4');
+        if(!h) return;
+        const t = (h.textContent||'').trim();
+        if(/^Stochastic Processes/i.test(t)){
+          h.textContent = 'Brownian Motion';
+          const p = card.querySelector('p');
+          if(p) p.textContent = 'Simulate Brownian motion and geometric Brownian motion; analyze time slices.';
+        }
+      });
+    })();
+
+    /* 3) Better icons for 3 landing cards (SVG, monochrome) */
+    (function cardIcons(){
+      function injectIcon(card, svg){
+        if(!card) return;
+        const slot = card.querySelector('.card-icon') || card.querySelector('.emoji, .symbol, .top-icon');
+        if(slot){ slot.innerHTML = svg; slot.style.opacity = 0.85; return; }
+        // fallback: prepend
+        const div = document.createElement('div');
+        div.className = 'card-icon';
+        div.style.cssText = 'height:56px;display:flex;align-items:center;justify-content:center;margin-top:6px;';
+        div.innerHTML = svg;
+        card.firstElementChild ? card.firstElementChild.before(div) : card.prepend(div);
+      }
+      const stairsSVG = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="1.6"><path d="M4 20h16M6 18v-4h4v-4h4V6h4" /></svg>`;
+      const bridgeSVG = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="1.6"><path d="M3 17c3-4 6-4 9 0s6 4 9 0" /><path d="M3 17h18" /></svg>`;
+      const waveSVG = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="1.6"><path d="M2 15c3-6 7 6 10 0s7 6 10 0" /></svg>`;
+
+      // guess cards by title
+      const all = Array.from(document.querySelectorAll('.home-card, .card'));
+      all.forEach(card=>{
+        const t = (card.querySelector('h3, .card-title, h4')||{}).textContent||'';
+        if(/Discrete Random Walk/i.test(t)) injectIcon(card, stairsSVG);
+        else if(/Donsker/i.test(t)) injectIcon(card, bridgeSVG);
+        else if(/Brownian Motion/i.test(t) || /Stochastic Processes/i.test(t)) injectIcon(card, waveSVG);
+      });
+    })();
+
+    /* 4) Keep segmented-switch-to-Poisson design from previous version (already present). No removal here. */
+
+    /* 5) “Step with dots” style refinement — always add markers when connection = step */
+    function enforceStepMarkers(gdId){
+      const gd = document.getElementById(gdId);
+      if(!gd || !gd.data) return;
+      const newData = gd.data.map(tr => {
+        if(tr.type==='scatter'){
+          const connSel = (gdId==='walk-paths-plot') ? (document.getElementById('walk-connection')||{}).value
+                          : (document.getElementById('cont-connection')||{}).value;
+          if(connSel==='step'){
+            tr.mode = (tr.mode && tr.mode.indexOf('lines')>=0) ? 'lines+markers' : 'lines+markers';
+            tr.marker = Object.assign({size:3}, tr.marker||{});
+            tr.line = Object.assign({shape:'hv'}, tr.line||{});
+          }
+        }
+        return tr;
+      });
+      Plotly.react(gd, newData, gd.layout, {responsive:true, edits:{shapePosition:true}});
+    }
+
+    // Hook discrete/continuous redraw to enforce step markers
+    const hookOnce = (id, ev, fn)=>{
+      const el = document.getElementById(id);
+      if(el && !el['__'+ev]){ el['__'+ev]=true; el.addEventListener(ev, fn); }
+    };
+
+    // After each plotly redraw, apply enforcement
+    const obs = new MutationObserver(()=>{
+      enforceStepMarkers('walk-paths-plot'); enforceStepMarkers('cont-paths-plot');
+    });
+    const p1=document.getElementById('walk-paths-plot'); if(p1) obs.observe(p1, {childList:true, subtree:true});
+    const p2=document.getElementById('cont-paths-plot'); if(p2) obs.observe(p2, {childList:true, subtree:true});
+
+    /* 6) Draggable slice lines + live histogram updates */
+    (function enableDraggableSlices(){
+      const gd = document.getElementById('walk-paths-plot');
+      if(!gd) return;
+      if(gd.__sliceDragBound) return; gd.__sliceDragBound = true;
+
+      // ensure shapes can be dragged
+      if(gd.layout){
+        gd.layout.dragmode = 'pan';
+      }
+      // listen to shape position change
+      gd.on('plotly_relayout', function(ev){
+        const keys = Object.keys(ev||{}).filter(k=>k.startsWith('shapes[') && k.endsWith('.x0'));
+        if(!keys.length) return;
+        // map shape index -> new x
+        keys.forEach(k=>{
+          const m = k.match(/shapes\[(\d+)\]\.x0/);
+          if(!m) return;
+          const i = +m[1];
+          const x0 = ev[k];
+          // update state.walk.slices[i] if exists
+          if(window.state && state.walk && state.walk.slices && state.walk.slices[i]){
+            const N = state.walk.nSteps||100;
+            const newStep = Math.max(1, Math.min(N, Math.round(x0)));
+            state.walk.slices[i].step = newStep;
+            // also move x1 to align
+            const update = {}; update[`shapes[${i}].x0`] = newStep; update[`shapes[${i}].x1`] = newStep;
+            Plotly.relayout(gd, update);
+            // refresh distribution + pills UI if present
+            if(window.updateWalkDistribution) window.updateWalkDistribution();
+            // if there is a pills container, update its label text
+            if(document.querySelectorAll('.slice-pill').length){
+              const pill = document.querySelectorAll('.slice-pill')[i];
+              if(pill) pill.textContent = `t=${newStep}`;
+            }
+          }
+        });
+      });
+    })();
+
+  });
+})();
+</script>
+
+
+<!-- ==== PATCH: Model preselect (Discrete/Continuous) + unified Rendering (Points/Stair/Line) ==== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  /* ============================ A) Discrete: formula & control visibility ============================
+     Keep UI/visual design intact. Only switch visibility based on the new model set: Poisson / Biased / Custom.
+  ===================================================================================================== */
+  (function enhanceDiscreteFormula() {
+    const _orig = window.updateDiscreteFormula;
+    window.updateDiscreteFormula = function () {
+      if (_orig) _orig();
+      try {
+        const model = (document.getElementById('discrete-model') || {}).value;
+        const box   = document.getElementById('discrete-formula');
+        const badge = document.getElementById('discrete-model-badge');
+
+        const driftCtl = document.getElementById('drift-control');
+        const preRow   = document.getElementById('pre-custom-row');
+        const poiCtl   = document.getElementById('poisson-rate-control');
+
+        // Hide all optional controls by default
+        if (driftCtl) driftCtl.style.display = 'none';
+        if (preRow)   preRow.style.display   = 'none';
+        if (poiCtl)   poiCtl.style.display   = 'none';
+
+        if (model === 'custom') {
+          if (box)   box.innerHTML = '\\[S_n=\\sum_{i=1}^n \\xi_i,\\; \\xi_i\\in\\{v_j\\},\\; P(\\xi_i=v_j)=p_j,\\; \\sum p_j=1\\]';
+          if (badge) badge.textContent = 'Custom (Values + Probs)';
+          if (preRow) preRow.style.display = '';
+        } else if (model === 'poisson') {
+          // Per step Bernoulli(p) counting; cumulative ~ Binomial(n,p)
+          if (box)   box.innerHTML = '\\[N_n=\\sum_{i=1}^n Y_i,\\; Y_i\\sim\\text{Bernoulli}(p)\\;\\Rightarrow\\;N_n\\sim\\text{Binomial}(n,p)\\]';
+          if (badge) badge.textContent = 'Poisson Counting (per-step Bernoulli)';
+          if (poiCtl) poiCtl.style.display = '';
+        } else if (model === 'biased') {
+          if (driftCtl) driftCtl.style.display = 'block';
+        }
+        if (window.MathJax && MathJax.typesetPromise) { MathJax.typesetPromise(); }
+      } catch (e) { /* no-op */ }
+    };
+  })();
+
+  /* ============================ B) Discrete: limit model dropdown (Poisson / Biased / Custom) ============================ */
+  (function limitDiscreteModels() {
+    const sel = document.getElementById('discrete-model');
+    if (!sel) return;
+    const opts = [
+      { value: 'poisson', text: 'Poisson Counting (0/1 per step)' },
+      { value: 'biased',  text: 'Biased Random Walk (with drift)' },
+      { value: 'custom',  text: 'Custom (values + probs)' }
+    ];
+    sel.innerHTML = '';
+    opts.forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.text; sel.appendChild(op); });
+    sel.value = 'biased'; // default; change to 'poisson' if you prefer
+    if (typeof window.updateDiscreteFormula === 'function') window.updateDiscreteFormula();
+
+    const postSel = document.getElementById('walk-post-model');
+    if (postSel) {
+      postSel.innerHTML =
+        '<option value="biased">Biased Random Walk (with drift)</option>' +
+        '<option value="custom">Custom (values + probs)</option>' +
+        '<option value="poisson">Poisson Counting (0/1 per step)</option>';
+    }
+  })();
+
+  /* ============================ C) Discrete: merge Rendering + Connector => Rendering (Points/Stair/Line) ============================ */
+  (function simplifyDiscreteRendering() {
+    const page = document.getElementById('module-discrete');
+    if (!page) return;
+
+    const seedGroup = Array.from(page.querySelectorAll('.control-group')).find(g => g.querySelector('#walk-seed'));
+    if (!seedGroup) return;
+
+    // Remove legacy controls (if still present)
+    const oldRender = document.getElementById('walk-rendering');
+    const oldConn   = document.getElementById('walk-connector');
+    if (oldRender && oldRender.closest('.control-group')) oldRender.closest('.control-group').remove();
+    if (oldConn   && oldConn.closest('.control-group'))   oldConn.closest('.control-group').remove();
+
+    // Insert the new select just before the seed group
+    const wrap = document.createElement('div');
+    wrap.className = 'control-group';
+    wrap.innerHTML = `
+      <label class="control-label">Rendering</label>
+      <select id="walk-style">
+        <option value="points" selected>Points</option>
+        <option value="step">Stair (step)</option>
+        <option value="line">Line</option>
+      </select>`;
+    seedGroup.parentNode.insertBefore(wrap, seedGroup);
+
+    function applyStyleTo(gd, style) {
+      if (!gd || !gd.data) return;
+      gd.data.forEach(tr => {
+        // Remember original type to be able to revert from 'step' (scatter) back to what the app used (often scattergl)
+        tr._originalType = tr._originalType || tr.type || 'scatter';
+        if (style === 'step') {
+          // Force SVG 'scatter' for proper step rendering; scattergl does not support step shapes
+          tr.type = 'scatter';
+          tr.mode = 'lines';
+          tr.line = tr.line || {};
+          tr.line.shape = 'hv';
+        } else if (style === 'points') {
+          tr.type = tr._originalType; // restore (likely scattergl)
+          tr.mode = 'markers';
+          if (tr.line) tr.line.shape = 'linear';
+        } else { // 'line'
+          tr.type = tr._originalType; // restore original engine
+          tr.mode = 'lines';
+          tr.line = tr.line || {};
+          tr.line.shape = 'linear';
+        }
+      });
+      Plotly.react(gd, gd.data, gd.layout, {responsive: true});
+    }
+
+    function sync() {
+      const style = (document.getElementById('walk-style') || {value:'points'}).value;
+      applyStyleTo(document.getElementById('walk-paths-plot'), style);
+    }
+
+    const styleSel = document.getElementById('walk-style');
+    if (styleSel) styleSel.addEventListener('change', sync);
+
+    // Re-apply after each re-draw
+    const _draw  = window.drawWalkPaths;
+    window.drawWalkPaths = function () { const r = _draw ? _draw() : void 0; sync(); return r; };
+    const _start = window.startWalk;
+    window.startWalk = function () { const r = _start ? _start() : void 0; sync(); return r; };
+  })();
+
+  /* ============================ D) Continuous: keep Brownian/GBM + same Rendering (Points/Stair/Line) ============================ */
+  (function limitContinuousModelsAndStyle() {
+    // 1) Model dropdown: only Brownian and GBM
+    const sel = document.getElementById('cont-model');
+    if (sel) {
+      sel.innerHTML =
+        '<option value="brownian">Brownian Motion (Wiener Process)</option>' +
+        '<option value="gbm">Geometric Brownian Motion</option>';
+      sel.value = 'brownian';
+      if (typeof window.updateContinuousFormula === 'function') window.updateContinuousFormula();
+    }
+
+    // 2) Replace legacy Connector with our Rendering control
+    const page = document.getElementById('module-continuous');
+    if (!page) return;
+
+    const seedGroup = Array.from(page.querySelectorAll('.control-group')).find(g => g.querySelector('#cont-seed'));
+    if (!seedGroup) return;
+
+    const oldConn = document.getElementById('cont-connector');
+    if (oldConn && oldConn.closest('.control-group')) oldConn.closest('.control-group').remove();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'control-group';
+    wrap.innerHTML = `
+      <label class="control-label">Rendering</label>
+      <select id="cont-style">
+        <option value="points" selected>Points</option>
+        <option value="step">Stair (step)</option>
+        <option value="line">Line</option>
+      </select>`;
+    seedGroup.parentNode.insertBefore(wrap, seedGroup);
+
+    function applyStyleTo(gd, style) {
+      if (!gd || !gd.data) return;
+      gd.data.forEach(tr => {
+        tr._originalType = tr._originalType || tr.type || 'scatter';
+        if (style === 'step') {
+          tr.type = 'scatter';
+          tr.mode = 'lines';
+          tr.line = tr.line || {};
+          tr.line.shape = 'hv';
+        } else if (style === 'points') {
+          tr.type = tr._originalType;
+          tr.mode = 'markers';
+          if (tr.line) tr.line.shape = 'linear';
+        } else {
+          tr.type = tr._originalType;
+          tr.mode = 'lines';
+          tr.line = tr.line || {};
+          tr.line.shape = 'linear';
+        }
+      });
+      Plotly.react(gd, gd.data, gd.layout, {responsive: true});
+    }
+
+    function sync() {
+      const style = (document.getElementById('cont-style') || {value:'points'}).value;
+      applyStyleTo(document.getElementById('cont-paths-plot'), style);
+    }
+
+    const styleSel = document.getElementById('cont-style');
+    if (styleSel) styleSel.addEventListener('change', sync);
+
+    const _draw = window.drawContinuousPaths;
+    window.drawContinuousPaths = function () { const r = _draw ? _draw() : void 0; sync(); return r; };
+  })();
+
+  /* ============================ E) Copy tweaks for landing/continuous ============================ */
+  (function copyTweaks() {
+    const landingSub = document.querySelector('.landing-header .subtitle');
+    if (landingSub && /Enhanced with Multiple/i.test(landingSub.textContent || '')) {
+      landingSub.textContent = 'Interactive lab: Random Walks → Donsker Bridge → Brownian / GBM';
+    }
+    document.querySelectorAll('.module-card').forEach(card => {
+      const h = card.querySelector('h3');
+      if (h && /Stochastic Processes/i.test(h.textContent || '')) {
+        h.textContent = 'Brownian Motion';
+        const p = card.querySelector('p');
+        if (p) p.textContent = 'Simulate Brownian and Geometric Brownian motion; analyze time slices.';
+      }
+    });
+    const contHead = document.querySelector('#module-continuous .module-header');
+    if (contHead) {
+      const h1 = contHead.querySelector('h1');
+      if (h1 && /Stochastic Processes/i.test(h1.textContent || '')) h1.textContent = 'Brownian Motion';
+      const desc = contHead.querySelector('.description');
+      if (desc && /classical stochastic/i.test((desc.textContent || '').toLowerCase())) {
+        desc.textContent = 'Brownian Motion & Geometric Brownian Motion with time-slice analysis';
+      }
+    }
+  })();
+
+});
+</script>
+
+
+</body>
+</html>
+
+<!-- ==== FINAL PATCH: bring back Simple Random Walk + grayscale landing + title rename ==== -->
+<style id="bw-gray-theme">
+/* --- Grayscale theme overrides (non-destructive) --- */
+.landing-header {
+  background: linear-gradient(180deg, #f5f5f5 0%, #ececec 100%) !important;
+}
+.landing-header .subtitle { color: #6a6a6a !important; }
+.module-card {
+  background: #ffffff !important;
+  border: 1px solid #e6e6e6 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
+}
+.module-card h3, .module-card p { color: #222 !important; }
+.module-card .label, .module-card .chip, .module-card .tag, .module-card [class*="badge"] {
+  background: #ededed !important;
+  color: #333 !important;
+  border: 1px solid #d8d8d8 !important;
+}
+/* Keep hover subtle and monochrome */
+.module-card:hover {
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08) !important;
+  transform: translateY(-1px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ---------- A) Discrete: add 'Simple Random Walk' back (default) ---------- */
+  (function addSimpleModel(){
+    const sel = document.getElementById('discrete-model');
+    if(!sel) return;
+
+    // Build option list with Simple included
+    sel.innerHTML =
+      '<option value="simple">Simple Random Walk (p = 0.5)</option>' +
+      '<option value="poisson">Poisson Counting (0/1 per step)</option>' +
+      '<option value="biased">Biased Random Walk (with drift)</option>' +
+      '<option value="custom">Custom (values + probs)</option>';
+    sel.value = 'simple'; // default to Simple on enter
+
+    // Wrap formula/controls toggle to support 'simple'
+    const orig = window.updateDiscreteFormula;
+    window.updateDiscreteFormula = function(){
+      if (orig) orig();
+
+      const model = (document.getElementById('discrete-model') || { value: 'simple' }).value;
+      const badge = document.getElementById('discrete-model-badge');
+      const box   = document.getElementById('discrete-formula');
+
+      const driftCtl = document.getElementById('drift-control');
+      const poiCtl   = document.getElementById('poisson-rate-control');
+      const preRow   = document.getElementById('pre-custom-row');
+      const driftInput = driftCtl ? driftCtl.querySelector('input,select,textarea') : null;
+
+      // default hide
+      if (driftCtl) driftCtl.style.display = 'none';
+      if (poiCtl)   poiCtl.style.display   = 'none';
+      if (preRow)   preRow.style.display   = 'none';
+
+      if (model === 'simple'){
+        // p fixed at 0.5 (hide & disable input if present)
+        if (driftInput){ driftInput.value = 0.5; driftInput.disabled = true; }
+        if (badge) badge.textContent = 'Simple Random Walk (p = 0.5)';
+        if (box)   box.innerHTML = '\\[S_n = \\sum_{i=1}^n X_i,\\; P(X_i=+1)=P(X_i=-1)=\\tfrac{1}{2}\\]';
+      } else if (model === 'biased'){
+        if (driftCtl) driftCtl.style.display = '';
+        if (driftInput) driftInput.disabled = false;
+        if (badge) badge.textContent = 'Biased Random Walk';
+        // leave formula to original (or set explicitly)
+      } else if (model === 'poisson'){
+        if (poiCtl) poiCtl.style.display = '';
+        if (badge) badge.textContent = 'Poisson Counting (per-step Bernoulli)';
+        if (box)   box.innerHTML = '\\[N_n=\\sum_{i=1}^n Y_i,\\; Y_i\\sim\\text{Bernoulli}(p)\\Rightarrow N_n\\sim\\text{Binomial}(n,p)\\]';
+      } else if (model === 'custom'){
+        if (preRow) preRow.style.display = '';
+        if (badge) badge.textContent = 'Custom (values + probs)';
+        if (box)   box.innerHTML = '\\[S_n=\\sum_{i=1}^n \\xi_i,\\; \\xi_i\\in\\{v_j\\},\\; P(\\xi_i=v_j)=p_j,\\; \\sum p_j=1\\]';
+      }
+
+      try { if (window.MathJax && MathJax.typesetPromise) { MathJax.typesetPromise(); } } catch(e){}
+    };
+
+    // Trigger once to sync UI
+    if (typeof window.updateDiscreteFormula === 'function') window.updateDiscreteFormula();
+  })();
+
+  /* ---------- B) Landing copy & grayscale: rename 3rd card to 'Brownian Motion' ---------- */
+  (function renameLandingCard(){
+    // Subtitle keep but page is grayscale via CSS above
+    document.querySelectorAll('.module-card').forEach(function(card){
+      const h = card.querySelector('h3');
+      if (!h) return;
+      if (/Stochastic Processes/i.test(h.textContent || '')) {
+        h.textContent = 'Brownian Motion';
+        const p = card.querySelector('p');
+        if (p) p.textContent = 'Simulate Brownian and Geometric Brownian motion; analyze time slices.';
+      }
+    });
+  })();
+
+});
+</script>
