@@ -40,4 +40,9 @@
     "vendor/font-awesome/fontawesome",
     "vendor/font-awesome/solid",
     "vendor/font-awesome/brands"
+   .author__avatar img {
+  max-width: 72px;   /* 默认大约 90，可以改成 72 或 64 看效果 */
+  border-radius: 50%;
+}
+
 ;
