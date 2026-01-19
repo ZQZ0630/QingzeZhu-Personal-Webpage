@@ -5,7 +5,7 @@
  * This file controls what is imported from /_sass
  *
  * Note that the files are processed in the order they are imported, so they are partly
-   sorted by the dependencies. Also, the first two lines of the file are required by Jekyll.
+ * sorted by the dependencies. Also, the first two lines of the file are required by Jekyll.
  */
 
 @import
@@ -39,10 +39,10 @@
 
     "vendor/font-awesome/fontawesome",
     "vendor/font-awesome/solid",
-    "vendor/font-awesome/brands"
-   .author__avatar img {
-  max-width: 72px;   /* 默认大约 90，可以改成 72 或 64 看效果 */
-  border-radius: 50%;
-}
+    "vendor/font-awesome/brands";  /* 注意这里加了分号，结束导入 */
 
-;
+/* 下面是你自定义的头像样式，必须放在分号后面 */
+.author__avatar img {
+    max-width: 72px;
+    border-radius: 50%;
+}
