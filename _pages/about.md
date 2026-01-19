@@ -1,3 +1,9 @@
+
+---
+layout: home
+author_profile: true
+---
+
 Welcome
 
 I am an undergraduate in Statistics at the University of Wisconsin–Madison. My work sits at the intersection of statistics, rural development, and supply chains in contemporary China, with a focus on how different intermediaries affect farmers’ income, bargaining power, and risk.
