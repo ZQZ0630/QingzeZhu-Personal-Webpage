@@ -11,7 +11,7 @@ I graduated from the University of Wisconsin–Madison with a B.S. in Statistics
 
 ---
 
-## CV/Resume
+## CV
 
 Click here to download my CV/Resume (PDF):  
 👉 [Download CV]({{ site.baseurl }}/files/Zhu_Qingze_resume.pdf){: .btn .btn--primary}
