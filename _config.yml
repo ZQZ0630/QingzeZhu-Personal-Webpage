@@ -21,30 +21,32 @@ repository               : "ZQZ0630/QingzeZhu-Personal-Webpage"
 # The following control what appear as part of the author content on the side bar.
 author:
   name             : *name
-  avatar           : "profile.jpg"   # 之后你可以把头像命名为 profile.jpg 上传到 images/ 里
+  # 注意：请确保你的仓库里有这张图片，或者改回之前的 "/files/profile.png"
+  avatar           : "profile.jpg"   
   bio              : "Undergraduate in Statistics at UW–Madison"
   location         : "Madison, WI"
   employer         : "University of Wisconsin–Madison"
   email            : "qzhu237@wisc.edu"
-  github           : "ZQZ0630"
-  linkedin         : ""
-  orcid            : ""
-  website          : ""
+  
+  # 下面的链接都已隐藏（加了 # 号）。如果你想显示，把前面的 # 去掉即可。
+  # github           : "ZQZ0630"
+  # linkedin         : ""
+  # orcid            : ""
+  # website          : ""
 
-
-  # Academic websites
-  academia         : # URL
-  arxiv            : # URL - Update with the correct link to your profile
-  googlescholar    : "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
-  inspire-hep      : # URL
-  impactstory      : # URL
-  orcid            : "https://orcid.org/yourorcidurl"
-  semantic         : # URL
-  ssrn             : # URL
-  pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
-  researchgate     : # URL
-  scopus           : # URL
-  zotero           : # URL
+  # Academic websites (全部隐藏)
+  # academia         : # URL
+  # arxiv            : # URL 
+  # googlescholar    : "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
+  # inspire-hep      : # URL
+  # impactstory      : # URL
+  # orcid            : "https://orcid.org/yourorcidurl"
+  # semantic         : # URL
+  # ssrn             : # URL
+  # pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
+  # researchgate     : # URL
+  # scopus           : # URL
+  # zotero           : # URL
 
 # Analytics
 analytics:
