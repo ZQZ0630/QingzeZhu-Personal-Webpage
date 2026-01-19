@@ -8,13 +8,13 @@ redirect_from:
   - /about.html
 ---
 
-I am **Qingze Zhu**, an undergraduate student in Statistics at the **University of Wisconsin–Madison**. 
+I am **Qingze Zhu**. I graduated from the **University of Wisconsin–Madison** with a B.S. in Statistics.
 
-My interests lie in **development sociology** and **economic sociology**, especially how different types of intermediaries shape smallholders’ bargaining power and risk exposure. I work mainly in Python, R, and JavaScript.
+My research interests lie in **development sociology** and **economic sociology**, with a particular focus on how different types of intermediaries shape smallholders' bargaining power and risk exposure.
 
-Currently, I am focusing on agricultural value chains and rural livelihoods in contemporary China, combining fieldwork with quantitative modeling.
+I am proficient in **Python**, **R (RStudio)**, and **JavaScript**.
 
-I also build small interactive tools that turn probabilistic concepts into experiments.
+I also have professional experience in **supply chain operations** and **e-commerce**.
 
 Feel free to contact me via email: [qzhu237@wisc.edu](mailto:qzhu237@wisc.edu) :)
 
