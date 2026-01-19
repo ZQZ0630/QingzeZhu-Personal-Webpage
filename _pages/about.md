@@ -1,56 +1,58 @@
----
-permalink: /
-title: "Academic Pages is a ready-to-fork GitHub Pages template for academic personal websites"
-author_profile: true
-redirect_from: 
-  - /about/
-  - /about.html
+Welcome
+
+I am an undergraduate in Statistics at the University of Wisconsin–Madison. My work sits at the intersection of statistics, rural development, and supply chains in contemporary China, with a focus on how different intermediaries affect farmers’ income, bargaining power, and risk.
+
 ---
 
-This is the front page of a website that is powered by the [Academic Pages template](https://github.com/academicpages/academicpages.github.io) and hosted on GitHub pages. [GitHub pages](https://pages.github.com) is a free service in which websites are built and hosted from code and data stored in a GitHub repository, automatically updating when a new commit is made to the repository. This template was forked from the [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/) created by Michael Rose, and then extended to support the kinds of content that academics have: publications, talks, teaching, a portfolio, blog posts, and a dynamically-generated CV. Incidentally, these same features make it a great template for anyone that needs to show off a professional template!
+## CV
 
- You can fork [this template](https://github.com/academicpages/academicpages.github.io) right now, modify the configuration and Markdown files, add your own PDFs and other content, and have your own site for free, with no ads!
+A concise overview of my education, research experience, technical skills, and selected projects.
 
-A data-driven personal website
-======
-Like many other Jekyll-based GitHub Pages templates, Academic Pages makes you separate the website's content from its form. The content & metadata of your website are in structured Markdown files, while various other files constitute the theme, specifying how to transform that content & metadata into HTML pages. You keep these various Markdown (.md), YAML (.yml), HTML, and CSS files in a public GitHub repository. Each time you commit and push an update to the repository, the [GitHub pages](https://pages.github.com/) service creates static HTML pages based on these files, which are hosted on GitHub's servers free of charge.
+👉 [View full CV]({{ site.baseurl }}/cv/){: .btn .btn--primary}
 
-Many of the features of dynamic content management systems (like Wordpress) can be achieved in this fashion, using a fraction of the computational resources and with far less vulnerability to hacking and DDoSing. You can also modify the theme to your heart's content without touching the content of your site. If you get to a point where you've broken something in Jekyll/HTML/CSS beyond repair, your Markdown files describing your talks, publications, etc. are safe. You can rollback the changes or even delete the repository and start over - just be sure to save the Markdown files! You can also write scripts that process the structured data on the site, such as [this one](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.ipynb) that analyzes metadata in pages about talks to display [a map of every location you've given a talk](https://academicpages.github.io/talkmap.html).
+---
 
-For those users that need more advanced functionality, the template also supports the following popular tools:
-- [MathJax](https://www.mathjax.org/) for mathematical equations
-- [Mermaid](https://mermaid.js.org/) for diagraming
-- [Plotly](https://plotly.com/javascript/) for plotting
+## Research experience
 
-Getting started
-======
-1. Register a GitHub account if you don't have one and confirm your e-mail (required!)
-1. Fork [this template](https://github.com/academicpages/academicpages.github.io) by clicking the "Use this template" button in the top right. 
-1. Go to the repository's settings (rightmost item in the tabs that start with "Code", should be below "Unwatch"). Rename the repository "[your GitHub username].github.io", which will also be your website's URL.
-1. Set site-wide configuration and create content & metadata (see below -- also see [this set of diffs](https://archive.is/3TPas) showing what files were changed to set up [an example site](https://getorg-testacct.github.io) for a user with the username "getorg-testacct")
-1. Upload any files (like PDFs, .zip files, etc.) to the files/ directory. They will appear at https://[your GitHub username].github.io/files/example.pdf.  
-1. Check status by going to the repository settings, in the "GitHub pages" section
+I work on questions around agricultural supply chains and rural livelihoods, combining fieldwork with quantitative modeling.
 
-Site-wide configuration
-------
-The main configuration file for the site is in the base directory in [_config.yml](https://github.com/academicpages/academicpages.github.io/blob/master/_config.yml), which defines the content in the sidebars and other site-wide features. You will need to replace the default variables with ones about yourself and your site's github repository. The configuration file for the top menu is in [_data/navigation.yml](https://github.com/academicpages/academicpages.github.io/blob/master/_data/navigation.yml). For example, if you don't have a portfolio or blog posts, you can remove those items from that navigation.yml file to remove them from the header. 
+- **Rural livelihoods & intermediaries (Majiaba Village, Zigui County)** – multi-year fieldwork with ~200 citrus-farming households, interviews with cooperatives and local officials, and analysis of how different marketing channels affect income stability and bargaining power.  
+- **Processing location for cross-border perishables** – network-flow model comparing inland vs. port-based processing for products such as konjac, quantifying cost and loss trade-offs under different logistics scenarios.  
+- **Agricultural development patterns & farmers’ income** – cross-country panel analysis (World Bank data) on how agricultural value-added, mechanization, and structural change relate to farmers’ income.
 
-Create content & metadata
-------
-For site content, there is one Markdown file for each type of content, which are stored in directories like _publications, _talks, _posts, _teaching, or _pages. For example, each talk is a Markdown file in the [_talks directory](https://github.com/academicpages/academicpages.github.io/tree/master/_talks). At the top of each Markdown file is structured data in YAML about the talk, which the theme will parse to do lots of cool stuff. The same structured data about a talk is used to generate the list of talks on the [Talks page](https://academicpages.github.io/talks), each [individual page](https://academicpages.github.io/talks/2012-03-01-talk-1) for specific talks, the talks section for the [CV page](https://academicpages.github.io/cv), and the [map of places you've given a talk](https://academicpages.github.io/talkmap.html) (if you run this [python file](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.py) or [Jupyter notebook](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.ipynb), which creates the HTML for the map based on the contents of the _talks directory).
+👉 [More details on research]({{ site.baseurl }}/research/){: .btn .btn--secondary}
 
-**Markdown generator**
+---
 
-The repository includes [a set of Jupyter notebooks](https://github.com/academicpages/academicpages.github.io/tree/master/markdown_generator
-) that converts a CSV containing structured data about talks or presentations into individual Markdown files that will be properly formatted for the Academic Pages template. The sample CSVs in that directory are the ones I used to create my own personal website at stuartgeiger.com. My usual workflow is that I keep a spreadsheet of my publications and talks, then run the code in these notebooks to generate the Markdown files, then commit and push them to the GitHub repository.
+## Interactive visualization showcase
 
-How to edit your site's GitHub repository
-------
-Many people use a git client to create files on their local computer and then push them to GitHub's servers. If you are not familiar with git, you can directly edit these configuration and Markdown files directly in the github.com interface. Navigate to a file (like [this one](https://github.com/academicpages/academicpages.github.io/blob/master/_talks/2012-03-01-talk-1.md) and click the pencil icon in the top right of the content preview (to the right of the "Raw | Blame | History" buttons). You can delete a file by clicking the trashcan icon to the right of the pencil icon. You can also create new files or upload files by navigating to a directory and clicking the "Create new file" or "Upload files" buttons. 
+I build small interactive tools to turn probabilistic and stochastic-process concepts into experiments that students can run themselves.
 
-Example: editing a Markdown file for a talk
-![Editing a Markdown file for a talk](/images/editing-talk.png)
+- **Probability Distributions Map** – an interactive map of common distributions. Users click a node (e.g., Normal, Binomial, Poisson) to see formulas, parameter meanings, typical modeling scenarios, and small interactive elements showing how graphs change with parameters.  
+- **Brownian Motion Laboratory** – a three-module environment for exploring discrete random walks, Donsker’s bridge, and continuous-time processes such as Brownian Motion, Geometric Brownian Motion, Ornstein–Uhlenbeck, and CIR. Users set parameters and watch sample paths, time slices, and terminal distributions evolve over time.
 
-For more info
-------
-More info about configuring Academic Pages can be found in [the guide](https://academicpages.github.io/markdown/), the [growing wiki](https://github.com/academicpages/academicpages.github.io/wiki), and you can always [ask a question on GitHub](https://github.com/academicpages/academicpages.github.io/discussions). The [guides for the Minimal Mistakes theme](https://mmistakes.github.io/minimal-mistakes/docs/configuration/) (which this theme was forked from) might also be helpful.
+👉 [Open the interactive visualization showcase]({{ site.baseurl }}/visualization/){: .btn .btn--primary}
+
+---
+
+## Courses and quantitative training
+
+I am building a quantitative foundation in statistics, probability, and computation. Representative coursework includes:
+
+- **Statistics & probability:** probability theory, mathematical statistics, regression and ANOVA, financial statistics, data visualization.  
+- **Computation & data:** programming in R and Python, simulation, basic optimization and network models.  
+- **Mathematics:** calculus sequence, linear algebra, and related supporting math for statistics.
+
+A more detailed list of courses and grades is available on my CV and transcripts.
+
+---
+
+## Other experience
+
+Beyond formal research, my background includes:
+
+- **Cross-border e-commerce and logistics operations**, working with order, inventory, and shipment data for overseas marketplaces.  
+- **Informal consulting for rural producers and cooperatives**, helping interpret platform fees, settlement statements, and channel choices.  
+- **Fieldwork organization and community engagement** in Majiaba Village, coordinating survey work and follow-up visits with local households and institutions.
+
+👉 [More on professional and field experience]({{ site.baseurl }}/professional-experience/){: .btn .btn--secondary}
