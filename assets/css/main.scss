@@ -41,8 +41,17 @@
     "vendor/font-awesome/solid",
     "vendor/font-awesome/brands";  /* 注意这里加了分号，结束导入 */
 
-/* 找到文件最后面，替换为： */
+/* 圆形 + 尺寸减半 + 防止变形 */
+.sidebar .author__avatar img, 
 .author__avatar img {
-    max-width: 200px;   /* 改大到 200px，或者写 100% 让它占满侧边栏 */
-    border-radius: 0;   /* 改为 0，去掉圆角，变回方形 */
+    width: 120px !important;       /* 宽度设为 120px (大概是侧边栏的一半) */
+    height: 120px !important;      /* 高度也设为 120px，必须相等 */
+    max-width: 120px !important;   /* 限制最大宽度 */
+    
+    border-radius: 50% !important; /* 变成圆形 */
+    
+    object-fit: cover !important;  /* 【关键】自动裁剪图片中心，防止长方形图片变成椭圆 */
+    
+    padding: 0 !important;         /* 去掉内边距 */
+    border: none !important;       /* 去掉边框 */
 }
