@@ -1,11 +1,11 @@
 main:
-  - title: "About"
-    url: /
-  - title: "Research"
-    url: /research/
-  - title: "Projects"
-    url: /portfolio/
-  - title: "CV"
+  - title: "CV/Resume"
     url: /cv/
+  - title: "Research Experience"
+    url: /research/
   - title: "Visualization"
     url: /visualization/
+  - title: "Courses"
+    url: /courses/
+  - title: "Other Experience"
+    url: /other/
