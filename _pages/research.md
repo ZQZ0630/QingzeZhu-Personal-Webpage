@@ -33,6 +33,8 @@ author_profile: true
 - Found that processing near origin ports can reduce total landed cost by 52.8% ($20,119→$9,492) and effective loss by 62.4%; derived simple rules whose recommendations agree with the optimizer in ≈96% of cases.
 - Produced a working paper and fully reproducible code/data package shared with partner cooperatives to support their strategy discussions on near-origin processing and farmer income stability.
 
+![Supply Chain Optimization Results](/images/supply_chain_kpi.png)
+
 ---
 
 ## Data Analysis Project: Agricultural Development Patterns & Farmers' Income
