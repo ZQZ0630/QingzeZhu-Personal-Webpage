@@ -7,6 +7,6 @@ redirect_from:
   - /resume
 ---
 
-[Download CV as PDF]({{ site.baseurl }}/files/Zhu_Qingze_resume.pdf){: .btn .btn--primary}
+Click here for my [Curriculum Vitae (PDF)]({{ site.baseurl }}/files/Zhu_Qingze_resume.pdf).
 
 ---
