@@ -5,7 +5,7 @@ permalink: /visualization/
 author_profile: true
 ---
 
-This page collects a few interactive tools I built for learning and teaching probability and stochastic processes.
+This page presents the deliverables from my faculty-supervised research on teaching technology, demonstrating my ability to translate statistical concepts into interactive computational tools
 
 ## Probability Distributions Map
 
