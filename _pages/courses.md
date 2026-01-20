@@ -1,69 +1,80 @@
 ---
 layout: archive
-title: "Courses & Quantitative Training"
+title: "Courses"
 permalink: /courses/
 author_profile: true
 ---
 
-{% include base_path %}
 
-Below is an overview of my coursework and quantitative training at the University of Wisconsin–Madison.
+## Statistics
 
----
-
-## Statistics & Probability
-
-| Course | Topics Covered |
-|--------|----------------|
-| **STAT 309: Intro to Probability & Mathematical Statistics I** | Probability axioms, random variables, expectation, common distributions |
-| **STAT 310: Intro to Probability & Mathematical Statistics II** | Hypothesis testing, confidence intervals, ANOVA, likelihood ratio tests |
-| **STAT 333: Applied Regression Analysis** | Linear regression, model diagnostics, variable selection |
-| **STAT 436: Data Visualization** | ggplot2, interactive graphics, Shiny applications, visualization principles |
-| **STAT 461: Financial Statistics** | Time series analysis, ARMA models, GARCH models, volatility modeling |
-
----
-
-## Computation & Data Science
-
-| Course | Topics Covered |
-|--------|----------------|
-| **CS 220: Data Science Programming I** | Python fundamentals, pandas, data wrangling |
-| **CS 320: Data Science Programming II** | Advanced Python, web scraping, databases |
-| **STAT 340: Data Modeling II** | Simulation, bootstrapping, cross-validation |
+| Course | Title |
+|--------|-------|
+| STAT 240 | Data Science Modeling I |
+| STAT 310 | Intro to Probability & Mathematical Statistics II |
+| STAT 311 | Intro to Mathematical Statistics (Theory & Methods) I |
+| STAT 333 | Applied Regression Analysis |
+| STAT 424 | Statistical Experimental Design |
+| STAT 461 | Financial Statistics |
+| STAT 525 | Linear Optimization |
 
 ---
 
 ## Mathematics
 
-| Course | Topics Covered |
-|--------|----------------|
-| **MATH 221-222-234: Calculus Sequence** | Single/multivariable calculus, series, integration |
-| **MATH 340: Linear Algebra** | Matrix operations, eigenvalues, vector spaces |
-| **MATH 431: Introduction to Probability Theory** | Rigorous probability, convergence theorems |
+| Course | Title |
+|--------|-------|
+| MATH 221 | Calculus & Analytic Geometry I |
+| MATH 222 | Calculus & Analytic Geometry II |
+| MATH 234 | Calculus - Functions of Several Variables |
+| MATH 320 | Linear Algebra & Differential Equations |
 
 ---
 
-## Programming & Tools
+## Programming
 
-Through coursework and self-study, I have developed proficiency in:
+### Python
 
-**Languages:**
-- R (tidyverse, Shiny, ggplot2)
-- Python (pandas, numpy, scipy, matplotlib)
-- JavaScript (D3.js, interactive web apps)
-- SQL (data querying and management)
+| Course | Title |
+|--------|-------|
+| STAT 451 | Machine Learning |
+| ECE 532 | Matrix Methods in Machine Learning |
+| MITx (edX) | Introduction to Computer Science and Programming Using Python |
 
-**Tools:**
-- RStudio, Jupyter Notebook
-- Git/GitHub for version control
-- LaTeX for academic writing
-- Excel/Sheets for quick analysis
+### R
+
+| Course | Title |
+|--------|-------|
+| STAT 303 | R for Statistics I |
+| STAT 304 | R for Statistics II |
+| STAT 436 | Statistical Data Visualization (R/Shiny) |
+
+### Java / Computer Engineering
+
+| Course | Title |
+|--------|-------|
+| COMP SCI 200 | Programming I |
+| COMP SCI 252 | Intro to Computer Engineering |
 
 ---
 
-## Ongoing Learning
+## Supply Chain Management
 
-I continue to expand my skills through:
-- Online courses on causal inference and machine learning
-- Reading academic papers in computational social science
-- Building personal projects to apply new methods
+### MITx MicroMasters in Supply Chain Management (edX)
+
+| Course Code | Title |
+|-------------|-------|
+| CTL.SC0x | Supply Chain Analytics |
+| CTL.SC1x | Supply Chain Fundamentals |
+| CTL.SC2x | Supply Chain Design |
+| CTL.SC3x | Supply Chain Dynamics |
+| CTL.SC4x | Supply Chain Technology and Systems |
+
+
+
+## Online Certificates
+
+| Provider | Certificate |
+|----------|-------------|
+| University of Amsterdam (Coursera) | Classical Sociological Theory |
+| University of Amsterdam (Coursera) | Research Methods in Sociology |
