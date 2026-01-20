@@ -22,7 +22,7 @@ table th:last-child, table td:last-child {
 
 | Course | Topics Covered |
 |--------|----------------|
-| **STAT 240: Data Science Modeling I** | R programming, data wrangling, ggplot2 visualization, probability, statistical inference |
+| **STAT 240: Data Science Modeling I** | R programming, data wrangling, ggplot2 visualization, statistical inference |
 | **STAT 310: Intro to Probability & Mathematical Statistics II** | Hypothesis testing, confidence intervals, ANOVA, likelihood ratio tests |
 | **STAT 311: Intro to Mathematical Statistics I** | Probability axioms, random variables, expectation, common distributions |
 | **STAT 333: Applied Regression Analysis** | Linear regression, model diagnostics, residual analysis, variable selection |
