@@ -4,15 +4,13 @@ title: "Research Experience"
 permalink: /research/
 author_profile: true
 ---
----
 
 ## Faculty-Supervised Research: Teaching Technology & Reproducible Research
 
-**Duration:** *Sep 2025 – Dec 2025*  
-**Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
+**Duration:** *Sep 2025 – Dec 2025* **Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
 **Affiliation:** Department of Statistics, UW-Madison
 
-**View:** [Results in Visualization Page](/visualization/)
+**View:** [Results in Visualization Page]({{ site.baseurl }}/visualization/)
 
 - Built interactive course tools and use handouts with JavaScript/Python, including an animated derivation from discrete random walk to Brownian motion; developed a probability knowledge map with hover highlights and click-through links to notes.
 - Standardized R Markdown/Quarto outputs: added chunk options, code folding, and show/hide controls to improve HTML readability and reproducibility.
@@ -22,8 +20,7 @@ author_profile: true
 
 ## Independent Research: Agricultural Supply Chain & Processing
 
-**Duration:** *May 2025 – Sep 2025*  
-**Role:** Independent Researcher (supervised by [Prof. Sinan Tas](https://bus.wisc.edu/faculty/sinan-tas))  
+**Duration:** *May 2025 – Sep 2025* **Role:** Independent Researcher (supervised by [Prof. Sinan Tas](https://bus.wisc.edu/faculty/sinan-tas))  
 **Affiliation:** University of Wisconsin–Madison
 
 **View:** [Working Paper (SSRN)](https://doi.org/10.2139/ssrn.5408150)
@@ -33,14 +30,13 @@ author_profile: true
 - Found that processing near origin ports can reduce total landed cost by 52.8% ($20,119→$9,492) and effective loss by 62.4%; derived simple rules whose recommendations agree with the optimizer in ≈96% of cases.
 - Produced a working paper and fully reproducible code/data package shared with partner cooperatives to support their strategy discussions on near-origin processing and farmer income stability.
 
-![Supply Chain Optimization Results](/images/supply_chain_kpi.png)
+![Supply Chain Optimization Results]({{ site.baseurl }}/images/supply_chain_kpi.png)
 
 ---
 
 ## Data Analysis Project: Agricultural Development Patterns & Farmers' Income
 
-**Duration:** *Jul 2025 – Sep 2025*  
-**Affiliation:** University of Wisconsin–Madison
+**Duration:** *Jul 2025 – Sep 2025* **Affiliation:** University of Wisconsin–Madison
 
 - Assembled a multi-decade panel dataset (≈30 years) for 266 World Bank countries for farmers' incomes; harmonized series and handled missing values for cross-country comparison.
 - Built an interactive dashboard with world maps, time-series plots, and dumbbell charts comparing top vs. bottom countries and ratios of farmer income to national averages.
@@ -50,8 +46,7 @@ author_profile: true
 
 ## Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot
 
-**Duration:** *Jul 2021 – Aug 2022*  
-**Role:** Fieldwork Lead  
+**Duration:** *Jul 2021 – Aug 2022* **Role:** Fieldwork Lead  
 **Affiliation:** Majiaba Village, Zigui County, Hubei, China
 
 **Year 1:**
@@ -62,5 +57,3 @@ author_profile: true
 **Year 2:**
 - Designed and implemented the "Orange Warms the Countryside" WeChat Mini Program to pilot direct sales and basic vendor-managed inventory for local households.
 - Introduced ABC supplier tiering and simple stock-management practices; over six months, reduced spoilage by ≈25% and helped 10 farmers achieve a collective income increase of ≈¥100,000.
-
----
