@@ -4,6 +4,19 @@ title: "Courses"
 permalink: /courses/
 author_profile: true
 ---
+<style>
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+table th:first-child, table td:first-child {
+  width: 45%;
+}
+table th:last-child, table td:last-child {
+  width: 55%;
+}
+</style>
+---
 
 ## Statistics
 
@@ -71,9 +84,9 @@ author_profile: true
 
 ---
 
-## Online Certificates
+## Online Other Certificates
 
 | Provider | Certificate |
 |----------|-------------|
-| University of Amsterdam (Coursera) | Classical Sociological Theory |
-| University of Amsterdam (Coursera) | Research Methods in Sociology |
+| **University of Amsterdam (Coursera)** | Classical Sociological Theory |
+| **University of Amsterdam (Coursera)** | Research Methods in Sociology |
