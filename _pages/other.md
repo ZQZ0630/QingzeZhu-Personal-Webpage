@@ -5,74 +5,47 @@ permalink: /other/
 author_profile: true
 ---
 
-{% include base_path %}
 
 Beyond formal research, my background includes professional experience and community engagement that inform my academic interests.
 
 ---
 
-## Cross-Border E-Commerce & Logistics
+## Professional Experience
 
-**Supply Chain Operations Consultant**  
-*2023*
+### Consultant
+**Zhejiang Yangtian Company Co., Ltd.**  
+*Dec 2022 – Nov 2023*
 
-- Worked with order, inventory, and shipment data for overseas marketplaces
-- Conducted **SKU-level analysis** using mixed-effects models to identify demand patterns
-- Developed inventory optimization strategies achieving measurable cost reductions
-- Gained hands-on experience with:
-  - Order management systems
-  - Warehouse operations
-  - International shipping logistics
-  - Platform fee structures and settlement processes
+- Managed data and inventory systems for a multi-store e-commerce operation (20 online stores; ~2.1k orders/day avg, 5k+ peak; ~4.2k SKUs; 3 DCs; 5 external plants).
+- Analyzed how platform commission structures, promotion and rating rules, and logistics constraints shaped pricing, product assortment, and service levels for small and medium suppliers.
+- Led ERP-based standardization of SKU coding, units, inventory aging, and in-transit tracking, enabling differentiated service tiers and replenishment policies across key vs. long-tail products.
+- Built dashboards and anomaly alerts for stockouts, long-tail demand, and negative inventory, improving inventory-record accuracy to 97.5%, OTIF to 98%, cutting stockouts by ~45%, and reducing Days of Inventory by 30 days (≈¥4.5–5.2M working capital released).
 
----
+### Regional Lead (China)
+**SOAR International**  
+*Dec 2022 – Jun 2023*
 
-## Rural Producer & Cooperative Consulting
-
-**Informal Advisory Work**  
-*Ongoing*
-
-- Helped rural producers and cooperatives understand:
-  - Platform fees and commission structures
-  - Settlement statements and payment cycles
-  - Channel choices (traditional middlemen vs. e-commerce vs. cooperatives)
-- Translated complex business documents into accessible explanations
-- Provided data analysis support for decision-making
+- Collected and vetted international volunteer projects; assessed processes and feasibility.
+- Delivered campus talks across nearby provinces; recruited and interviewed volunteers.
+- Operated Xiaohong Shu and WeChat Official Account; produced analyses and stories on volunteer experiences.
 
 ---
 
-## Fieldwork Organization & Community Engagement
+## Community Engagement
 
-**Majiaba Village, Zigui County**  
-*2022–2024*
+### Program Initiator & Coordinator: Pediatric ICU Volunteer Partnership
+**Wuhan Children's Hospital**  
+*Feb 2021 – Jun 2022*
 
-- Coordinated survey work across multiple rounds of data collection
-- Organized follow-up visits with local households and institutions
-- Built and maintained relationships with:
-  - Farming households
-  - Village committees
-  - Local cooperatives
-  - County agricultural bureaus
-- Managed research logistics including travel, accommodations, and scheduling
+- Established a point-to-point partnership between campus volunteers and ICU units; organized weekly selection/training and weekend bedside activities (games/companionship).
+- Held supportive conversations with parents of children under treatment (e.g., leukemia/brain tumors); compiled anonymized needs lists and connected families with charities/social services.
 
----
+### Volunteer Teacher: Ayi Potato Teaching Support Project
+**Liangshan Yi Autonomous Prefecture, Sichuan**  
+*Sep 2018 – Jun 2020*
 
-## Teaching & Volunteer Experience
-
-**Volunteer Teaching**  
-*Liangshan Yi Autonomous Prefecture, Sichuan*
-
-- Participated in educational volunteer programs in rural mountainous areas
-- Gained firsthand exposure to rural development challenges
-- Developed interest in connecting academic research with practical community needs
+- Taught Chinese across three grades (two classes); coordinated day-to-day learning and student well-being.
+- Conducted monthly home visits; recorded study conditions, parental attitudes, and how family income/structure affected schooling.
+- Counseled parents reluctant to keep children in school; compiled hardship cases and submitted to local authorities for assistance.
 
 ---
-
-## Professional Skills Developed
-
-Through these experiences, I have strengthened:
-
-- **Communication:** Explaining complex concepts to diverse audiences
-- **Organization:** Managing multi-stakeholder projects
-- **Adaptability:** Working effectively in resource-constrained environments
-- **Cultural sensitivity:** Building trust across urban-rural divides
