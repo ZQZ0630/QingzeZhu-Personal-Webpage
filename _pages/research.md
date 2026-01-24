@@ -21,7 +21,7 @@ author_profile: true
 
 ---
 
-## 2. Independent Research: Agricultural Supply Chain & Processing
+## 2. Independent Research: Processing Location and Value Capture in Cross-Border Agricultural Supply Chains
 
 **Duration:** *May 2025 – Sep 2025* **Role:** Independent Researcher (supervised by [Prof. Sinan Tas](https://bus.wisc.edu/faculty/sinan-tas))  
 **Affiliation:** University of Wisconsin–Madison
@@ -37,7 +37,7 @@ author_profile: true
 
 ---
 
-## 3. Faculty-Supervised Research: Teaching Technology & Reproducible Research
+## 3. Faculty-Supervised Research: Computational and Interactive Visualization Tools for Statistical Instruction
 
 **Duration:** *Sep 2025 – Dec 2025* **Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
 **Affiliation:** Department of Statistics, UW-Madison
