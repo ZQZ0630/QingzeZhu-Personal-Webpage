@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Binomial – Interactive Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#045275; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:12px 20px; background:#045275; color:#fff; font-weight:600; font-size:18px}
+
+    .wrap{max-width:1200px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; grid-template-rows: auto auto; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px}
+
+    .row{display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap}
+    label{min-width:24px; color:#333; font-weight:600}
+    input[type="range"]{width:120px}
+    input[type="number"]{width:72px; padding:6px 8px; border:1px solid var(--border); border-radius:6px}
+    .note{color:var(--muted); font-size:13px}
+
+    .kblock{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:12px}
+    .kblock-title{font-weight:600; font-size:13px; color:var(--accent); margin-bottom:8px}
+
+    .plot-card{grid-column:2; grid-row:1}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px}
+    .plot h3{margin:0 0 8px 0; font-size:14px; font-weight:600}
+    canvas{width:100%; height:300px; display:block; background:#fafafa; border-radius:8px}
+
+    .axis-controls{display:flex; gap:16px; margin-top:10px; justify-content:center; flex-wrap:wrap}
+    .axis-btn-group{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+    .axis-btn{padding:3px 8px; border:1px solid var(--border); background:#fff; border-radius:4px; font-size:11px; cursor:pointer; transition:all 0.2s}
+    .axis-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+    .axis-btn:hover:not(.active){background:#e0f7fa}
+
+    .stats-bar{display:flex; justify-content:center; gap:24px; padding:10px; background:#e0f7fa; border-radius:8px; margin-top:12px; font-size:13px; flex-wrap:wrap}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+
+    .calc-card{grid-column:2; grid-row:2; margin-top:0}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#e0f7fa; padding:2px 6px; border-radius:4px; font-size:12px}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:60px}
+    .calc-row input{flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:6px 8px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px; min-height:34px; display:flex; align-items:center}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:6px; transition:background 0.2s; font-size:13px}
+    .calc-btn:hover{background:#033d57}
+    .calc-note{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.3}
+
+    .examples-card{grid-column:1; grid-row:2}
+    .examples-card h4{font-size:13px; color:var(--accent); margin:0 0 10px 0}
+    .example-item{padding:10px; border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid var(--border); transition:all 0.2s}
+    .example-item:hover{background:#e0f7fa; border-color:var(--accent)}
+    .example-item.active{background:#e0f7fa; border-color:var(--accent)}
+    .example-item .ex-title{font-weight:600; font-size:13px; margin-bottom:2px}
+    .example-item .ex-params{color:var(--accent); font-family:monospace; font-size:12px}
+    .example-item .ex-desc{color:var(--muted); font-size:11px; margin-top:4px}
+
+    @media (max-width: 900px){ 
+      .wrap{grid-template-columns: 1fr} 
+      .plot-card{grid-column:1; grid-row:2}
+      .examples-card{grid-column:1; grid-row:3}
+      .calc-card{grid-column:1; grid-row:4}
+      .calc-grid{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+<header>Binomial Distribution $X \sim \text{Bin}(n, p)$</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label>$n$</label>
+      <input id="n" type="range" min="1" max="50" step="1" value="10">
+      <input id="nNum" type="number" min="1" max="100" step="1" value="10">
+      <span class="note">(trials)</span>
+    </div>
+    <div class="row">
+      <label>$p$</label>
+      <input id="p" type="range" min="0.01" max="0.99" step="0.01" value="0.5">
+      <input id="pNum" type="number" min="0.01" max="0.99" step="0.01" value="0.5">
+      <span class="note">(success prob)</span>
+    </div>
+
+    <div class="kblock">
+      <div class="kblock-title">Probability Mass Function</div>
+      <div style="text-align:center; font-size:14px">
+        $$P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$$
+      </div>
+    </div>
+
+    <div class="kblock">
+      <div class="kblock-title">Key Properties</div>
+      <table style="width:100%; font-size:12px">
+        <tr><td style="color:var(--muted)">Support</td><td>$k \in \{0, 1, \ldots, n\}$</td></tr>
+        <tr><td style="color:var(--muted)">Mean</td><td>$E[X] = np$</td></tr>
+        <tr><td style="color:var(--muted)">Variance</td><td>$\text{Var}[X] = np(1-p)$</td></tr>
+        <tr><td style="color:var(--muted)">Mode</td><td>$\lfloor (n+1)p \rfloor$</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="card plot-card">
+    <div class="plot">
+      <h3>PMF $P(X=k)$</h3>
+      <canvas id="pmf"></canvas>
+      <div class="axis-controls">
+        <div class="axis-btn-group">
+          <span>x-axis:</span>
+          <button class="axis-btn active" id="xAuto">Auto</button>
+          <button class="axis-btn" id="xFixed">Fixed</button>
+        </div>
+        <div class="axis-btn-group">
+          <span>y-axis:</span>
+          <button class="axis-btn active" id="yAuto">Auto</button>
+          <button class="axis-btn" id="yFixed">Fixed</button>
+        </div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-label">$n$</div><div class="stat-value" id="nOut">10</div></div>
+        <div class="stat-item"><div class="stat-label">$p$</div><div class="stat-value" id="pOut">0.50</div></div>
+        <div class="stat-item"><div class="stat-label">$E[X]$</div><div class="stat-value" id="meanOut">5.00</div></div>
+        <div class="stat-item"><div class="stat-label">$\text{Var}[X]$</div><div class="stat-value" id="varOut">2.50</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card examples-card">
+    <h4>📚 Examples</h4>
+    <div class="example-item active" data-n="10" data-p="0.5">
+      <div class="ex-title">Fair Coin Flips</div>
+      <div class="ex-params">n=10, p=0.5</div>
+      <div class="ex-desc"># heads in 10 fair coin flips.</div>
+    </div>
+    <div class="example-item" data-n="20" data-p="0.3">
+      <div class="ex-title">Quality Control</div>
+      <div class="ex-params">n=20, p=0.3</div>
+      <div class="ex-desc"># defective items in batch of 20.</div>
+    </div>
+    <div class="example-item" data-n="50" data-p="0.8">
+      <div class="ex-title">Survey Response</div>
+      <div class="ex-params">n=50, p=0.8</div>
+      <div class="ex-desc"># positive responses from 50 surveys.</div>
+    </div>
+    <div class="example-item" data-n="12" data-p="0.167">
+      <div class="ex-title">Rolling Sixes</div>
+      <div class="ex-params">n=12, p=1/6</div>
+      <div class="ex-desc"># sixes when rolling die 12 times.</div>
+    </div>
+  </section>
+
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Probability Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box">
+        <h4><code>dbinom(k)</code> PMF</h4>
+        <div class="calc-row">
+          <label>k =</label>
+          <input type="number" id="dbinom_k" value="5" min="0" step="1">
+        </div>
+        <button class="calc-btn" onclick="calcDbinom()">Calculate P(X=k)</button>
+        <div class="calc-row">
+          <label>P(X=k) =</label>
+          <div class="result" id="dbinom_result">0.246094</div>
+        </div>
+        <div class="calc-note">R: <code>dbinom(k, n, p)</code></div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>pbinom(k)</code> CDF</h4>
+        <div class="calc-row">
+          <label>k =</label>
+          <input type="number" id="pbinom_k" value="5" min="0" step="1">
+        </div>
+        <button class="calc-btn" onclick="calcPbinom()">Calculate P(X≤k)</button>
+        <div class="calc-row">
+          <label>P(X≤k) =</label>
+          <div class="result" id="pbinom_result">0.623047</div>
+        </div>
+        <div class="calc-note">R: <code>pbinom(k, n, p)</code></div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>qbinom(q)</code> Quantile</h4>
+        <div class="calc-row">
+          <label>q =</label>
+          <input type="number" id="qbinom_q" value="0.5" min="0" max="1" step="0.01">
+        </div>
+        <button class="calc-btn" onclick="calcQbinom()">Calculate k</button>
+        <div class="calc-row">
+          <label>k =</label>
+          <div class="result" id="qbinom_result">5</div>
+        </div>
+        <div class="calc-note">Smallest k where P(X≤k) ≥ q</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const nSlider = document.getElementById('n');
+const nNum = document.getElementById('nNum');
+const pSlider = document.getElementById('p');
+const pNum = document.getElementById('pNum');
+const pmfCanvas = document.getElementById('pmf');
+
+let n = 10, p = 0.5;
+let xAxisMode = 'auto', yAxisMode = 'auto';
+const fixedYMax = 0.4;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function binomCoeff(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  let res = 1;
+  for (let i = 1; i <= k; i++) res = res * (n + 1 - i) / i;
+  return res;
+}
+
+function binomPmf(k, n, p) {
+  return binomCoeff(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+}
+
+function binomCdf(k, n, p) {
+  let sum = 0;
+  for (let i = 0; i <= k; i++) sum += binomPmf(i, n, p);
+  return sum;
+}
+
+function binomQuantile(q, n, p) {
+  let cum = 0;
+  for (let k = 0; k <= n; k++) {
+    cum += binomPmf(k, n, p);
+    if (cum >= q) return k;
+  }
+  return n;
+}
+
+function draw() {
+  const ctx = setupCanvas(pmfCanvas);
+  const rect = pmfCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 15, T = 15, B = 35;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const Kmax = xAxisMode === 'fixed' ? 50 : n;
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= Kmax; k++) {
+    const val = binomPmf(k, n, p);
+    probs.push(val);
+    if (val > maxP) maxP = val;
+  }
+
+  let ymax = yAxisMode === 'fixed' ? fixedYMax : maxP * 1.15;
+
+  // Grid
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    const y = yBase - (i / 5) * plotH;
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(w - R, y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+
+  // Labels
+  ctx.font = '11px system-ui';
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'center';
+  const step = Kmax <= 20 ? 2 : Kmax <= 50 ? 5 : 10;
+  for (let k = 0; k <= Kmax; k += step) {
+    const x = L + (k + 0.5) * plotW / (Kmax + 1);
+    ctx.fillText(String(k), x, h - 12);
+  }
+
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const yVal = (i / 4) * ymax;
+    const y = yBase - (i / 4) * plotH;
+    ctx.fillText(yVal.toFixed(2), L - 8, y + 4);
+  }
+
+  // Bars
+  const barW = Math.min(18, plotW / ((Kmax + 1) * 1.4));
+  for (let k = 0; k <= Kmax; k++) {
+    const pval = probs[k];
+    const xCenter = L + (k + 0.5) * plotW / (Kmax + 1);
+    const barHeight = Math.min(pval, ymax) / ymax * plotH;
+    ctx.fillStyle = '#045275';
+    ctx.fillRect(xCenter - barW / 2, yBase - barHeight, barW, barHeight);
+  }
+
+  // Mean line
+  const mean = n * p;
+  const xMean = L + (mean + 0.5) * plotW / (Kmax + 1);
+  if (xMean >= L && xMean <= w - R) {
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(xMean, yBase); ctx.lineTo(xMean, T); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#666';
+    ctx.textAlign = 'center';
+    ctx.fillText('μ', xMean, T - 5);
+  }
+}
+
+function sync(newN, newP) {
+  n = parseInt(newN) || 10;
+  p = parseFloat(newP) || 0.5;
+  n = Math.max(1, Math.min(100, n));
+  p = Math.max(0.01, Math.min(0.99, p));
+
+  nSlider.value = Math.min(50, n);
+  nNum.value = n;
+  pSlider.value = p;
+  pNum.value = p.toFixed(2);
+
+  document.getElementById('nOut').textContent = n;
+  document.getElementById('pOut').textContent = p.toFixed(2);
+  document.getElementById('meanOut').textContent = (n * p).toFixed(2);
+  document.getElementById('varOut').textContent = (n * p * (1 - p)).toFixed(2);
+
+  draw();
+  calcDbinom();
+  calcPbinom();
+  calcQbinom();
+}
+
+function calcDbinom() {
+  const k = parseInt(document.getElementById('dbinom_k').value) || 0;
+  document.getElementById('dbinom_result').textContent = binomPmf(k, n, p).toFixed(6);
+}
+
+function calcPbinom() {
+  const k = parseInt(document.getElementById('pbinom_k').value) || 0;
+  document.getElementById('pbinom_result').textContent = binomCdf(k, n, p).toFixed(6);
+}
+
+function calcQbinom() {
+  const q = parseFloat(document.getElementById('qbinom_q').value) || 0.5;
+  document.getElementById('qbinom_result').textContent = binomQuantile(q, n, p);
+}
+
+nSlider.addEventListener('input', e => sync(e.target.value, p));
+nNum.addEventListener('input', e => sync(e.target.value, p));
+pSlider.addEventListener('input', e => sync(n, e.target.value));
+pNum.addEventListener('input', e => sync(n, e.target.value));
+
+document.getElementById('xAuto').addEventListener('click', () => {
+  xAxisMode = 'auto';
+  document.getElementById('xAuto').classList.add('active');
+  document.getElementById('xFixed').classList.remove('active');
+  draw();
+});
+document.getElementById('xFixed').addEventListener('click', () => {
+  xAxisMode = 'fixed';
+  document.getElementById('xFixed').classList.add('active');
+  document.getElementById('xAuto').classList.remove('active');
+  draw();
+});
+document.getElementById('yAuto').addEventListener('click', () => {
+  yAxisMode = 'auto';
+  document.getElementById('yAuto').classList.add('active');
+  document.getElementById('yFixed').classList.remove('active');
+  draw();
+});
+document.getElementById('yFixed').addEventListener('click', () => {
+  yAxisMode = 'fixed';
+  document.getElementById('yFixed').classList.add('active');
+  document.getElementById('yAuto').classList.remove('active');
+  draw();
+});
+
+document.querySelectorAll('.example-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.example-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+    sync(item.dataset.n, item.dataset.p);
+  });
+});
+
+document.getElementById('dbinom_k').addEventListener('input', calcDbinom);
+document.getElementById('pbinom_k').addEventListener('input', calcPbinom);
+document.getElementById('qbinom_q').addEventListener('input', calcQbinom);
+
+window.addEventListener('resize', draw);
+sync(10, 0.5);
+</script>
+</body>
+</html>

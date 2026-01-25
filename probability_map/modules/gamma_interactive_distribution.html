@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Gamma – Interactive Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#6b7280; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:12px 20px; background:#6b7280; color:#fff; font-weight:600; font-size:18px}
+    .wrap{max-width:1200px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; grid-template-rows: auto auto; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px}
+    .row{display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap}
+    label{min-width:24px; color:#333; font-weight:600}
+    input[type="range"]{width:100px}
+    input[type="number"]{width:72px; padding:6px 8px; border:1px solid var(--border); border-radius:6px}
+    .note{color:var(--muted); font-size:13px}
+    .kblock{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:12px}
+    .kblock-title{font-weight:600; font-size:13px; color:var(--accent); margin-bottom:8px}
+    .plot-card{grid-column:2; grid-row:1}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px}
+    .plot h3{margin:0 0 8px 0; font-size:14px; font-weight:600}
+    canvas{width:100%; height:300px; display:block; background:#fafafa; border-radius:8px}
+    .axis-controls{display:flex; gap:16px; margin-top:10px; justify-content:center; flex-wrap:wrap}
+    .axis-btn-group{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+    .axis-btn{padding:3px 8px; border:1px solid var(--border); background:#fff; border-radius:4px; font-size:11px; cursor:pointer; transition:all 0.2s}
+    .axis-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+    .axis-btn:hover:not(.active){background:#f3f4f6}
+    .stats-bar{display:flex; justify-content:center; gap:24px; padding:10px; background:#f3f4f6; border-radius:8px; margin-top:12px; font-size:13px}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+    .calc-card{grid-column:2; grid-row:2; margin-top:0}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#f3f4f6; padding:2px 6px; border-radius:4px; font-size:12px}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:60px}
+    .calc-row input{flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:6px 8px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px; min-height:34px; display:flex; align-items:center}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:6px; transition:background 0.2s; font-size:13px}
+    .calc-btn:hover{background:#4b5563}
+    .calc-note{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.3}
+    .examples-card{grid-column:1; grid-row:2}
+    .examples-card h4{font-size:13px; color:var(--accent); margin:0 0 10px 0}
+    .example-item{padding:10px; border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid var(--border); transition:all 0.2s}
+    .example-item:hover{background:#f3f4f6; border-color:var(--accent)}
+    .example-item.active{background:#f3f4f6; border-color:var(--accent)}
+    .example-item .ex-title{font-weight:600; font-size:13px; margin-bottom:2px}
+    .example-item .ex-params{color:var(--accent); font-family:monospace; font-size:12px}
+    .example-item .ex-desc{color:var(--muted); font-size:11px; margin-top:4px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} .plot-card{grid-column:1; grid-row:2} .examples-card{grid-column:1; grid-row:3} .calc-card{grid-column:1; grid-row:4} .calc-grid{grid-template-columns: 1fr} }
+  </style>
+</head>
+<body>
+<header>Gamma Distribution $X \sim \text{Gamma}(\alpha, \lambda)$</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row"><label>$\alpha$</label><input id="alpha" type="range" min="0.5" max="10" step="0.5" value="3"><input id="alphaNum" type="number" min="0.1" max="20" step="0.1" value="3"><span class="note">(shape)</span></div>
+    <div class="row"><label>$\lambda$</label><input id="lambda" type="range" min="0.2" max="5" step="0.1" value="1"><input id="lambdaNum" type="number" min="0.01" max="10" step="0.1" value="1"><span class="note">(rate)</span></div>
+    <div class="kblock"><div class="kblock-title">Probability Density Function</div><div style="text-align:center; font-size:14px">$$f(x) = \frac{\lambda^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\lambda x}$$</div></div>
+    <div class="kblock"><div class="kblock-title">Key Properties</div><table style="width:100%; font-size:12px"><tr><td style="color:var(--muted)">Support</td><td>$x \geq 0$</td></tr><tr><td style="color:var(--muted)">Mean</td><td>$E[X] = \alpha/\lambda$</td></tr><tr><td style="color:var(--muted)">Variance</td><td>$\text{Var}[X] = \alpha/\lambda^2$</td></tr><tr><td style="color:var(--muted)">Mode</td><td>$(\alpha-1)/\lambda$ if $\alpha \geq 1$</td></tr></table></div>
+    <div class="kblock"><div class="kblock-title">Special Cases</div><table style="width:100%; font-size:12px"><tr><td style="color:var(--muted)">$\alpha=1$</td><td>Exponential($\lambda$)</td></tr><tr><td style="color:var(--muted)">$\alpha=\nu/2, \lambda=1/2$</td><td>Chi-square($\nu$)</td></tr></table></div>
+  </section>
+  <section class="card plot-card">
+    <div class="plot">
+      <h3>PDF $f(x)$</h3>
+      <canvas id="pdf"></canvas>
+      <div class="axis-controls"><div class="axis-btn-group"><span>x-axis:</span><button class="axis-btn active" id="xAuto">Auto</button><button class="axis-btn" id="xFixed">Fixed</button></div><div class="axis-btn-group"><span>y-axis:</span><button class="axis-btn active" id="yAuto">Auto</button><button class="axis-btn" id="yFixed">Fixed</button></div></div>
+      <div class="stats-bar"><div class="stat-item"><div class="stat-label">$\alpha$</div><div class="stat-value" id="alphaOut">3</div></div><div class="stat-item"><div class="stat-label">$\lambda$</div><div class="stat-value" id="lambdaOut">1.00</div></div><div class="stat-item"><div class="stat-label">$E[X]$</div><div class="stat-value" id="meanOut">3.00</div></div><div class="stat-item"><div class="stat-label">$\text{Var}[X]$</div><div class="stat-value" id="varOut">3.00</div></div></div>
+    </div>
+  </section>
+  <section class="card examples-card">
+    <h4>📚 Examples</h4>
+    <div class="example-item active" data-alpha="3" data-lambda="1"><div class="ex-title">Default Gamma</div><div class="ex-params">α=3, λ=1</div><div class="ex-desc">Sum of 3 Exp(1) vars.</div></div>
+    <div class="example-item" data-alpha="1" data-lambda="2"><div class="ex-title">Exponential</div><div class="ex-params">α=1, λ=2</div><div class="ex-desc">Special case.</div></div>
+    <div class="example-item" data-alpha="5" data-lambda="0.5"><div class="ex-title">Waiting Time</div><div class="ex-params">α=5, λ=0.5</div><div class="ex-desc">Time until 5th event.</div></div>
+    <div class="example-item" data-alpha="2" data-lambda="0.5"><div class="ex-title">Chi-square(4)</div><div class="ex-params">α=2, λ=0.5</div><div class="ex-desc">Equivalent to χ²(4).</div></div>
+  </section>
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Probability Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box"><h4><code>dgamma(x)</code> Density</h4><div class="calc-row"><label>x =</label><input type="number" id="dgamma_x" value="3" min="0" step="0.1"></div><button class="calc-btn" onclick="calcDgamma()">Calculate f(x)</button><div class="calc-row"><label>f(x) =</label><div class="result" id="dgamma_result">0.224042</div></div><div class="calc-note">R: <code>dgamma(x, α, rate=λ)</code></div></div>
+      <div class="calc-box"><h4><code>pgamma(x)</code> CDF</h4><div class="calc-row"><label>x =</label><input type="number" id="pgamma_x" value="3" min="0" step="0.1"></div><button class="calc-btn" onclick="calcPgamma()">Calculate P(X≤x)</button><div class="calc-row"><label>P(X≤x) =</label><div class="result" id="pgamma_result">0.576810</div></div><div class="calc-note">R: <code>pgamma(x, α, rate=λ)</code></div></div>
+      <div class="calc-box"><h4><code>qgamma(p)</code> Quantile</h4><div class="calc-row"><label>p =</label><input type="number" id="qgamma_p" value="0.5" min="0" max="1" step="0.01"></div><button class="calc-btn" onclick="calcQgamma()">Calculate x</button><div class="calc-row"><label>x =</label><div class="result" id="qgamma_result">2.674149</div></div><div class="calc-note">Median when p=0.5</div></div>
+    </div>
+  </section>
+</main>
+<script>
+const alphaSlider = document.getElementById('alpha'), alphaNum = document.getElementById('alphaNum'), lambdaSlider = document.getElementById('lambda'), lambdaNum = document.getElementById('lambdaNum'), pdfCanvas = document.getElementById('pdf');
+let alpha = 3, lambda = 1, xAxisMode = 'auto', yAxisMode = 'auto';
+const fixedXMax = 15, fixedYMax = 0.5;
+function setupCanvas(c) { const d = window.devicePixelRatio || 1, r = c.getBoundingClientRect(); c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const ctx = c.getContext('2d'); ctx.setTransform(d, 0, 0, d, 0, 0); return ctx; }
+function gammafn(z) { const g = 7, p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7]; if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gammafn(1 - z)); z -= 1; let x = p[0]; for (let i = 1; i < p.length; i++) x += p[i] / (z + i); const t = z + g + 0.5; return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x; }
+function gammaPdf(x, a, l) { if (x <= 0) return 0; const c = Math.pow(l, a) / gammafn(a); return c * Math.pow(x, a - 1) * Math.exp(-l * x); }
+function gammainc(a, x) { if (x === 0 || x < 0) return 0; const EPS = 1e-12, MAX = 200; if (x < a + 1) { let sum = 1/a, term = 1/a; for (let n = 1; n < MAX; n++) { term *= x / (a + n); sum += term; if (Math.abs(term) < EPS * Math.abs(sum)) break; } return sum * Math.exp(-x + a * Math.log(x) - Math.log(gammafn(a))); } else { let b = x + 1 - a, c = 1e30, d = 1/b, h = d; for (let i = 1; i < MAX; i++) { const an = -i * (i - a); b += 2; d = an * d + b; if (Math.abs(d) < 1e-30) d = 1e-30; c = b + an / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < EPS) break; } return 1 - Math.exp(-x + a * Math.log(x) - Math.log(gammafn(a))) * h; } }
+function gammaCdf(x, a, l) { return x <= 0 ? 0 : gammainc(a, l * x); }
+function gammaQuantile(p, a, l) { if (p <= 0) return 0; if (p >= 1) return Infinity; let lo = 0, hi = a / l + 10 * Math.sqrt(a) / l; for (let i = 0; i < 100; i++) { const mid = (lo + hi) / 2, cdf = gammaCdf(mid, a, l); if (Math.abs(cdf - p) < 1e-10) return mid; if (cdf < p) lo = mid; else hi = mid; } return (lo + hi) / 2; }
+function draw() {
+  const ctx = setupCanvas(pdfCanvas), rect = pdfCanvas.getBoundingClientRect(), w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+  const L = 50, R = 15, T = 15, B = 35, plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+  const mean = alpha / lambda, sd = Math.sqrt(alpha) / lambda;
+  let xMax = xAxisMode === 'fixed' ? fixedXMax : Math.max(8, mean + 5 * sd);
+  const steps = 300; let maxPdf = 0;
+  for (let i = 1; i <= steps; i++) { const x = i / steps * xMax, pdf = gammaPdf(x, alpha, lambda); if (pdf > maxPdf) maxPdf = pdf; }
+  let ymax = yAxisMode === 'fixed' ? fixedYMax : maxPdf * 1.15;
+  ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) { const y = yBase - (i / 5) * plotH; ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(w - R, y); ctx.stroke(); }
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke(); ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+  ctx.font = '11px system-ui'; ctx.fillStyle = '#888'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 5; i++) { const xVal = i / 5 * xMax, x = L + i / 5 * plotW; ctx.fillText(xVal.toFixed(1), x, h - 12); }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { const yVal = (i / 4) * ymax, y = yBase - (i / 4) * plotH; ctx.fillText(yVal.toFixed(2), L - 8, y + 4); }
+  ctx.beginPath(); ctx.moveTo(L, yBase);
+  for (let i = 0; i <= steps; i++) { const xVal = i / steps * xMax, x = L + xVal / xMax * plotW, pdf = gammaPdf(xVal, alpha, lambda), y = yBase - Math.min(pdf, ymax) / ymax * plotH; ctx.lineTo(x, y); }
+  ctx.lineTo(L + plotW, yBase); ctx.closePath(); ctx.fillStyle = 'rgba(107, 114, 128, 0.2)'; ctx.fill();
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) { const xVal = i / steps * xMax, x = L + xVal / xMax * plotW, pdf = gammaPdf(xVal, alpha, lambda), y = yBase - Math.min(pdf, ymax) / ymax * plotH; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+  ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 2.5; ctx.stroke();
+  const xMean = L + mean / xMax * plotW;
+  if (xMean >= L && xMean <= w - R) { ctx.beginPath(); ctx.moveTo(xMean, yBase); ctx.lineTo(xMean, T); ctx.strokeStyle = '#666'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#666'; ctx.textAlign = 'center'; ctx.fillText('μ', xMean, T - 5); }
+}
+function sync(newA, newL) {
+  alpha = parseFloat(newA) || 3; lambda = parseFloat(newL) || 1;
+  alpha = Math.max(0.1, Math.min(20, alpha)); lambda = Math.max(0.01, Math.min(10, lambda));
+  alphaSlider.value = Math.min(10, Math.max(0.5, alpha)); alphaNum.value = alpha;
+  lambdaSlider.value = Math.min(5, Math.max(0.2, lambda)); lambdaNum.value = lambda.toFixed(2);
+  document.getElementById('alphaOut').textContent = alpha;
+  document.getElementById('lambdaOut').textContent = lambda.toFixed(2);
+  document.getElementById('meanOut').textContent = (alpha / lambda).toFixed(2);
+  document.getElementById('varOut').textContent = (alpha / (lambda * lambda)).toFixed(2);
+  draw(); calcDgamma(); calcPgamma(); calcQgamma();
+}
+function calcDgamma() { const x = parseFloat(document.getElementById('dgamma_x').value) || 0; document.getElementById('dgamma_result').textContent = gammaPdf(x, alpha, lambda).toFixed(6); }
+function calcPgamma() { const x = parseFloat(document.getElementById('pgamma_x').value) || 0; document.getElementById('pgamma_result').textContent = gammaCdf(x, alpha, lambda).toFixed(6); }
+function calcQgamma() { const p = parseFloat(document.getElementById('qgamma_p').value) || 0.5; document.getElementById('qgamma_result').textContent = gammaQuantile(p, alpha, lambda).toFixed(6); }
+alphaSlider.addEventListener('input', e => sync(e.target.value, lambda));
+alphaNum.addEventListener('input', e => sync(e.target.value, lambda));
+lambdaSlider.addEventListener('input', e => sync(alpha, e.target.value));
+lambdaNum.addEventListener('input', e => sync(alpha, e.target.value));
+document.getElementById('xAuto').addEventListener('click', () => { xAxisMode = 'auto'; document.getElementById('xAuto').classList.add('active'); document.getElementById('xFixed').classList.remove('active'); draw(); });
+document.getElementById('xFixed').addEventListener('click', () => { xAxisMode = 'fixed'; document.getElementById('xFixed').classList.add('active'); document.getElementById('xAuto').classList.remove('active'); draw(); });
+document.getElementById('yAuto').addEventListener('click', () => { yAxisMode = 'auto'; document.getElementById('yAuto').classList.add('active'); document.getElementById('yFixed').classList.remove('active'); draw(); });
+document.getElementById('yFixed').addEventListener('click', () => { yAxisMode = 'fixed'; document.getElementById('yFixed').classList.add('active'); document.getElementById('yAuto').classList.remove('active'); draw(); });
+document.querySelectorAll('.example-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.example-item').forEach(el => el.classList.remove('active')); item.classList.add('active'); sync(item.dataset.alpha, item.dataset.lambda); }); });
+document.getElementById('dgamma_x').addEventListener('input', calcDgamma);
+document.getElementById('pgamma_x').addEventListener('input', calcPgamma);
+document.getElementById('qgamma_p').addEventListener('input', calcQgamma);
+window.addEventListener('resize', draw);
+sync(3, 1);
+</script>
+</body>
+</html>

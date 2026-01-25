@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Exponential → Gamma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #f97316; --accent2: #14b8a6; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] { width: 70px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .explanation-box { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1px solid #fdba74; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #c2410c; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #ea580c; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Exponential → Gamma</h1>
+  <nav class="nav-links">
+    <a href="../probability-map.html">← Back to Map</a>
+    <a href="../modules2/exponential_minimal.html">Exponential</a>
+    <a href="../modules2/gamma_rate_latest.html">Gamma</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Sum of k Independent Exponentials</h2>
+    <div class="relation-formula">
+      X₁ + X₂ + ... + Xₖ ~ Gamma(k, λ) where Xᵢ ~ Exp(λ)
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">Exponential(λ)</div>
+      <div class="control-row">
+        <label>λ</label>
+        <input type="range" id="lambda" min="0.5" max="3" step="0.1" value="1">
+        <input type="number" id="lambdaNum" min="0.5" max="3" step="0.1" value="1">
+        <span class="param-note">(rate)</span>
+      </div>
+      <div class="control-row">
+        <label>k</label>
+        <input type="range" id="k" min="1" max="10" step="1" value="3">
+        <input type="number" id="kNum" min="1" max="10" step="1" value="3">
+        <span class="param-note">(# of exponentials)</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="expChart"></canvas>
+      </div>
+      <div class="stats">
+        E[Xᵢ] = 1/λ = <strong id="expMean">1.000</strong>, Var[Xᵢ] = 1/λ² = <strong id="expVar">1.000</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Y = X₁ + ... + Xₖ ~ Gamma(k, λ)</div>
+      <div class="chart-container">
+        <canvas id="gammaChart"></canvas>
+      </div>
+      <div class="stats">
+        E[Y] = k/λ = <strong id="gammaMean">3.000</strong>, Var[Y] = k/λ² = <strong id="gammaVar">3.000</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <p>
+      If X₁, X₂, ..., Xₖ are <strong>k independent</strong> Exponential(λ) random variables, 
+      their sum Y = X₁ + ... + Xₖ follows a <strong>Gamma(α=k, β=λ)</strong> distribution.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Intuition:</strong> Each exponential represents a waiting time until an event. 
+      The sum of k waiting times is the total time until k events occur (Erlang distribution).
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Special case:</strong> When k = 1, Gamma(1, λ) = Exponential(λ).
+    </p>
+  </div>
+</div>
+
+<script>
+let lambda = 1, k = 3;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function expPdf(x, lam) {
+  return x < 0 ? 0 : lam * Math.exp(-lam * x);
+}
+
+function gamma(n) {
+  if (n === 1) return 1;
+  if (n === 0.5) return Math.sqrt(Math.PI);
+  return (n - 1) * gamma(n - 1);
+}
+
+function gammaPdf(x, alpha, beta) {
+  if (x <= 0) return 0;
+  return Math.pow(beta, alpha) / gamma(alpha) * Math.pow(x, alpha - 1) * Math.exp(-beta * x);
+}
+
+function drawExp() {
+  const canvas = document.getElementById('expChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 10, T = 10, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const xMax = 5 / lambda;
+  const ymax = lambda * 1.1;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  // Filled area
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - expPdf(xVal, lambda) / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(249, 115, 22, 0.3)';
+  ctx.fill();
+
+  // Curve
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - expPdf(xVal, lambda) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#f97316';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function drawGamma() {
+  const canvas = document.getElementById('gammaChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 10, T = 10, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const mean = k / lambda;
+  const xMax = mean + 4 * Math.sqrt(k) / lambda;
+  
+  let ymax = 0;
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const pdf = gammaPdf(xVal, k, lambda);
+    if (pdf > ymax) ymax = pdf;
+  }
+  ymax *= 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  // Filled area
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - gammaPdf(xVal, k, lambda) / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(20, 184, 166, 0.3)';
+  ctx.fill();
+
+  // Curve
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - gammaPdf(xVal, k, lambda) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#14b8a6';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function update() {
+  drawExp();
+  drawGamma();
+  document.getElementById('expMean').textContent = (1/lambda).toFixed(3);
+  document.getElementById('expVar').textContent = (1/(lambda*lambda)).toFixed(3);
+  document.getElementById('gammaMean').textContent = (k/lambda).toFixed(3);
+  document.getElementById('gammaVar').textContent = (k/(lambda*lambda)).toFixed(3);
+}
+
+document.getElementById('lambda').addEventListener('input', e => { lambda = parseFloat(e.target.value); document.getElementById('lambdaNum').value = lambda; update(); });
+document.getElementById('lambdaNum').addEventListener('change', e => { lambda = parseFloat(e.target.value); document.getElementById('lambda').value = lambda; update(); });
+document.getElementById('k').addEventListener('input', e => { k = parseInt(e.target.value); document.getElementById('kNum').value = k; update(); });
+document.getElementById('kNum').addEventListener('change', e => { k = parseInt(e.target.value); document.getElementById('k').value = k; update(); });
+window.addEventListener('resize', update);
+
+update();
+</script>
+</body>
+</html>

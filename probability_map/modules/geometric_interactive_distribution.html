@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Geometric – Interactive Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#8b5cf6; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:12px 20px; background:#8b5cf6; color:#fff; font-weight:600; font-size:18px}
+    .wrap{max-width:1200px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; grid-template-rows: auto auto; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px}
+    .row{display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap}
+    label{min-width:24px; color:#333; font-weight:600}
+    input[type="range"]{width:140px}
+    input[type="number"]{width:72px; padding:6px 8px; border:1px solid var(--border); border-radius:6px}
+    .note{color:var(--muted); font-size:13px}
+    .kblock{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:12px}
+    .kblock-title{font-weight:600; font-size:13px; color:var(--accent); margin-bottom:8px}
+    .plot-card{grid-column:2; grid-row:1}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px}
+    .plot h3{margin:0 0 8px 0; font-size:14px; font-weight:600}
+    canvas{width:100%; height:300px; display:block; background:#fafafa; border-radius:8px}
+    .axis-controls{display:flex; gap:16px; margin-top:10px; justify-content:center; flex-wrap:wrap}
+    .axis-btn-group{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+    .axis-btn{padding:3px 8px; border:1px solid var(--border); background:#fff; border-radius:4px; font-size:11px; cursor:pointer; transition:all 0.2s}
+    .axis-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+    .axis-btn:hover:not(.active){background:#f3e8ff}
+    .stats-bar{display:flex; justify-content:center; gap:24px; padding:10px; background:#f3e8ff; border-radius:8px; margin-top:12px; font-size:13px}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+    .calc-card{grid-column:2; grid-row:2; margin-top:0}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#f3e8ff; padding:2px 6px; border-radius:4px; font-size:12px}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:60px}
+    .calc-row input{flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:6px 8px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px; min-height:34px; display:flex; align-items:center}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:6px; transition:background 0.2s; font-size:13px}
+    .calc-btn:hover{background:#7c3aed}
+    .calc-note{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.3}
+    .examples-card{grid-column:1; grid-row:2}
+    .examples-card h4{font-size:13px; color:var(--accent); margin:0 0 10px 0}
+    .example-item{padding:10px; border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid var(--border); transition:all 0.2s}
+    .example-item:hover{background:#f3e8ff; border-color:var(--accent)}
+    .example-item.active{background:#f3e8ff; border-color:var(--accent)}
+    .example-item .ex-title{font-weight:600; font-size:13px; margin-bottom:2px}
+    .example-item .ex-params{color:var(--accent); font-family:monospace; font-size:12px}
+    .example-item .ex-desc{color:var(--muted); font-size:11px; margin-top:4px}
+    @media (max-width: 900px){ .wrap{grid-template-columns: 1fr} .plot-card{grid-column:1; grid-row:2} .examples-card{grid-column:1; grid-row:3} .calc-card{grid-column:1; grid-row:4} .calc-grid{grid-template-columns: 1fr} }
+  </style>
+</head>
+<body>
+<header>Geometric Distribution $X \sim \text{Geom}(p)$</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row"><label>$p$</label><input id="p" type="range" min="0.05" max="0.95" step="0.01" value="0.3"><input id="pNum" type="number" min="0.01" max="0.99" step="0.01" value="0.3"><span class="note">(success prob)</span></div>
+    <div class="kblock"><div class="kblock-title">Probability Mass Function</div><div style="text-align:center; font-size:14px">$$P(X=k) = (1-p)^k p, \quad k = 0, 1, 2, \ldots$$</div></div>
+    <div class="kblock"><div class="kblock-title">Key Properties</div><table style="width:100%; font-size:12px"><tr><td style="color:var(--muted)">Support</td><td>$k \in \{0, 1, 2, \ldots\}$</td></tr><tr><td style="color:var(--muted)">Mean</td><td>$E[X] = \frac{1-p}{p}$</td></tr><tr><td style="color:var(--muted)">Variance</td><td>$\text{Var}[X] = \frac{1-p}{p^2}$</td></tr><tr><td style="color:var(--muted)">Interpretation</td><td># failures before 1st success</td></tr></table></div>
+    <div class="kblock"><div class="kblock-title">Memoryless Property</div><div style="font-size:12px; color:var(--muted)">$P(X > m+n \mid X > m) = P(X > n)$</div></div>
+  </section>
+  <section class="card plot-card">
+    <div class="plot">
+      <h3>PMF $P(X=k)$</h3>
+      <canvas id="pmf"></canvas>
+      <div class="axis-controls"><div class="axis-btn-group"><span>x-axis:</span><button class="axis-btn active" id="xAuto">Auto</button><button class="axis-btn" id="xFixed">Fixed</button></div><div class="axis-btn-group"><span>y-axis:</span><button class="axis-btn active" id="yAuto">Auto</button><button class="axis-btn" id="yFixed">Fixed</button></div></div>
+      <div class="stats-bar"><div class="stat-item"><div class="stat-label">$p$</div><div class="stat-value" id="pOut">0.30</div></div><div class="stat-item"><div class="stat-label">$E[X]$</div><div class="stat-value" id="meanOut">2.33</div></div><div class="stat-item"><div class="stat-label">$\text{Var}[X]$</div><div class="stat-value" id="varOut">7.78</div></div><div class="stat-item"><div class="stat-label">Mode</div><div class="stat-value" id="modeOut">0</div></div></div>
+    </div>
+  </section>
+  <section class="card examples-card">
+    <h4>📚 Examples</h4>
+    <div class="example-item active" data-p="0.3"><div class="ex-title">Free Throw</div><div class="ex-params">p=0.3</div><div class="ex-desc"># misses before 1st make.</div></div>
+    <div class="example-item" data-p="0.5"><div class="ex-title">Coin Flip</div><div class="ex-params">p=0.5</div><div class="ex-desc"># tails before 1st heads.</div></div>
+    <div class="example-item" data-p="0.167"><div class="ex-title">Rolling a Six</div><div class="ex-params">p=0.167</div><div class="ex-desc"># non-sixes before a 6.</div></div>
+    <div class="example-item" data-p="0.9"><div class="ex-title">Reliable Test</div><div class="ex-params">p=0.9</div><div class="ex-desc"># failures before passing.</div></div>
+  </section>
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Probability Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box"><h4><code>dgeom(k)</code> PMF</h4><div class="calc-row"><label>k =</label><input type="number" id="dgeom_k" value="2" min="0" step="1"></div><button class="calc-btn" onclick="calcDgeom()">Calculate P(X=k)</button><div class="calc-row"><label>P(X=k) =</label><div class="result" id="dgeom_result">0.147000</div></div><div class="calc-note">R: <code>dgeom(k, p)</code></div></div>
+      <div class="calc-box"><h4><code>pgeom(k)</code> CDF</h4><div class="calc-row"><label>k =</label><input type="number" id="pgeom_k" value="2" min="0" step="1"></div><button class="calc-btn" onclick="calcPgeom()">Calculate P(X≤k)</button><div class="calc-row"><label>P(X≤k) =</label><div class="result" id="pgeom_result">0.657000</div></div><div class="calc-note">R: <code>pgeom(k, p)</code></div></div>
+      <div class="calc-box"><h4><code>qgeom(q)</code> Quantile</h4><div class="calc-row"><label>q =</label><input type="number" id="qgeom_q" value="0.5" min="0" max="1" step="0.01"></div><button class="calc-btn" onclick="calcQgeom()">Calculate k</button><div class="calc-row"><label>k =</label><div class="result" id="qgeom_result">1</div></div><div class="calc-note">Smallest k where P(X≤k) ≥ q</div></div>
+    </div>
+  </section>
+</main>
+<script>
+const pSlider = document.getElementById('p'), pNum = document.getElementById('pNum'), pmfCanvas = document.getElementById('pmf');
+let p = 0.3, xAxisMode = 'auto', yAxisMode = 'auto';
+const fixedXMax = 30, fixedYMax = 0.5;
+function setupCanvas(c) { const d = window.devicePixelRatio || 1, r = c.getBoundingClientRect(); c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const ctx = c.getContext('2d'); ctx.setTransform(d, 0, 0, d, 0, 0); return ctx; }
+function geomPmf(k, p) { return k < 0 ? 0 : Math.pow(1 - p, k) * p; }
+function geomCdf(k, p) { return k < 0 ? 0 : 1 - Math.pow(1 - p, k + 1); }
+function geomQuantile(q, p) { return q <= 0 ? 0 : q >= 1 ? Infinity : Math.ceil(Math.log(1 - q) / Math.log(1 - p)) - 1; }
+function draw() {
+  const ctx = setupCanvas(pmfCanvas), rect = pmfCanvas.getBoundingClientRect(), w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+  const L = 50, R = 15, T = 15, B = 35, plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+  const mean = (1 - p) / p, variance = (1 - p) / (p * p);
+  let Kmax = xAxisMode === 'fixed' ? fixedXMax : Math.min(50, Math.max(10, Math.ceil(mean + 4 * Math.sqrt(variance))));
+  const probs = []; let maxP = 0;
+  for (let k = 0; k <= Kmax; k++) { const val = geomPmf(k, p); probs.push(val); if (val > maxP) maxP = val; }
+  let ymax = yAxisMode === 'fixed' ? fixedYMax : maxP * 1.15;
+  ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) { const y = yBase - (i / 5) * plotH; ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(w - R, y); ctx.stroke(); }
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke(); ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+  ctx.font = '11px system-ui'; ctx.fillStyle = '#888'; ctx.textAlign = 'center';
+  const step = Kmax <= 20 ? 2 : 5;
+  for (let k = 0; k <= Kmax; k += step) { const x = L + (k + 0.5) * plotW / (Kmax + 1); ctx.fillText(String(k), x, h - 12); }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { const yVal = (i / 4) * ymax, y = yBase - (i / 4) * plotH; ctx.fillText(yVal.toFixed(2), L - 8, y + 4); }
+  const barW = Math.min(18, plotW / ((Kmax + 1) * 1.4));
+  for (let k = 0; k <= Kmax; k++) { const pval = probs[k], xCenter = L + (k + 0.5) * plotW / (Kmax + 1), barHeight = Math.min(pval, ymax) / ymax * plotH, x = xCenter - barW / 2, y = yBase - barHeight; ctx.fillStyle = '#8b5cf6'; ctx.fillRect(x, y, barW, barHeight); }
+  const xMean = L + (mean + 0.5) * plotW / (Kmax + 1);
+  if (xMean >= L && xMean <= w - R) { ctx.beginPath(); ctx.moveTo(xMean, yBase); ctx.lineTo(xMean, T); ctx.strokeStyle = '#666'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#666'; ctx.textAlign = 'center'; ctx.fillText('μ', xMean, T - 5); }
+}
+function sync(newP) {
+  p = parseFloat(newP) || 0.3; p = Math.max(0.01, Math.min(0.99, p));
+  pSlider.value = Math.max(0.05, Math.min(0.95, p)); pNum.value = p.toFixed(2);
+  const mean = (1 - p) / p, variance = (1 - p) / (p * p);
+  document.getElementById('pOut').textContent = p.toFixed(2);
+  document.getElementById('meanOut').textContent = mean.toFixed(2);
+  document.getElementById('varOut').textContent = variance.toFixed(2);
+  document.getElementById('modeOut').textContent = '0';
+  draw(); calcDgeom(); calcPgeom(); calcQgeom();
+}
+function calcDgeom() { const k = parseInt(document.getElementById('dgeom_k').value) || 0; document.getElementById('dgeom_result').textContent = geomPmf(k, p).toFixed(6); }
+function calcPgeom() { const k = parseInt(document.getElementById('pgeom_k').value) || 0; document.getElementById('pgeom_result').textContent = geomCdf(k, p).toFixed(6); }
+function calcQgeom() { const q = parseFloat(document.getElementById('qgeom_q').value) || 0.5; const r = geomQuantile(q, p); document.getElementById('qgeom_result').textContent = Number.isFinite(r) ? r : 'Infinity'; }
+pSlider.addEventListener('input', e => sync(e.target.value));
+pNum.addEventListener('input', e => sync(e.target.value));
+document.getElementById('xAuto').addEventListener('click', () => { xAxisMode = 'auto'; document.getElementById('xAuto').classList.add('active'); document.getElementById('xFixed').classList.remove('active'); draw(); });
+document.getElementById('xFixed').addEventListener('click', () => { xAxisMode = 'fixed'; document.getElementById('xFixed').classList.add('active'); document.getElementById('xAuto').classList.remove('active'); draw(); });
+document.getElementById('yAuto').addEventListener('click', () => { yAxisMode = 'auto'; document.getElementById('yAuto').classList.add('active'); document.getElementById('yFixed').classList.remove('active'); draw(); });
+document.getElementById('yFixed').addEventListener('click', () => { yAxisMode = 'fixed'; document.getElementById('yFixed').classList.add('active'); document.getElementById('yAuto').classList.remove('active'); draw(); });
+document.querySelectorAll('.example-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.example-item').forEach(el => el.classList.remove('active')); item.classList.add('active'); sync(item.dataset.p); }); });
+document.getElementById('dgeom_k').addEventListener('input', calcDgeom);
+document.getElementById('pgeom_k').addEventListener('input', calcPgeom);
+document.getElementById('qgeom_q').addEventListener('input', calcQgeom);
+window.addEventListener('resize', draw);
+sync(0.3);
+</script>
+</body>
+</html>

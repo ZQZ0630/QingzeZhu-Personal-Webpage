@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Standard Normal – Interactive Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#ef4444; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:12px 20px; background:#ef4444; color:#fff; font-weight:600; font-size:18px}
+
+    .wrap{max-width:1200px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 320px 1fr; grid-template-rows: auto auto; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px}
+
+    .row{display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap}
+    label{min-width:24px; color:#333; font-weight:600}
+    input[type="range"]{width:120px}
+    input[type="number"]{width:72px; padding:6px 8px; border:1px solid var(--border); border-radius:6px}
+    .note{color:var(--muted); font-size:13px}
+
+    .kblock{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:12px}
+    .kblock-title{font-weight:600; font-size:13px; color:var(--accent); margin-bottom:8px}
+
+    .plot-card{grid-column:2; grid-row:1}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px}
+    .plot h3{margin:0 0 8px 0; font-size:14px; font-weight:600}
+    canvas{width:100%; height:300px; display:block; background:#fafafa; border-radius:8px}
+
+    .axis-controls{display:flex; gap:16px; margin-top:10px; justify-content:center; flex-wrap:wrap}
+    .axis-btn-group{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+    .axis-btn{padding:3px 8px; border:1px solid var(--border); background:#fff; border-radius:4px; font-size:11px; cursor:pointer; transition:all 0.2s}
+    .axis-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+    .axis-btn:hover:not(.active){background:#fef2f2}
+
+    .stats-bar{display:flex; justify-content:center; gap:24px; padding:10px; background:#fef2f2; border-radius:8px; margin-top:12px; font-size:13px}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+
+    .calc-card{grid-column:2; grid-row:2; margin-top:0}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#fee2e2; padding:2px 6px; border-radius:4px; font-size:12px}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:60px}
+    .calc-row input{flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:6px 8px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px; min-height:34px; display:flex; align-items:center}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:6px; transition:background 0.2s; font-size:13px}
+    .calc-btn:hover{background:#dc2626}
+    .calc-note{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.3}
+
+    .examples-card{grid-column:1; grid-row:2}
+    .examples-card h4{font-size:13px; color:var(--accent); margin:0 0 10px 0}
+    .example-item{padding:10px; border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid var(--border); transition:all 0.2s}
+    .example-item:hover{background:#fef2f2; border-color:var(--accent)}
+    .example-item.active{background:#fef2f2; border-color:var(--accent)}
+    .example-item .ex-title{font-weight:600; font-size:13px; margin-bottom:2px}
+    .example-item .ex-params{color:var(--accent); font-family:monospace; font-size:12px}
+    .example-item .ex-desc{color:var(--muted); font-size:11px; margin-top:4px}
+
+    @media (max-width: 900px){ 
+      .wrap{grid-template-columns: 1fr} 
+      .plot-card{grid-column:1; grid-row:2}
+      .examples-card{grid-column:1; grid-row:3}
+      .calc-card{grid-column:1; grid-row:4}
+      .calc-grid{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+<header>Standard Normal Distribution $Z \sim \mathcal{N}(0, 1)$</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label>$z$</label>
+      <input id="z" type="range" min="-4" max="4" step="0.01" value="0">
+      <input id="zNum" type="number" min="-4" max="4" step="0.01" value="0">
+      <span class="note">(highlight z-value)</span>
+    </div>
+
+    <div class="kblock">
+      <div class="kblock-title">Probability Density Function</div>
+      <div style="text-align:center; font-size:14px">
+        $$\varphi(z) = \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}}$$
+      </div>
+    </div>
+
+    <div class="kblock">
+      <div class="kblock-title">Key Properties</div>
+      <table style="width:100%; font-size:12px">
+        <tr><td style="color:var(--muted)">Support</td><td>$z \in (-\infty, +\infty)$</td></tr>
+        <tr><td style="color:var(--muted)">Mean</td><td>$E[Z] = 0$</td></tr>
+        <tr><td style="color:var(--muted)">Variance</td><td>$\text{Var}[Z] = 1$</td></tr>
+        <tr><td style="color:var(--muted)">Skewness</td><td>$0$</td></tr>
+        <tr><td style="color:var(--muted)">Kurtosis</td><td>$3$</td></tr>
+      </table>
+    </div>
+
+    <div class="kblock">
+      <div class="kblock-title">68-95-99.7 Rule</div>
+      <table style="width:100%; font-size:12px">
+        <tr><td style="color:var(--muted)">$P(|Z| \leq 1)$</td><td>≈ 68.27%</td></tr>
+        <tr><td style="color:var(--muted)">$P(|Z| \leq 2)$</td><td>≈ 95.45%</td></tr>
+        <tr><td style="color:var(--muted)">$P(|Z| \leq 3)$</td><td>≈ 99.73%</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="card plot-card">
+    <div class="plot">
+      <h3>PDF $\varphi(z)$ — shaded area = $\Phi(z)$</h3>
+      <canvas id="pdf"></canvas>
+      <div class="axis-controls">
+        <div class="axis-btn-group">
+          <span>x-axis:</span>
+          <button class="axis-btn active" id="xAuto">Auto</button>
+          <button class="axis-btn" id="xFixed">Fixed</button>
+        </div>
+        <div class="axis-btn-group">
+          <span>y-axis:</span>
+          <button class="axis-btn active" id="yAuto">Auto</button>
+          <button class="axis-btn" id="yFixed">Fixed</button>
+        </div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-label">$z$</div><div class="stat-value" id="zOut">0.00</div></div>
+        <div class="stat-item"><div class="stat-label">$\varphi(z)$</div><div class="stat-value" id="pdfOut">0.3989</div></div>
+        <div class="stat-item"><div class="stat-label">$\Phi(z)$</div><div class="stat-value" id="cdfOut">0.5000</div></div>
+        <div class="stat-item"><div class="stat-label">$1-\Phi(z)$</div><div class="stat-value" id="tailOut">0.5000</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card examples-card">
+    <h4>📚 Common Z-Values</h4>
+    <div class="example-item active" data-z="0">
+      <div class="ex-title">Mean (z=0)</div>
+      <div class="ex-params">z=0</div>
+      <div class="ex-desc">Center of distribution, Φ(0)=0.5</div>
+    </div>
+    <div class="example-item" data-z="1.96">
+      <div class="ex-title">95% CI Critical Value</div>
+      <div class="ex-params">z=1.96</div>
+      <div class="ex-desc">Upper bound for 95% two-sided CI.</div>
+    </div>
+    <div class="example-item" data-z="-1.645">
+      <div class="ex-title">90% One-Sided</div>
+      <div class="ex-params">z=-1.645</div>
+      <div class="ex-desc">10th percentile, P(Z < -1.645) ≈ 0.05</div>
+    </div>
+    <div class="example-item" data-z="2.576">
+      <div class="ex-title">99% CI Critical Value</div>
+      <div class="ex-params">z=2.576</div>
+      <div class="ex-desc">Upper bound for 99% two-sided CI.</div>
+    </div>
+  </section>
+
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Probability Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box">
+        <h4><code>dnorm(z)</code> Density</h4>
+        <div class="calc-row">
+          <label>z =</label>
+          <input type="number" id="dnorm_z" value="0" step="0.01">
+        </div>
+        <button class="calc-btn" onclick="calcDnorm()">Calculate φ(z)</button>
+        <div class="calc-row">
+          <label>φ(z) =</label>
+          <div class="result" id="dnorm_result">0.398942</div>
+        </div>
+        <div class="calc-note">R: <code>dnorm(z)</code></div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>pnorm(z)</code> CDF</h4>
+        <div class="calc-row">
+          <label>z =</label>
+          <input type="number" id="pnorm_z" value="0" step="0.01">
+        </div>
+        <button class="calc-btn" onclick="calcPnorm()">Calculate Φ(z)</button>
+        <div class="calc-row">
+          <label>Φ(z) =</label>
+          <div class="result" id="pnorm_result">0.500000</div>
+        </div>
+        <div class="calc-note">R: <code>pnorm(z)</code></div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>qnorm(p)</code> Quantile</h4>
+        <div class="calc-row">
+          <label>p =</label>
+          <input type="number" id="qnorm_p" value="0.5" min="0.0001" max="0.9999" step="0.01">
+        </div>
+        <button class="calc-btn" onclick="calcQnorm()">Calculate z</button>
+        <div class="calc-row">
+          <label>z =</label>
+          <div class="result" id="qnorm_result">0.000000</div>
+        </div>
+        <div class="calc-note">Inverse CDF: Φ⁻¹(p)</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const zSlider = document.getElementById('z');
+const zNum = document.getElementById('zNum');
+const pdfCanvas = document.getElementById('pdf');
+
+let z = 0;
+let xAxisMode = 'auto', yAxisMode = 'auto';
+const fixedXMin = -4, fixedXMax = 4, fixedYMax = 0.45;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function stdNormalPdf(z) {
+  return Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+}
+
+function stdNormalCdf(z) {
+  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+  const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+  const sign = z < 0 ? -1 : 1;
+  const x = Math.abs(z) / Math.sqrt(2);
+  const t = 1.0 / (1.0 + p * x);
+  const y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t * Math.exp(-x*x);
+  return 0.5 * (1.0 + sign * y);
+}
+
+function stdNormalQuantile(p) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  if (p === 0.5) return 0;
+  
+  const a = [
+    -3.969683028665376e+01, 2.209460984245205e+02,
+    -2.759285104469687e+02, 1.383577518672690e+02,
+    -3.066479806614716e+01, 2.506628277459239e+00
+  ];
+  const b = [
+    -5.447609879822406e+01, 1.615858368580409e+02,
+    -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01
+  ];
+  const c = [
+    -7.784894002430293e-03, -3.223964580411365e-01,
+    -2.400758277161838e+00, -2.549732539343734e+00,
+    4.374664141464968e+00, 2.938163982698783e+00
+  ];
+  const d = [
+    7.784695709041462e-03, 3.224671290700398e-01,
+    2.445134137142996e+00, 3.754408661907416e+00
+  ];
+  
+  const pLow = 0.02425, pHigh = 1 - pLow;
+  let q, r;
+  
+  if (p < pLow) {
+    q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+           ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if (p <= pHigh) {
+    q = p - 0.5;
+    r = q * q;
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+           (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+            ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+}
+
+function draw() {
+  const ctx = setupCanvas(pdfCanvas);
+  const rect = pdfCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 15, T = 15, B = 35;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  let xMin, xMax;
+  if (xAxisMode === 'fixed') {
+    xMin = fixedXMin; xMax = fixedXMax;
+  } else {
+    xMin = -4; xMax = 4;
+  }
+
+  let ymax;
+  if (yAxisMode === 'fixed') {
+    ymax = fixedYMax;
+  } else {
+    ymax = stdNormalPdf(0) * 1.15;
+  }
+
+  // Grid
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    const y = yBase - (i / 5) * plotH;
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(w - R, y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+
+  // X labels
+  ctx.font = '11px system-ui';
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'center';
+  for (let i = -3; i <= 3; i++) {
+    const x = L + (i - xMin) / (xMax - xMin) * plotW;
+    ctx.fillText(String(i), x, h - 12);
+  }
+
+  // Y labels
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const yVal = (i / 4) * ymax;
+    const y = yBase - (i / 4) * plotH;
+    ctx.fillText(yVal.toFixed(2), L - 8, y + 4);
+  }
+
+  // Shaded area up to z
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  const steps = 300;
+  const endZ = Math.min(Math.max(z, xMin), xMax);
+  for (let i = 0; i <= steps; i++) {
+    const zVal = xMin + (endZ - xMin) * i / steps;
+    const x = L + (zVal - xMin) / (xMax - xMin) * plotW;
+    const pdf = stdNormalPdf(zVal);
+    const y = yBase - Math.min(pdf, ymax) / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  const endX = L + (endZ - xMin) / (xMax - xMin) * plotW;
+  ctx.lineTo(endX, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
+  ctx.fill();
+
+  // Full curve
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const zVal = xMin + (xMax - xMin) * i / steps;
+    const x = L + (zVal - xMin) / (xMax - xMin) * plotW;
+    const pdf = stdNormalPdf(zVal);
+    const y = yBase - Math.min(pdf, ymax) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Vertical line at z
+  if (z >= xMin && z <= xMax) {
+    const xZ = L + (z - xMin) / (xMax - xMin) * plotW;
+    const yZ = yBase - stdNormalPdf(z) / ymax * plotH;
+    ctx.beginPath();
+    ctx.moveTo(xZ, yBase);
+    ctx.lineTo(xZ, yZ);
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.beginPath();
+    ctx.arc(xZ, yZ, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ef4444';
+    ctx.fill();
+
+    ctx.fillStyle = '#666';
+    ctx.textAlign = 'center';
+    ctx.fillText('z=' + z.toFixed(2), xZ, yBase + 22);
+  }
+}
+
+function sync(newZ) {
+  z = parseFloat(newZ) || 0;
+  z = Math.max(-4, Math.min(4, z));
+
+  zSlider.value = z;
+  zNum.value = z.toFixed(2);
+
+  const pdf = stdNormalPdf(z);
+  const cdf = stdNormalCdf(z);
+
+  document.getElementById('zOut').textContent = z.toFixed(2);
+  document.getElementById('pdfOut').textContent = pdf.toFixed(4);
+  document.getElementById('cdfOut').textContent = cdf.toFixed(4);
+  document.getElementById('tailOut').textContent = (1 - cdf).toFixed(4);
+
+  draw();
+  calcDnorm();
+  calcPnorm();
+  calcQnorm();
+}
+
+function calcDnorm() {
+  const zVal = parseFloat(document.getElementById('dnorm_z').value) || 0;
+  const result = stdNormalPdf(zVal);
+  document.getElementById('dnorm_result').textContent = result.toFixed(6);
+}
+
+function calcPnorm() {
+  const zVal = parseFloat(document.getElementById('pnorm_z').value) || 0;
+  const result = stdNormalCdf(zVal);
+  document.getElementById('pnorm_result').textContent = result.toFixed(6);
+}
+
+function calcQnorm() {
+  const p = parseFloat(document.getElementById('qnorm_p').value) || 0.5;
+  const result = stdNormalQuantile(p);
+  document.getElementById('qnorm_result').textContent = result.toFixed(6);
+}
+
+// Event listeners
+zSlider.addEventListener('input', e => sync(e.target.value));
+zNum.addEventListener('input', e => sync(e.target.value));
+
+document.getElementById('xAuto').addEventListener('click', () => {
+  xAxisMode = 'auto';
+  document.getElementById('xAuto').classList.add('active');
+  document.getElementById('xFixed').classList.remove('active');
+  draw();
+});
+document.getElementById('xFixed').addEventListener('click', () => {
+  xAxisMode = 'fixed';
+  document.getElementById('xFixed').classList.add('active');
+  document.getElementById('xAuto').classList.remove('active');
+  draw();
+});
+document.getElementById('yAuto').addEventListener('click', () => {
+  yAxisMode = 'auto';
+  document.getElementById('yAuto').classList.add('active');
+  document.getElementById('yFixed').classList.remove('active');
+  draw();
+});
+document.getElementById('yFixed').addEventListener('click', () => {
+  yAxisMode = 'fixed';
+  document.getElementById('yFixed').classList.add('active');
+  document.getElementById('yAuto').classList.remove('active');
+  draw();
+});
+
+// Examples
+document.querySelectorAll('.example-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.example-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+    sync(item.dataset.z);
+  });
+});
+
+document.getElementById('dnorm_z').addEventListener('input', calcDnorm);
+document.getElementById('pnorm_z').addEventListener('input', calcPnorm);
+document.getElementById('qnorm_p').addEventListener('input', calcQnorm);
+
+window.addEventListener('resize', draw);
+
+// Init
+sync(0);
+</script>
+</body>
+</html>
