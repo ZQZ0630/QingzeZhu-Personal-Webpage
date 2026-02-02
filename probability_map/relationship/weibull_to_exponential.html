@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Weibull → Exponential</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --panel: #ffffff;
+      --ink: #111;
+      --muted: #555;
+      --border: #dcdcdc;
+      --accent: #7c3aed;
+      --accent2: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    header {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge-continuous { background: #fef3c7; color: #d97706; }
+    .badge-special { background: #dcfce7; color: #16a34a; }
+    .controls { margin-bottom: 16px; }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .control-row label { min-width: 28px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    .explanation-box {
+      background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+      border: 1px solid #c084fc;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .explanation-box h3 {
+      font-size: 15px;
+      color: #6b21a8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .explanation-box p, .explanation-box div {
+      font-size: 14px;
+      color: #7e22ce;
+      line-height: 1.8;
+    }
+    .convergence-display {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .convergence-display h3 { font-size: 15px; margin-bottom: 12px; }
+    .metric-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .metric {
+      text-align: center;
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      min-width: 120px;
+    }
+    .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .metric-value { font-size: 18px; font-weight: 600; color: var(--accent); }
+    .metric-value.exact { color: #16a34a; }
+    .shape-indicator {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .shape-indicator h3 { font-size: 15px; margin-bottom: 12px; }
+    .shape-bar {
+      height: 30px;
+      background: linear-gradient(90deg, #fef3c7 0%, #dcfce7 50%, #e0e7ff 100%);
+      border-radius: 15px;
+      position: relative;
+      margin: 20px 0;
+    }
+    .shape-marker {
+      position: absolute;
+      top: -5px;
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      transition: left 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .shape-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .shape-label { text-align: center; }
+    .shape-label strong { display: block; color: var(--ink); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Weibull → Exponential</h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/weibull_distribution.html">Weibull</a>
+    <a href="../distribution/exponential_distribution.html">Exponential</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Special Case: Shape Parameter $k = 1$</h2>
+    <div class="relation-formula">
+      $\text{Weibull}(k=1, \lambda) \equiv \text{Exponential}(\lambda)$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Left: Weibull Distribution -->
+    <div class="card">
+      <div class="card-title">
+        <span>Weibull$(k, \lambda)$</span>
+        <span class="badge badge-continuous">Continuous</span>
+      </div>
+      <div class="controls">
+        <div class="control-row">
+          <label>$k$</label>
+          <input type="range" id="k" min="0.5" max="3" step="0.1" value="1.5">
+          <input type="number" id="kNum" min="0.1" max="5" step="0.1" value="1.5">
+          <span class="param-note">(shape)</span>
+        </div>
+        <div class="control-row">
+          <label>$\lambda$</label>
+          <input type="range" id="lambda" min="0.5" max="3" step="0.1" value="1">
+          <input type="number" id="lambdaNum" min="0.1" max="5" step="0.1" value="1">
+          <span class="param-note">(scale)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="weibullChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[X] = $ <strong id="weibullMean">0.886</strong></span> · 
+        <span>$\text{Var}[X] = $ <strong id="weibullVar">0.216</strong></span>
+      </div>
+    </div>
+
+    <!-- Right: Exponential Distribution -->
+    <div class="card">
+      <div class="card-title">
+        <span>Exponential$(\lambda)$ — Reference</span>
+        <span class="badge badge-special" id="exactBadge" style="display: none;">k=1 Exact!</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="expChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[T] = \lambda = $ <strong id="expMean">1.000</strong></span> · 
+        <span>$\text{Var}[T] = \lambda^2 = $ <strong id="expVar">1.000</strong></span>
+      </div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center;">
+        Exponential PDF: $f(t) = \frac{1}{\lambda} e^{-t/\lambda}$
+      </div>
+    </div>
+  </div>
+
+  <!-- Shape Parameter Interpretation -->
+  <div class="shape-indicator">
+    <h3>📊 Shape Parameter $k$ Interpretation</h3>
+    <div class="shape-bar">
+      <div class="shape-marker" id="shapeMarker">1.5</div>
+    </div>
+    <div class="shape-labels">
+      <div class="shape-label"><strong>$k < 1$</strong>Decreasing hazard<br>(infant mortality)</div>
+      <div class="shape-label"><strong>$k = 1$</strong>Constant hazard<br>(Exponential)</div>
+      <div class="shape-label"><strong>$k > 1$</strong>Increasing hazard<br>(wear-out)</div>
+    </div>
+  </div>
+
+  <!-- Convergence Metrics -->
+  <div class="convergence-display">
+    <h3>📐 Comparison Metrics</h3>
+    <div class="metric-row">
+      <div class="metric">
+        <div class="metric-label">Shape $k$</div>
+        <div class="metric-value" id="metricK">1.5</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Scale $\lambda$</div>
+        <div class="metric-value" id="metricLambda">1.0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">|k - 1|</div>
+        <div class="metric-value" id="metricDiff">0.50</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Max |PDF Diff|</div>
+        <div class="metric-value" id="metricPdfDiff">0.152</div>
+      </div>
+    </div>
+    <p style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--muted);">
+      Move $k$ toward 1 to see the Weibull converge to Exponential!
+    </p>
+  </div>
+
+  <!-- Explanation -->
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <div>
+      <p><strong>PDF Comparison:</strong></p>
+      <p style="margin: 10px 0;">
+        Weibull: $f(x) = \dfrac{k}{\lambda}\left(\dfrac{x}{\lambda}\right)^{k-1} e^{-(x/\lambda)^k}, \quad x \geq 0$
+      </p>
+      <p style="margin: 10px 0;">
+        When $k = 1$: $f(x) = \dfrac{1}{\lambda} e^{-x/\lambda}$ — exactly Exponential!
+      </p>
+    </div>
+    <p style="margin-top: 12px;">
+      <strong>Proof:</strong> Setting $k = 1$ in the Weibull PDF:
+      $$f(x) = \frac{1}{\lambda}\left(\frac{x}{\lambda}\right)^{0} e^{-(x/\lambda)^1} = \frac{1}{\lambda} e^{-x/\lambda}$$
+      This is the Exponential$(\lambda)$ PDF (using scale parameterization).
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Hazard Function:</strong><br>
+      The Weibull hazard function is $h(t) = \dfrac{k}{\lambda}\left(\dfrac{t}{\lambda}\right)^{k-1}$
+    </p>
+    <ul style="margin-left: 20px; margin-top: 8px;">
+      <li>$k < 1$: hazard decreases over time (early failures)</li>
+      <li>$k = 1$: constant hazard (memoryless, Exponential)</li>
+      <li>$k > 1$: hazard increases over time (aging/wear-out)</li>
+    </ul>
+    <p style="margin-top: 10px;">
+      <strong>Special Cases:</strong><br>
+      $k = 2$ gives the <strong>Rayleigh distribution</strong>; $k \approx 3.6$ approximates a Normal.
+    </p>
+  </div>
+</div>
+
+<script>
+// Parameters
+let k = 1.5, lambda = 1;
+
+// DOM Elements
+const kSlider = document.getElementById('k');
+const kNum = document.getElementById('kNum');
+const lambdaSlider = document.getElementById('lambda');
+const lambdaNum = document.getElementById('lambdaNum');
+const weibullCanvas = document.getElementById('weibullChart');
+const expCanvas = document.getElementById('expChart');
+
+// Canvas setup
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// Gamma function (Lanczos approximation)
+function gammafn(z) {
+  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gammafn(1 - z));
+  z -= 1;
+  const g = 7;
+  const p = [0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  let x = p[0];
+  for (let i = 1; i < p.length; i++) x += p[i] / (z + i);
+  const t = z + g + 0.5;
+  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+}
+
+// Weibull PDF
+function weibullPdf(x, k, lambda) {
+  if (x < 0) return 0;
+  if (x === 0) return k < 1 ? Infinity : (k === 1 ? 1 / lambda : 0);
+  return (k / lambda) * Math.pow(x / lambda, k - 1) * Math.exp(-Math.pow(x / lambda, k));
+}
+
+// Exponential PDF
+function expPdf(x, lambda) {
+  if (x < 0) return 0;
+  return (1 / lambda) * Math.exp(-x / lambda);
+}
+
+// Draw PDF
+function drawPdf(canvas, pdfFunc, color, params, showExp = false) {
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 15, B = 25;
+  const plotW = w - L - R;
+  const plotH = h - T - B;
+  const yBase = h - B;
+
+  const xMax = lambda * 4;
+  let ymax = 0;
+  const steps = 200;
+  
+  // Find max y
+  for (let i = 1; i <= steps; i++) {
+    const x = i / steps * xMax;
+    const pdf = pdfFunc(x, ...params);
+    if (isFinite(pdf) && pdf > ymax) ymax = pdf;
+  }
+  ymax *= 1.15;
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase);
+  ctx.moveTo(L, T); ctx.lineTo(L, yBase);
+  ctx.stroke();
+
+  // Draw exponential reference if showing comparison
+  if (showExp) {
+    ctx.beginPath();
+    ctx.moveTo(L, yBase);
+    for (let i = 0; i <= steps; i++) {
+      const x = i / steps * xMax;
+      const pdf = expPdf(x, lambda);
+      const px = L + (x / xMax) * plotW;
+      const py = yBase - (Math.min(pdf, ymax) / ymax) * plotH;
+      ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // PDF curve
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= steps; i++) {
+    const x = i / steps * xMax;
+    const pdf = pdfFunc(x, ...params);
+    const px = L + (x / xMax) * plotW;
+    const clampedPdf = isFinite(pdf) ? Math.min(pdf, ymax) : 0;
+    const py = yBase - (clampedPdf / ymax) * plotH;
+    if (!started) { ctx.moveTo(px, yBase); ctx.lineTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = color.replace(')', ', 0.3)').replace('rgb', 'rgba');
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // X labels
+  ctx.font = '10px system-ui';
+  ctx.fillStyle = '#6b7280';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const x = i / 4 * xMax;
+    const px = L + i / 4 * plotW;
+    ctx.fillText(x.toFixed(1), px, h - 8);
+  }
+
+  ctx.textAlign = 'right';
+  ctx.fillText('x', w - 5, yBase + 4);
+}
+
+// Update stats
+function updateStats() {
+  const weibullMean = lambda * gammafn(1 + 1 / k);
+  const weibullVar = lambda * lambda * (gammafn(1 + 2 / k) - Math.pow(gammafn(1 + 1 / k), 2));
+  
+  document.getElementById('weibullMean').textContent = weibullMean.toFixed(3);
+  document.getElementById('weibullVar').textContent = weibullVar.toFixed(3);
+  document.getElementById('expMean').textContent = lambda.toFixed(3);
+  document.getElementById('expVar').textContent = (lambda * lambda).toFixed(3);
+  
+  // Metrics
+  document.getElementById('metricK').textContent = k.toFixed(2);
+  document.getElementById('metricLambda').textContent = lambda.toFixed(2);
+  
+  const kDiff = Math.abs(k - 1);
+  const diffEl = document.getElementById('metricDiff');
+  diffEl.textContent = kDiff.toFixed(2);
+  diffEl.className = kDiff < 0.05 ? 'metric-value exact' : 'metric-value';
+  
+  // Max PDF difference
+  let maxPdfDiff = 0;
+  for (let i = 1; i <= 100; i++) {
+    const x = i / 100 * lambda * 4;
+    const diff = Math.abs(weibullPdf(x, k, lambda) - expPdf(x, lambda));
+    if (isFinite(diff) && diff > maxPdfDiff) maxPdfDiff = diff;
+  }
+  const pdfDiffEl = document.getElementById('metricPdfDiff');
+  pdfDiffEl.textContent = maxPdfDiff.toFixed(3);
+  pdfDiffEl.className = maxPdfDiff < 0.01 ? 'metric-value exact' : 'metric-value';
+  
+  // Show/hide exact badge
+  const badge = document.getElementById('exactBadge');
+  badge.style.display = kDiff < 0.05 ? 'inline' : 'none';
+  
+  // Update shape marker
+  const marker = document.getElementById('shapeMarker');
+  const minK = 0.5, maxK = 3;
+  const percent = (k - minK) / (maxK - minK) * 100;
+  marker.style.left = Math.max(5, Math.min(95, percent)) + '%';
+  marker.textContent = k.toFixed(1);
+}
+
+// Update all
+function update() {
+  drawPdf(weibullCanvas, weibullPdf, 'rgb(124, 58, 237)', [k, lambda], true);
+  drawPdf(expCanvas, expPdf, 'rgb(245, 158, 11)', [lambda]);
+  updateStats();
+}
+
+// Event listeners
+kSlider.addEventListener('input', e => {
+  k = parseFloat(e.target.value);
+  kNum.value = k.toFixed(1);
+  update();
+});
+
+kNum.addEventListener('change', e => {
+  k = Math.max(0.1, Math.min(5, parseFloat(e.target.value)));
+  kSlider.value = Math.min(3, Math.max(0.5, k));
+  kNum.value = k.toFixed(1);
+  update();
+});
+
+lambdaSlider.addEventListener('input', e => {
+  lambda = parseFloat(e.target.value);
+  lambdaNum.value = lambda.toFixed(1);
+  update();
+});
+
+lambdaNum.addEventListener('change', e => {
+  lambda = Math.max(0.1, Math.min(5, parseFloat(e.target.value)));
+  lambdaSlider.value = Math.min(3, Math.max(0.5, lambda));
+  lambdaNum.value = lambda.toFixed(1);
+  update();
+});
+
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

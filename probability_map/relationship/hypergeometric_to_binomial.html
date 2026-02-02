@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Hypergeometric → Binomial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --panel: #ffffff;
+      --ink: #111;
+      --muted: #555;
+      --border: #dcdcdc;
+      --accent: #2563eb;
+      --accent2: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    header {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge-discrete { background: #dbeafe; color: #1d4ed8; }
+    .controls { margin-bottom: 16px; }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .control-row label { min-width: 28px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 150px; }
+    input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    .explanation-box {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #6ee7b7;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .explanation-box h3 {
+      font-size: 15px;
+      color: #065f46;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .explanation-box p, .explanation-box div {
+      font-size: 14px;
+      color: #047857;
+      line-height: 1.8;
+    }
+    .convergence-display {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .convergence-display h3 { font-size: 15px; margin-bottom: 12px; }
+    .metric-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .metric {
+      text-align: center;
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      min-width: 120px;
+    }
+    .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .metric-value { font-size: 18px; font-weight: 600; color: var(--accent); }
+    .metric-value.good { color: #10b981; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Hypergeometric → Binomial</h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/hypergeometric_distribution.html">Hypergeometric</a>
+    <a href="../distribution/binomial_distribution.html">Binomial</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Limiting Case: $N \to \infty$ with $K/N \to p$</h2>
+    <div class="relation-formula">
+      $\text{Hypergeometric}(N, K, n) \xrightarrow{N \to \infty} \text{Binomial}(n, p)$ where $p = K/N$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Left: Hypergeometric Distribution -->
+    <div class="card">
+      <div class="card-title">
+        <span>Hypergeometric$(N, K, n)$</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="controls">
+        <div class="control-row">
+          <label>$N$</label>
+          <input type="range" id="N" min="20" max="500" step="10" value="50">
+          <input type="number" id="NNum" min="20" max="1000" step="10" value="50">
+          <span class="param-note">(population)</span>
+        </div>
+        <div class="control-row">
+          <label>$K$</label>
+          <input type="range" id="K" min="1" max="250" step="1" value="25">
+          <input type="number" id="KNum" min="1" max="500" step="1" value="25">
+          <span class="param-note">(successes in pop)</span>
+        </div>
+        <div class="control-row">
+          <label>$n$</label>
+          <input type="range" id="n" min="1" max="30" step="1" value="10">
+          <input type="number" id="nNum" min="1" max="50" step="1" value="10">
+          <span class="param-note">(sample size)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="hyperChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[X] = $ <strong id="hyperMean">5.000</strong></span> · 
+        <span>$\text{Var}[X] = $ <strong id="hyperVar">2.041</strong></span>
+      </div>
+    </div>
+
+    <!-- Right: Binomial Distribution (Limit) -->
+    <div class="card">
+      <div class="card-title">
+        <span>Binomial$(n, p)$ where $p = K/N$</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="binomChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[Y] = np = $ <strong id="binomMean">5.000</strong></span> · 
+        <span>$\text{Var}[Y] = np(1-p) = $ <strong id="binomVar">2.500</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Convergence Metrics -->
+  <div class="convergence-display">
+    <h3>📊 Convergence Metrics</h3>
+    <div class="metric-row">
+      <div class="metric">
+        <div class="metric-label">Population $N$</div>
+        <div class="metric-value" id="metricN">50</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">$p = K/N$</div>
+        <div class="metric-value" id="metricP">0.500</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Sample Ratio $n/N$</div>
+        <div class="metric-value" id="metricRatio">0.200</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Max |PMF Diff|</div>
+        <div class="metric-value" id="metricDiff">0.0152</div>
+      </div>
+    </div>
+    <p style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--muted);">
+      As $N \to \infty$ (with $n/N \to 0$), the distributions converge. Try increasing $N$!
+    </p>
+  </div>
+
+  <!-- Explanation -->
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <div>
+      <p><strong>PMF Comparison:</strong></p>
+      <p style="margin: 10px 0;">
+        Hypergeometric: $P(X=k) = \dfrac{\binom{K}{k}\binom{N-K}{n-k}}{\binom{N}{n}}$
+      </p>
+      <p style="margin: 10px 0;">
+        Binomial: $P(Y=k) = \binom{n}{k} p^k (1-p)^{n-k}$
+      </p>
+    </div>
+    <p style="margin-top: 12px;">
+      <strong>Intuition:</strong> The Hypergeometric distribution models sampling <em>without replacement</em> 
+      from a finite population. When the population $N$ is very large compared to the sample size $n$, 
+      removing one item barely changes the composition, so sampling without replacement behaves like 
+      sampling <em>with replacement</em> (Binomial).
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Variance Relationship:</strong><br>
+      $\text{Var}_{\text{Hyper}} = np(1-p) \cdot \dfrac{N-n}{N-1} = \text{Var}_{\text{Binom}} \cdot \underbrace{\dfrac{N-n}{N-1}}_{\text{finite population correction}}$
+    </p>
+    <p style="margin-top: 10px;">
+      As $N \to \infty$, the finite population correction $\frac{N-n}{N-1} \to 1$, so the variances converge.
+    </p>
+  </div>
+</div>
+
+<script>
+// Parameters
+let N = 50, K = 25, n = 10;
+
+// DOM Elements
+const NSlider = document.getElementById('N');
+const NNum = document.getElementById('NNum');
+const KSlider = document.getElementById('K');
+const KNum = document.getElementById('KNum');
+const nSlider = document.getElementById('n');
+const nNum = document.getElementById('nNum');
+const hyperCanvas = document.getElementById('hyperChart');
+const binomCanvas = document.getElementById('binomChart');
+
+// Canvas setup
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// Log binomial coefficient (for numerical stability)
+function logComb(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  if (k === 0 || k === n) return 0;
+  let res = 0;
+  for (let i = 0; i < k; i++) {
+    res += Math.log(n - i) - Math.log(i + 1);
+  }
+  return res;
+}
+
+// Hypergeometric PMF
+function hyperPmf(x, N, K, n) {
+  const minX = Math.max(0, n - (N - K));
+  const maxX = Math.min(n, K);
+  if (x < minX || x > maxX) return 0;
+  const logP = logComb(K, x) + logComb(N - K, n - x) - logComb(N, n);
+  return Math.exp(logP);
+}
+
+// Binomial PMF
+function binomPmf(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  const logP = logComb(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p);
+  return Math.exp(logP);
+}
+
+// Draw PMF chart
+function drawPmf(canvas, pmfFunc, color, params) {
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 15, B = 25;
+  const plotW = w - L - R;
+  const plotH = h - T - B;
+  const yBase = h - B;
+
+  // Compute PMF values
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= n; k++) {
+    const pval = pmfFunc(k, ...params);
+    probs.push(pval);
+    if (pval > maxP) maxP = pval;
+  }
+  const ymax = maxP * 1.15;
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  ctx.lineTo(w - R, yBase);
+  ctx.moveTo(L, T);
+  ctx.lineTo(L, yBase);
+  ctx.stroke();
+
+  // Bars
+  const m = n + 1;
+  const barW = Math.min(25, plotW / (m * 1.5));
+
+  for (let k = 0; k <= n; k++) {
+    const pval = probs[k];
+    const xCenter = L + (k + 0.5) * plotW / m;
+    const barH = pval / ymax * plotH;
+    const x = xCenter - barW / 2;
+    const y = yBase - barH;
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barW, barH);
+
+    // X label
+    ctx.font = '10px system-ui';
+    ctx.fillStyle = '#6b7280';
+    ctx.textAlign = 'center';
+    if (n <= 15 || k % 2 === 0) {
+      ctx.fillText(String(k), xCenter, h - 8);
+    }
+  }
+
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '11px system-ui';
+  ctx.textAlign = 'right';
+  ctx.fillText('k', w - 5, yBase + 4);
+}
+
+// Update all
+function update() {
+  // Ensure valid parameters
+  K = Math.min(K, N);
+  n = Math.min(n, N);
+  KSlider.max = N;
+  nSlider.max = Math.min(30, N);
+  
+  const p = K / N;
+  
+  drawPmf(hyperCanvas, hyperPmf, '#2563eb', [N, K, n]);
+  drawPmf(binomCanvas, binomPmf, '#10b981', [n, p]);
+  
+  // Update stats
+  const hyperMean = n * K / N;
+  const hyperVar = n * (K / N) * ((N - K) / N) * ((N - n) / (N - 1));
+  const binomMean = n * p;
+  const binomVar = n * p * (1 - p);
+  
+  document.getElementById('hyperMean').textContent = hyperMean.toFixed(3);
+  document.getElementById('hyperVar').textContent = hyperVar.toFixed(3);
+  document.getElementById('binomMean').textContent = binomMean.toFixed(3);
+  document.getElementById('binomVar').textContent = binomVar.toFixed(3);
+  
+  // Convergence metrics
+  let maxDiff = 0;
+  for (let k = 0; k <= n; k++) {
+    const diff = Math.abs(hyperPmf(k, N, K, n) - binomPmf(k, n, p));
+    if (diff > maxDiff) maxDiff = diff;
+  }
+  
+  document.getElementById('metricN').textContent = N;
+  document.getElementById('metricP').textContent = p.toFixed(3);
+  document.getElementById('metricRatio').textContent = (n / N).toFixed(3);
+  const diffEl = document.getElementById('metricDiff');
+  diffEl.textContent = maxDiff.toFixed(4);
+  diffEl.className = maxDiff < 0.01 ? 'metric-value good' : 'metric-value';
+}
+
+// Event listeners
+NSlider.addEventListener('input', e => { N = parseInt(e.target.value); NNum.value = N; update(); });
+NNum.addEventListener('change', e => { N = Math.max(20, Math.min(1000, parseInt(e.target.value))); NSlider.value = Math.min(500, N); NNum.value = N; update(); });
+KSlider.addEventListener('input', e => { K = parseInt(e.target.value); KNum.value = K; update(); });
+KNum.addEventListener('change', e => { K = Math.max(1, Math.min(N, parseInt(e.target.value))); KSlider.value = K; KNum.value = K; update(); });
+nSlider.addEventListener('input', e => { n = parseInt(e.target.value); nNum.value = n; update(); });
+nNum.addEventListener('change', e => { n = Math.max(1, Math.min(N, parseInt(e.target.value))); nSlider.value = n; nNum.value = n; update(); });
+
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

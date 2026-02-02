@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Poisson (PMF) – Discrete Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#059669; } /* Green for Poisson */
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:var(--accent); color:#fff; font-weight:600}
+
+    /* Layout Grid */
+    .wrap{max-width:1150px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 340px 1fr; grid-template-rows: auto auto; gap:14px}
+
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; gap:10px; margin:6px 0; flex-wrap:wrap}
+    label{min-width:24px; color:#333; font-weight:600}
+    input[type="range"]{width:120px}
+    input[type="number"]{width:70px; padding:6px 8px; border:1px solid var(--border); border-radius:8px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+    .note{color:var(--muted); font-size:13px}
+
+    /* Plot Area (Top Right) */
+    .plot-card{grid-column: 2; grid-row: 1;}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    canvas{width:100%; height:300px; display:block; background:#fafafa; border-radius:8px}
+
+    /* Stats bar within plot */
+    .stats-bar{display:flex; justify-content:center; gap:20px; padding:8px; background:#ecfdf5; border-radius:8px; margin-top:10px; font-size:13px}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+
+    /* PMF Table Panel (Bottom Left) - THE REQUESTED FEATURE */
+    .table-card{grid-column: 1; grid-row: 2; display:flex; flex-direction:column; max-height:400px}
+    .table-container{overflow-y:auto; border:1px solid var(--border); border-radius:8px; margin-top:10px}
+    table.pmf-table{width:100%; border-collapse:collapse; font-size:13px; text-align:right}
+    .pmf-table th{position:sticky; top:0; background:#f0fdf4; padding:8px; border-bottom:1px solid var(--border); text-align:right; font-weight:600; color:var(--accent); z-index:10}
+    .pmf-table td{padding:6px 8px; border-bottom:1px solid #eee}
+    .pmf-table tr:last-child td{border-bottom:none}
+    .pmf-table tr:hover{background:#f9fafb}
+    .prob-bar-bg{width:100%; height:4px; background:#e5e7eb; margin-top:2px; border-radius:2px; overflow:hidden}
+    .prob-bar-fill{height:100%; background:var(--accent)}
+
+    /* Calculator Section (Bottom Right) */
+    .calc-card{grid-column: 2; grid-row: 2;}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#d1fae5; padding:2px 6px; border-radius:4px; font-size:12px; color:#065f46}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:50px}
+    .calc-row input{flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:8px 10px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px; min-height:36px; display:flex; align-items:center}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:8px; transition:background 0.2s; font-size:13px}
+    .calc-btn:hover{background:#047857}
+
+    /* Responsive */
+    @media (max-width: 900px){ 
+      .wrap{grid-template-columns: 1fr} 
+      .plot-card{grid-column:1; grid-row:2}
+      .table-card{grid-column:1; grid-row:3}
+      .calc-card{grid-column:1; grid-row:4}
+    }
+  </style>
+</head>
+<body>
+<header>Poisson Distribution $X \sim \text{Pois}(\lambda)$</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label>$\lambda$</label>
+      <input id="lambda" type="range" min="0.1" max="20" step="0.1" value="4">
+      <input id="lambdaNum" type="number" min="0.1" max="50" step="0.1" value="4">
+      <span class="note">(rate)</span>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Probability Mass Function (PMF)</div>
+      <div class="note" style="margin-bottom:8px">This is for <b>discrete</b> events. It gives the exact probability for each count $k$.</div>
+      <div style="text-align:center; padding:8px 0; font-size:1.1em">
+        $$P(X=k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+      </div>
+      <div class="note" style="text-align:center; margin-top:4px">$k = 0, 1, 2, \dots$</div>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Properties</div>
+      <table style="width:100%; font-size:12px">
+        <tr><td style="color:var(--muted)">Mean $E[X]$</td><td>$\lambda$</td></tr>
+        <tr><td style="color:var(--muted)">Variance</td><td>$\lambda$</td></tr>
+        <tr><td style="color:var(--muted)">Mode</td><td>$\lfloor \lambda \rfloor$</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="card plot-card">
+    <div class="plot">
+      <h3 style="margin:0 0 6px 0; font-size:14px">PMF Visualization (Bar Chart)</h3>
+      <canvas id="pmfCanvas"></canvas>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-label">$\lambda$</div><div class="stat-value" id="lamOut">4.0</div></div>
+        <div class="stat-item"><div class="stat-label">Max Prob</div><div class="stat-value" id="maxProb">0.195</div></div>
+        <div class="stat-item"><div class="stat-label">Significant Range</div><div class="stat-value" id="sigRange">[0, 10]</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table-card">
+    <h4 style="margin:0 0 10px 0; font-size:14px; color:var(--accent)">📋 PMF Table (Exact Values)</h4>
+    <div class="note" style="margin-bottom:6px">This table lists the exact probability for each outcome.</div>
+    <div class="table-container">
+      <table class="pmf-table">
+        <thead>
+          <tr>
+            <th style="text-align:center; width:50px">k</th>
+            <th>P(X=k)</th>
+            <th>Cumul. P(X≤k)</th>
+          </tr>
+        </thead>
+        <tbody id="pmfTableBody">
+          </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Discrete Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box">
+        <h4><code>dpois(k)</code> Probability</h4>
+        <div class="calc-row">
+          <label>k =</label>
+          <input type="number" id="d_k" value="0" step="1" min="0">
+        </div>
+        <button class="calc-btn" onclick="calcD()">Calc P(X=k)</button>
+        <div class="calc-row">
+          <label>Prob =</label>
+          <div class="result" id="d_res">—</div>
+        </div>
+        <div class="calc-note">Exact chance of k events.</div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>ppois(k)</code> Cumulative</h4>
+        <div class="calc-row">
+          <label>k =</label>
+          <input type="number" id="p_k" value="0" step="1" min="0">
+        </div>
+        <button class="calc-btn" onclick="calcP()">Calc P(X≤k)</button>
+        <div class="calc-row">
+          <label>Prob =</label>
+          <div class="result" id="p_res">—</div>
+        </div>
+        <div class="calc-note">Chance of k or fewer.</div>
+      </div>
+
+      <div class="calc-box">
+        <h4><code>qpois(p)</code> Quantile</h4>
+        <div class="calc-row">
+          <label>p =</label>
+          <input type="number" id="q_p" value="0.5" step="0.01" min="0" max="0.999">
+        </div>
+        <button class="calc-btn" onclick="calcQ()">Calc k</button>
+        <div class="calc-row">
+          <label>k =</label>
+          <div class="result" id="q_res">—</div>
+        </div>
+        <div class="calc-note">Counts to reach prob p.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// State
+let lambda = 4;
+const canvas = document.getElementById('pmfCanvas');
+
+// Math functions
+function factorial(n) {
+  if (n < 0) return NaN;
+  if (n === 0 || n === 1) return 1;
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function poissonPMF(k, lam) {
+  if (k < 0 || !Number.isInteger(k)) return 0;
+  // Use log gamma for stability with large numbers
+  // PMF = exp(k*ln(lam) - lam - ln(k!))
+  return Math.exp(k * Math.log(lam) - lam - logFactorial(k));
+}
+
+function logFactorial(n) {
+  if (n === 0) return 0;
+  // Stirling approx for large n, simple loop for small
+  if (n < 20) return Math.log(factorial(n));
+  return n * Math.log(n) - n + 0.5 * Math.log(2 * Math.PI * n); 
+}
+
+function poissonCDF(k, lam) {
+  if (k < 0) return 0;
+  let sum = 0;
+  for (let i = 0; i <= k; i++) {
+    sum += poissonPMF(i, lam);
+  }
+  return Math.min(1, sum);
+}
+
+// Draw Bar Chart
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Determine range (0 to where Prob < 0.001)
+  let maxK = Math.max(10, Math.ceil(lambda + 4 * Math.sqrt(lambda)));
+  while (poissonPMF(maxK, lambda) > 0.0001) maxK++;
+  maxK = Math.min(maxK, 100); // Safety cap
+
+  // Determine max Y
+  let maxP = 0;
+  for (let k = 0; k <= maxK; k++) maxP = Math.max(maxP, poissonPMF(k, lambda));
+  const yMax = maxP * 1.2;
+
+  const L = 40, R = 20, T = 20, B = 30;
+  const graphW = w - L - R;
+  const graphH = h - T - B;
+
+  // Draw Axes
+  ctx.strokeStyle = '#ddd';
+  ctx.beginPath();
+  ctx.moveTo(L, h - B); ctx.lineTo(w - R, h - B); // X
+  ctx.moveTo(L, T); ctx.lineTo(L, h - B); // Y
+  ctx.stroke();
+
+  // Draw Bars
+  const barWidth = (graphW / (maxK + 1)) * 0.7;
+  const step = graphW / (maxK + 1);
+
+  ctx.fillStyle = '#059669';
+  for (let k = 0; k <= maxK; k++) {
+    const p = poissonPMF(k, lambda);
+    const barH = (p / yMax) * graphH;
+    const x = L + k * step + (step - barWidth)/2;
+    const y = h - B - barH;
+
+    ctx.fillRect(x, y, barWidth, barH);
+
+    // Labels for some X
+    if (maxK <= 20 || k % 5 === 0) {
+      ctx.fillStyle = '#666';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(k, x + barWidth/2, h - B + 14);
+      ctx.fillStyle = '#059669';
+    }
+  }
+
+  // Update Stats UI
+  document.getElementById('lamOut').textContent = lambda.toFixed(1);
+  document.getElementById('maxProb').textContent = maxP.toFixed(4);
+  document.getElementById('sigRange').textContent = `[0, ${maxK}]`;
+
+  updateTable(maxK);
+}
+
+// Update Table
+function updateTable(maxK) {
+  const tbody = document.getElementById('pmfTableBody');
+  tbody.innerHTML = '';
+
+  let cum = 0;
+  for (let k = 0; k <= maxK; k++) {
+    const p = poissonPMF(k, lambda);
+    cum += p;
+    if (cum > 1) cum = 1;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center; font-weight:600; color:#333">${k}</td>
+      <td>
+        <div style="font-family:monospace; color:#059669">${p.toFixed(4)}</div>
+        <div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${p/0.4*100}%"></div></div>
+      </td>
+      <td style="font-family:monospace; color:#555">${cum.toFixed(4)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// Sync
+function sync(val) {
+  lambda = parseFloat(val);
+  document.getElementById('lambda').value = lambda;
+  document.getElementById('lambdaNum').value = lambda;
+  draw();
+  calcD(); calcP(); calcQ();
+}
+
+// Calc Functions
+function calcD() {
+  const k = parseInt(document.getElementById('d_k').value);
+  const p = poissonPMF(k, lambda);
+  document.getElementById('d_res').textContent = p.toFixed(6);
+}
+function calcP() {
+  const k = parseInt(document.getElementById('p_k').value);
+  const p = poissonCDF(k, lambda);
+  document.getElementById('p_res').textContent = p.toFixed(6);
+}
+function calcQ() {
+  const p = parseFloat(document.getElementById('q_p').value);
+  if(p<0||p>1) {document.getElementById('q_res').textContent="Err"; return;}
+  let k = 0;
+  let cdf = poissonPMF(0, lambda);
+  while (cdf < p) {
+    k++;
+    cdf += poissonPMF(k, lambda);
+  }
+  document.getElementById('q_res').textContent = k;
+}
+
+// Listeners
+document.getElementById('lambda').addEventListener('input', e=>sync(e.target.value));
+document.getElementById('lambdaNum').addEventListener('input', e=>sync(e.target.value));
+document.getElementById('d_k').addEventListener('input', calcD);
+document.getElementById('p_k').addEventListener('input', calcP);
+document.getElementById('q_p').addEventListener('input', calcQ);
+
+window.addEventListener('resize', draw);
+
+// Init
+sync(4);
+</script>
+</body>
+</html>

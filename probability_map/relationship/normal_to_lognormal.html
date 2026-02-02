@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Normal → Lognormal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #ef4444; --accent2: #84cc16; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; margin-bottom: 8px; }
+    .relation-formula { font-size: 20px; color: #65a30d; font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; }
+    input[type="range"] { flex: 1; max-width: 150px; }
+    input[type="number"] { width: 70px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .transform-box { text-align: center; padding: 20px; background: #f7fee7; border-radius: 10px; margin: 20px 0; font-size: 28px; color: #3f6212; }
+    .explanation-box { background: linear-gradient(135deg, #f7fee7 0%, #ecfccb 100%); border: 1px solid #bef264; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #3f6212; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #4d7c0f; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Normal → Lognormal</h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/normal_distribution.html">Normal</a>
+    <a href="../distribution/lognormal_distribution.html">Lognormal</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Exponential Transform</h2>
+    <div class="relation-formula">
+      If $X \sim N(\mu, \sigma^2)$, then $Y = e^X \sim \text{Lognormal}(\mu, \sigma^2)$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">$X \sim \text{Normal}(\mu, \sigma^2)$</div>
+      <div class="control-row">
+        <label>$\mu$</label>
+        <input type="range" id="mu" min="-1" max="2" step="0.1" value="0">
+        <input type="number" id="muNum" min="-1" max="2" step="0.1" value="0">
+      </div>
+      <div class="control-row">
+        <label>$\sigma$</label>
+        <input type="range" id="sigma" min="0.2" max="1.5" step="0.1" value="0.5">
+        <input type="number" id="sigmaNum" min="0.2" max="1.5" step="0.1" value="0.5">
+      </div>
+      <div class="chart-container">
+        <canvas id="normalChart"></canvas>
+      </div>
+      <div class="stats">
+        $E[X] = $ <strong id="xMean">0</strong>, $\text{Var}[X] = $ <strong id="xVar">0.25</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">$Y = e^X \sim \text{Lognormal}(\mu, \sigma^2)$</div>
+      <div class="chart-container">
+        <canvas id="lnChart"></canvas>
+      </div>
+      <div class="stats">
+        $E[Y] = e^{\mu+\sigma^2/2} = $ <strong id="yMean">1.133</strong>, 
+        $\text{Var}[Y] = $ <strong id="yVar">0.364</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="transform-box">
+    $$Y = e^X$$
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Exponential Transform</h3>
+    <p>
+      If $X$ is normally distributed, then $Y = e^X$ follows a <strong>lognormal</strong> distribution. 
+      Equivalently, $\ln(Y)$ is normally distributed — hence the name "lognormal".
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>PDF of Lognormal:</strong>
+      $$f_Y(y) = \frac{1}{y\sigma\sqrt{2\pi}} \exp\left(-\frac{(\ln y - \mu)^2}{2\sigma^2}\right), \quad y > 0$$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Properties:</strong><br>
+      • $E[Y] = e^{\mu + \sigma^2/2}$<br>
+      • $\text{Var}[Y] = (e^{\sigma^2} - 1) \cdot e^{2\mu + \sigma^2}$<br>
+      • $\text{Median}[Y] = e^\mu$<br>
+      • $\text{Mode}[Y] = e^{\mu - \sigma^2}$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Applications:</strong> Stock prices (geometric Brownian motion), income distributions, particle sizes — 
+      any quantity that is the product of many positive random factors.
+    </p>
+  </div>
+</div>
+
+<script>
+let mu = 0, sigma = 0.5;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function normalPdf(x, m, s) {
+  const z = (x - m) / s;
+  return Math.exp(-0.5 * z * z) / (s * Math.sqrt(2 * Math.PI));
+}
+
+function lognormalPdf(x, m, s) {
+  if (x <= 0) return 0;
+  const z = (Math.log(x) - m) / s;
+  return Math.exp(-0.5 * z * z) / (x * s * Math.sqrt(2 * Math.PI));
+}
+
+function drawNormal() {
+  const canvas = document.getElementById('normalChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 10, B = 25;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const xMin = mu - 4 * sigma, xMax = mu + 4 * sigma;
+  const ymax = normalPdf(mu, mu, sigma) * 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMin + (xMax - xMin) * i / 200;
+    const x = L + (xVal - xMin) / (xMax - xMin) * plotW;
+    const y = yBase - normalPdf(xVal, mu, sigma) / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.3)';
+  ctx.fill();
+
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMin + (xMax - xMin) * i / 200;
+    const x = L + (xVal - xMin) / (xMax - xMin) * plotW;
+    const y = yBase - normalPdf(xVal, mu, sigma) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function drawLognormal() {
+  const canvas = document.getElementById('lnChart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 10, B = 25;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const mean = Math.exp(mu + sigma * sigma / 2);
+  const xMax = mean * 4;
+  
+  let ymax = 0;
+  for (let i = 1; i <= 200; i++) {
+    const pdf = lognormalPdf(xMax * i / 200, mu, sigma);
+    if (pdf > ymax) ymax = pdf;
+  }
+  ymax *= 1.15;
+
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  for (let i = 0; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - lognormalPdf(xVal, mu, sigma) / ymax * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(132, 204, 22, 0.3)';
+  ctx.fill();
+
+  ctx.beginPath();
+  for (let i = 1; i <= 200; i++) {
+    const xVal = xMax * i / 200;
+    const x = L + xVal / xMax * plotW;
+    const y = yBase - lognormalPdf(xVal, mu, sigma) / ymax * plotH;
+    if (i === 1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#84cc16';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function update() {
+  drawNormal();
+  drawLognormal();
+  const yMean = Math.exp(mu + sigma * sigma / 2);
+  const yVar = (Math.exp(sigma * sigma) - 1) * Math.exp(2 * mu + sigma * sigma);
+  document.getElementById('xMean').textContent = mu.toFixed(2);
+  document.getElementById('xVar').textContent = (sigma * sigma).toFixed(2);
+  document.getElementById('yMean').textContent = yMean.toFixed(3);
+  document.getElementById('yVar').textContent = yVar.toFixed(3);
+}
+
+document.getElementById('mu').addEventListener('input', e => { mu = parseFloat(e.target.value); document.getElementById('muNum').value = mu; update(); });
+document.getElementById('muNum').addEventListener('change', e => { mu = parseFloat(e.target.value); document.getElementById('mu').value = mu; update(); });
+document.getElementById('sigma').addEventListener('input', e => { sigma = parseFloat(e.target.value); document.getElementById('sigmaNum').value = sigma; update(); });
+document.getElementById('sigmaNum').addEventListener('change', e => { sigma = parseFloat(e.target.value); document.getElementById('sigma').value = sigma; update(); });
+window.addEventListener('resize', update);
+
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Poisson ↔ Exponential</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --panel: #ffffff;
+      --ink: #111;
+      --muted: #555;
+      --border: #dcdcdc;
+      --accent: #8b5cf6;
+      --accent2: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    header {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge-discrete { background: #dbeafe; color: #1d4ed8; }
+    .badge-continuous { background: #fef3c7; color: #d97706; }
+    .controls { margin-bottom: 16px; }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .control-row label { min-width: 28px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    .explanation-box {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #fbbf24;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .explanation-box h3 {
+      font-size: 15px;
+      color: #92400e;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .explanation-box p, .explanation-box div {
+      font-size: 14px;
+      color: #a16207;
+      line-height: 1.8;
+    }
+    .visual-demo {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .visual-demo h3 { font-size: 15px; margin-bottom: 12px; }
+    .timeline {
+      position: relative;
+      height: 80px;
+      background: linear-gradient(90deg, #faf5ff 0%, #f3e8ff 100%);
+      border-radius: 8px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .timeline-axis {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: #8b5cf6;
+    }
+    .timeline-event {
+      position: absolute;
+      bottom: 15px;
+      width: 12px;
+      height: 12px;
+      background: #f59e0b;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .timeline-event:hover { transform: translateX(-50%) scale(1.3); }
+    .timeline-interval {
+      position: absolute;
+      bottom: 35px;
+      font-size: 11px;
+      color: #7c3aed;
+      font-weight: 600;
+      transform: translateX(-50%);
+    }
+    .demo-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .interval-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .interval-stat { text-align: center; }
+    .interval-stat-label { color: var(--muted); font-size: 11px; }
+    .interval-stat-value { font-weight: 600; color: var(--accent); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Poisson ↔ Exponential</h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/poisson_distribution.html">Poisson</a>
+    <a href="../distribution/exponential_distribution.html">Exponential</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Waiting Time Relationship</h2>
+    <div class="relation-formula">
+      If events occur as $\text{Poisson}(\lambda)$ process, then inter-arrival times follow $\text{Exp}(\lambda)$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Left: Poisson Distribution -->
+    <div class="card">
+      <div class="card-title">
+        <span>Poisson$(\lambda)$ — Event Counts</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="controls">
+        <div class="control-row">
+          <label>$\lambda$</label>
+          <input type="range" id="lambda" min="0.5" max="8" step="0.5" value="3">
+          <input type="number" id="lambdaNum" min="0.1" max="20" step="0.1" value="3">
+          <span class="param-note">(rate per unit time)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="poissonChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[N] = \lambda = $ <strong id="poissonMean">3.000</strong></span> · 
+        <span>$\text{Var}[N] = \lambda = $ <strong id="poissonVar">3.000</strong></span>
+      </div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center;">
+        $P(N=k) = \dfrac{\lambda^k e^{-\lambda}}{k!}$ — Number of events in unit time
+      </div>
+    </div>
+
+    <!-- Right: Exponential Distribution -->
+    <div class="card">
+      <div class="card-title">
+        <span>Exponential$(\lambda)$ — Waiting Times</span>
+        <span class="badge badge-continuous">Continuous</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="expChart"></canvas>
+      </div>
+      <div class="stats">
+        <span>$E[T] = 1/\lambda = $ <strong id="expMean">0.333</strong></span> · 
+        <span>$\text{Var}[T] = 1/\lambda^2 = $ <strong id="expVar">0.111</strong></span>
+      </div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center;">
+        $f(t) = \lambda e^{-\lambda t}$ — Time until next event
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Timeline Demo -->
+  <div class="visual-demo">
+    <h3>⏱️ Interactive Demo: Poisson Process Timeline</h3>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">
+      Click "Generate" to simulate a Poisson process. Orange dots are events; 
+      the intervals between them follow an Exponential distribution.
+    </p>
+    <div class="timeline" id="timeline">
+      <div class="timeline-axis"></div>
+    </div>
+    <div class="interval-stats">
+      <div class="interval-stat">
+        <div class="interval-stat-label">Events Generated</div>
+        <div class="interval-stat-value" id="eventCount">-</div>
+      </div>
+      <div class="interval-stat">
+        <div class="interval-stat-label">Mean Interval</div>
+        <div class="interval-stat-value" id="meanInterval">-</div>
+      </div>
+      <div class="interval-stat">
+        <div class="interval-stat-label">Expected $1/\lambda$</div>
+        <div class="interval-stat-value" id="expectedInterval">0.333</div>
+      </div>
+    </div>
+    <div class="demo-controls">
+      <button class="btn btn-primary" id="generateBtn">⏱️ Generate Process</button>
+      <button class="btn btn-secondary" id="resetBtn">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- Explanation -->
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <div>
+      <p><strong>The Poisson-Exponential Duality:</strong></p>
+      <p style="margin: 10px 0;">
+        A <strong>Poisson process</strong> with rate $\lambda$ is a counting process where:
+      </p>
+      <ul style="margin-left: 20px; margin-bottom: 10px;">
+        <li>Events occur independently</li>
+        <li>The number of events in time interval $[0, t]$ follows $\text{Poisson}(\lambda t)$</li>
+        <li>The waiting time until the next event follows $\text{Exp}(\lambda)$</li>
+      </ul>
+    </div>
+    <p style="margin-top: 12px;">
+      <strong>Key Connection:</strong><br>
+      $$P(T > t) = P(\text{no events in } [0,t]) = e^{-\lambda t}$$
+      This is exactly the survival function of $\text{Exp}(\lambda)$!
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Memoryless Property:</strong><br>
+      Both distributions share the memoryless property:
+      $$P(T > s + t \mid T > s) = P(T > t)$$
+      "The future is independent of the past, given the present."
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Sum of Exponentials:</strong><br>
+      If $T_1, T_2, \ldots, T_k \overset{\text{iid}}{\sim} \text{Exp}(\lambda)$, then 
+      $S_k = T_1 + \cdots + T_k \sim \text{Gamma}(k, \lambda)$
+      (time until $k$-th event).
+    </p>
+  </div>
+</div>
+
+<script>
+// Parameters
+let lambda = 3;
+
+// DOM Elements
+const lambdaSlider = document.getElementById('lambda');
+const lambdaNum = document.getElementById('lambdaNum');
+const poissonCanvas = document.getElementById('poissonChart');
+const expCanvas = document.getElementById('expChart');
+const timeline = document.getElementById('timeline');
+
+// Canvas setup
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// Factorial
+function factorial(n) {
+  if (n <= 1) return 1;
+  let res = 1;
+  for (let i = 2; i <= n; i++) res *= i;
+  return res;
+}
+
+// Poisson PMF
+function poissonPmf(k, lam) {
+  return Math.pow(lam, k) * Math.exp(-lam) / factorial(k);
+}
+
+// Exponential PDF
+function expPdf(t, lam) {
+  if (t < 0) return 0;
+  return lam * Math.exp(-lam * t);
+}
+
+// Draw Poisson PMF
+function drawPoisson() {
+  const ctx = setupCanvas(poissonCanvas);
+  const rect = poissonCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 15, B = 25;
+  const plotW = w - L - R;
+  const plotH = h - T - B;
+  const yBase = h - B;
+
+  // Compute PMF
+  const maxK = Math.max(15, Math.ceil(lambda + 4 * Math.sqrt(lambda)));
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= maxK; k++) {
+    const pval = poissonPmf(k, lambda);
+    probs.push(pval);
+    if (pval > maxP) maxP = pval;
+  }
+  const ymax = maxP * 1.15;
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase);
+  ctx.moveTo(L, T); ctx.lineTo(L, yBase);
+  ctx.stroke();
+
+  // Bars
+  const m = probs.length;
+  const barW = Math.min(20, plotW / (m * 1.5));
+
+  for (let k = 0; k < m; k++) {
+    const pval = probs[k];
+    if (pval < 0.001) continue;
+    const xCenter = L + (k + 0.5) * plotW / m;
+    const barH = pval / ymax * plotH;
+    const x = xCenter - barW / 2;
+    const y = yBase - barH;
+
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillRect(x, y, barW, barH);
+
+    ctx.font = '10px system-ui';
+    ctx.fillStyle = '#6b7280';
+    ctx.textAlign = 'center';
+    if (k % (m > 20 ? 2 : 1) === 0) {
+      ctx.fillText(String(k), xCenter, h - 8);
+    }
+  }
+
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '11px system-ui';
+  ctx.textAlign = 'right';
+  ctx.fillText('k', w - 5, yBase + 4);
+}
+
+// Draw Exponential PDF
+function drawExp() {
+  const ctx = setupCanvas(expCanvas);
+  const rect = expCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 10, T = 15, B = 25;
+  const plotW = w - L - R;
+  const plotH = h - T - B;
+  const yBase = h - B;
+
+  const tMax = Math.min(10, 5 / lambda);
+  const ymax = lambda * 1.15;
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase);
+  ctx.moveTo(L, T); ctx.lineTo(L, yBase);
+  ctx.stroke();
+
+  // PDF curve
+  ctx.beginPath();
+  ctx.moveTo(L, yBase);
+  const steps = 200;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps * tMax;
+    const pdf = expPdf(t, lambda);
+    const x = L + (t / tMax) * plotW;
+    const y = yBase - (pdf / ymax) * plotH;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(L + plotW, yBase);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(245, 158, 11, 0.3)';
+  ctx.fill();
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // X labels
+  ctx.font = '10px system-ui';
+  ctx.fillStyle = '#6b7280';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 5; i++) {
+    const t = i / 5 * tMax;
+    const x = L + i / 5 * plotW;
+    ctx.fillText(t.toFixed(1), x, h - 8);
+  }
+
+  ctx.textAlign = 'right';
+  ctx.fillText('t', w - 5, yBase + 4);
+}
+
+// Update stats
+function updateStats() {
+  document.getElementById('poissonMean').textContent = lambda.toFixed(3);
+  document.getElementById('poissonVar').textContent = lambda.toFixed(3);
+  document.getElementById('expMean').textContent = (1 / lambda).toFixed(3);
+  document.getElementById('expVar').textContent = (1 / (lambda * lambda)).toFixed(3);
+  document.getElementById('expectedInterval').textContent = (1 / lambda).toFixed(3);
+}
+
+// Update all
+function update() {
+  drawPoisson();
+  drawExp();
+  updateStats();
+  resetTimeline();
+}
+
+// Generate exponential random variable
+function randExp(lam) {
+  return -Math.log(Math.random()) / lam;
+}
+
+// Generate and display Poisson process
+function generateProcess() {
+  const timelineEl = document.getElementById('timeline');
+  // Clear existing events
+  const events = timelineEl.querySelectorAll('.timeline-event, .timeline-interval');
+  events.forEach(e => e.remove());
+
+  const totalTime = 5; // seconds of timeline
+  const timelineWidth = timelineEl.offsetWidth - 40; // subtract padding
+  let currentTime = 0;
+  const eventTimes = [];
+  const intervals = [];
+
+  // Generate events
+  while (currentTime < totalTime) {
+    const interval = randExp(lambda);
+    intervals.push(interval);
+    currentTime += interval;
+    if (currentTime < totalTime) {
+      eventTimes.push(currentTime);
+    }
+  }
+
+  // Display events
+  eventTimes.forEach((t, i) => {
+    const event = document.createElement('div');
+    event.className = 'timeline-event';
+    event.style.left = (20 + t / totalTime * timelineWidth) + 'px';
+    event.title = `Event ${i + 1} at t = ${t.toFixed(3)}`;
+    timelineEl.appendChild(event);
+
+    // Show interval label for first few
+    if (i < 5 && i < intervals.length) {
+      const label = document.createElement('div');
+      label.className = 'timeline-interval';
+      const prevT = i === 0 ? 0 : eventTimes[i - 1];
+      const midT = (prevT + t) / 2;
+      label.style.left = (20 + midT / totalTime * timelineWidth) + 'px';
+      label.textContent = intervals[i].toFixed(2);
+      timelineEl.appendChild(label);
+    }
+  });
+
+  // Update stats
+  document.getElementById('eventCount').textContent = eventTimes.length;
+  if (intervals.length > 1) {
+    const meanInt = intervals.slice(0, -1).reduce((a, b) => a + b, 0) / (intervals.length - 1);
+    document.getElementById('meanInterval').textContent = meanInt.toFixed(3);
+  } else {
+    document.getElementById('meanInterval').textContent = '-';
+  }
+}
+
+function resetTimeline() {
+  const timelineEl = document.getElementById('timeline');
+  const events = timelineEl.querySelectorAll('.timeline-event, .timeline-interval');
+  events.forEach(e => e.remove());
+  document.getElementById('eventCount').textContent = '-';
+  document.getElementById('meanInterval').textContent = '-';
+}
+
+// Event listeners
+lambdaSlider.addEventListener('input', e => {
+  lambda = parseFloat(e.target.value);
+  lambdaNum.value = lambda.toFixed(1);
+  update();
+});
+
+lambdaNum.addEventListener('change', e => {
+  lambda = Math.max(0.1, Math.min(20, parseFloat(e.target.value)));
+  lambdaSlider.value = Math.min(8, lambda);
+  lambdaNum.value = lambda.toFixed(1);
+  update();
+});
+
+document.getElementById('generateBtn').addEventListener('click', generateProcess);
+document.getElementById('resetBtn').addEventListener('click', resetTimeline);
+
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

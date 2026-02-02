@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Standard Normal – Interactive Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root{ --bg:#f5f7f9; --panel:#ffffff; --ink:#111; --muted:#555; --border:#dcdcdc; --accent:#4f46e5; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:var(--bg)}
+    header{padding:10px 18px; background:var(--accent); color:#fff; font-weight:600}
+
+    .wrap{max-width:1150px; margin:14px auto; padding:0 14px; display:grid; grid-template-columns: 340px 1fr; grid-template-rows: auto auto; gap:14px}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+
+    .note{color:var(--muted); font-size:13px}
+    .kblock{background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px}
+
+    .plot-card{grid-column:2; grid-row:1}
+    .plot{background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
+    canvas{width:100%; height:280px; display:block; background:#fafafa; border-radius:8px}
+
+    .stats-bar{display:flex; justify-content:center; gap:20px; padding:8px; background:#eef2ff; border-radius:8px; margin-top:10px; font-size:13px}
+    .stat-item{text-align:center}
+    .stat-label{color:var(--muted); font-size:11px}
+    .stat-value{font-weight:600; color:var(--accent)}
+
+    .table-card{grid-column:1; grid-row:2; display:flex; flex-direction:column; max-height:320px}
+    .table-container{overflow-y:auto; border:1px solid var(--border); border-radius:8px; margin-top:10px; flex:1}
+    table.pmf-table{width:100%; border-collapse:collapse; font-size:13px; text-align:right}
+    .pmf-table th{position:sticky; top:0; background:#eef2ff; padding:8px; border-bottom:1px solid var(--border); text-align:right; font-weight:600; color:var(--accent); z-index:10}
+    .pmf-table td{padding:6px 8px; border-bottom:1px solid #eee}
+    .pmf-table tr:hover{background:#f5f7ff}
+    .prob-bar-bg{width:100%; height:4px; background:#e5e7eb; margin-top:2px; border-radius:2px; overflow:hidden}
+    .prob-bar-fill{height:100%; background:var(--accent)}
+
+    .calc-card{grid-column:2; grid-row:2}
+    .calc-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 1100px) { .calc-grid{grid-template-columns: 1fr} }
+    .calc-box{background:#fafafa; border:1px solid var(--border); border-radius:10px; padding:12px}
+    .calc-box h4{font-size:13px; color:var(--accent); margin:0 0 10px 0; display:flex; align-items:center; gap:6px}
+    .calc-box h4 code{background:#eef2ff; padding:2px 6px; border-radius:4px; font-size:12px}
+    .calc-row{display:flex; align-items:center; gap:8px; margin:8px 0}
+    .calc-row label{font-size:13px; color:var(--muted); min-width:50px}
+    .calc-row input{flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px}
+    .calc-row .result{flex:1; padding:8px 10px; background:#fff; border:1px solid var(--accent); border-radius:6px; font-weight:600; color:var(--accent); font-size:13px}
+    .calc-btn{width:100%; padding:6px; background:var(--accent); color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:8px; font-size:13px}
+    .calc-btn:hover{background:#4338ca}
+
+    @media (max-width: 900px){ 
+      .wrap{grid-template-columns: 1fr} 
+      .plot-card{grid-column:1; grid-row:2}
+      .table-card{grid-column:1; grid-row:3}
+      .calc-card{grid-column:1; grid-row:4}
+    }
+  </style>
+</head>
+<body>
+<header>Standard Normal Distribution $Z \sim N(0, 1)$</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="kblock" style="margin-top:0">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Fixed Parameters</div>
+      <div style="font-size:14px; text-align:center; padding:8px">
+        $\mu = 0, \quad \sigma = 1$
+      </div>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Probability Density Function (PDF)</div>
+      <div style="text-align:center; padding:6px 0; font-size:1em">
+        $$\phi(z) = \frac{1}{\sqrt{2\pi}} e^{-z^2/2}$$
+      </div>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Cumulative Distribution Function</div>
+      <div style="text-align:center; padding:6px 0; font-size:0.95em">
+        $$\Phi(z) = \int_{-\infty}^{z} \phi(t) \, dt$$
+      </div>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">Properties</div>
+      <table style="width:100%; font-size:12px">
+        <tr><td style="color:var(--muted)">Mean</td><td>$0$</td></tr>
+        <tr><td style="color:var(--muted)">Variance</td><td>$1$</td></tr>
+        <tr><td style="color:var(--muted)">Skewness</td><td>$0$</td></tr>
+        <tr><td style="color:var(--muted)">Kurtosis</td><td>$3$</td></tr>
+      </table>
+    </div>
+
+    <div class="kblock">
+      <div class="note" style="font-weight:600; margin-bottom:6px">68-95-99.7 Rule</div>
+      <div style="font-size:11px; color:var(--muted)">
+        • $P(|Z| < 1) \approx 0.68$<br>
+        • $P(|Z| < 2) \approx 0.95$<br>
+        • $P(|Z| < 3) \approx 0.997$
+      </div>
+    </div>
+  </section>
+
+  <section class="card plot-card">
+    <div class="plot">
+      <h3 style="margin:0 0 6px 0; font-size:14px">PDF Visualization</h3>
+      <canvas id="pdfCanvas"></canvas>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-label">$\mu$</div><div class="stat-value">0</div></div>
+        <div class="stat-item"><div class="stat-label">$\sigma$</div><div class="stat-value">1</div></div>
+        <div class="stat-item"><div class="stat-label">$\phi(0)$</div><div class="stat-value">0.3989</div></div>
+        <div class="stat-item"><div class="stat-label">$\Phi(0)$</div><div class="stat-value">0.5000</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table-card">
+    <h4 style="margin:0 0 10px 0; font-size:14px; color:var(--accent)">📋 Z-Table (Key Values)</h4>
+    <div class="note" style="margin-bottom:6px">Common critical values for hypothesis testing.</div>
+    <div class="table-container">
+      <table class="pmf-table">
+        <thead>
+          <tr>
+            <th style="text-align:center; width:60px">z</th>
+            <th>φ(z)</th>
+            <th>Φ(z)</th>
+          </tr>
+        </thead>
+        <tbody id="pdfTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card calc-card">
+    <h3 style="margin:0 0 14px 0; font-size:15px; color:var(--accent)">📊 Calculator</h3>
+    <div class="calc-grid">
+      <div class="calc-box">
+        <h4><code>dnorm(z)</code> Density</h4>
+        <div class="calc-row"><label>z =</label><input type="number" id="d_z" value="0" step="0.1"></div>
+        <button class="calc-btn" onclick="calcD()">Calc φ(z)</button>
+        <div class="calc-row"><label>φ(z) =</label><div class="result" id="d_res">0.398942</div></div>
+      </div>
+      <div class="calc-box">
+        <h4><code>pnorm(z)</code> CDF</h4>
+        <div class="calc-row"><label>z =</label><input type="number" id="p_z" value="0" step="0.1"></div>
+        <button class="calc-btn" onclick="calcP()">Calc Φ(z)</button>
+        <div class="calc-row"><label>Φ(z) =</label><div class="result" id="p_res">0.500000</div></div>
+      </div>
+      <div class="calc-box">
+        <h4><code>qnorm(p)</code> Quantile</h4>
+        <div class="calc-row"><label>p =</label><input type="number" id="q_p" value="0.975" min="0" max="1" step="0.01"></div>
+        <button class="calc-btn" onclick="calcQ()">Calc z</button>
+        <div class="calc-row"><label>z =</label><div class="result" id="q_res">1.959964</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const canvas = document.getElementById('pdfCanvas');
+
+function phi(z) { return Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI); }
+
+function Phi(z) {
+  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+  const sign = z < 0 ? -1 : 1;
+  const absZ = Math.abs(z) / Math.sqrt(2);
+  const t = 1 / (1 + p * absZ);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absZ * absZ);
+  return 0.5 * (1 + sign * y);
+}
+
+function qnorm(prob) {
+  if (prob <= 0) return -Infinity; if (prob >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  const pLow = 0.02425, pHigh = 1 - pLow;
+  let q, r;
+  if (prob < pLow) { q = Math.sqrt(-2 * Math.log(prob)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (prob <= pHigh) { q = prob - 0.5; r = q * q; return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+  q = Math.sqrt(-2 * Math.log(1 - prob));
+  return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 40, R = 20, T = 20, B = 30;
+  const graphW = w - L - R, graphH = h - T - B;
+
+  const xMin = -4, xMax = 4;
+  const steps = 300;
+  const maxPdf = phi(0);
+  const yMax = maxPdf * 1.15;
+
+  ctx.strokeStyle = '#ddd';
+  ctx.beginPath(); ctx.moveTo(L, h - B); ctx.lineTo(w - R, h - B); ctx.moveTo(L, T); ctx.lineTo(L, h - B); ctx.stroke();
+
+  const x0 = L + (0 - xMin) / (xMax - xMin) * graphW;
+  ctx.strokeStyle = '#ccc'; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(x0, T); ctx.lineTo(x0, h - B); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath(); ctx.moveTo(L, h - B);
+  for (let i = 0; i <= steps; i++) {
+    const z = xMin + (i / steps) * (xMax - xMin);
+    const px = L + (i / steps) * graphW;
+    const pdf = phi(z);
+    const py = h - B - (pdf / yMax) * graphH;
+    ctx.lineTo(px, py);
+  }
+  ctx.lineTo(L + graphW, h - B); ctx.closePath();
+  ctx.fillStyle = 'rgba(79,70,229,0.2)'; ctx.fill();
+  ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.fillStyle = '#666'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  for (let i = -4; i <= 4; i++) {
+    const px = L + (i - xMin) / (xMax - xMin) * graphW;
+    ctx.fillText(i.toString(), px, h - 10);
+  }
+}
+
+function updateTable() {
+  const tbody = document.getElementById('pdfTableBody');
+  const zValues = [-3, -2.576, -2.326, -2, -1.96, -1.645, -1, 0, 1, 1.645, 1.96, 2, 2.326, 2.576, 3];
+  const maxPdf = phi(0);
+  let html = '';
+
+  zValues.forEach(z => {
+    const pdf = phi(z), cdf = Phi(z);
+    const barW = (pdf / maxPdf) * 100;
+    html += `<tr>
+      <td style="text-align:center; font-weight:600; color:#333">${z.toFixed(3)}</td>
+      <td><div style="font-family:monospace; color:var(--accent)">${pdf.toFixed(4)}</div>
+        <div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${barW}%"></div></div></td>
+      <td style="font-family:monospace; color:#555">${cdf.toFixed(4)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function calcD() { const z = parseFloat(document.getElementById('d_z').value) || 0; document.getElementById('d_res').textContent = phi(z).toFixed(6); }
+function calcP() { const z = parseFloat(document.getElementById('p_z').value) || 0; document.getElementById('p_res').textContent = Phi(z).toFixed(6); }
+function calcQ() { const p = parseFloat(document.getElementById('q_p').value) || 0.5; const r = qnorm(p); document.getElementById('q_res').textContent = Number.isFinite(r) ? r.toFixed(6) : (r > 0 ? '∞' : '-∞'); }
+
+document.getElementById('d_z').addEventListener('input', calcD);
+document.getElementById('p_z').addEventListener('input', calcP);
+document.getElementById('q_p').addEventListener('input', calcQ);
+window.addEventListener('resize', draw);
+
+draw(); updateTable(); calcD(); calcP(); calcQ();
+</script>
+</body>
+</html>

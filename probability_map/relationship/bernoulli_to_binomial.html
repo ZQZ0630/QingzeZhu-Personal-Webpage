@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Bernoulli → Binomial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #3b82f6; --accent2: #10b981; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .card-title .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+    .badge-discrete { background: #dbeafe; color: #1d4ed8; }
+    .controls { margin-bottom: 16px; }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] { width: 70px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 220px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .explanation-box { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #6ee7b7; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #065f46; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .explanation-box p { font-size: 14px; color: #047857; line-height: 1.7; }
+    .visual-demo { margin-top: 20px; padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+    .visual-demo h3 { font-size: 15px; margin-bottom: 12px; }
+    .bernoulli-trials { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+    .trial { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; transition: all 0.3s; cursor: pointer; }
+    .trial.success { background: #10b981; color: white; }
+    .trial.failure { background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb; }
+    .demo-controls { display: flex; justify-content: center; gap: 12px; margin-top: 16px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .sum-display { text-align: center; margin-top: 12px; font-size: 16px; font-weight: 600; color: var(--accent); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Bernoulli → Binomial</h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/bernoulli_distribution.html">Bernoulli</a>
+    <a href="../distribution/binomial_distribution.html">Binomial</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Sum of $n$ Independent Bernoulli Trials</h2>
+    <div class="relation-formula">
+      $X_1 + X_2 + \cdots + X_n \sim \text{Binomial}(n, p)$ where $X_i \overset{\text{iid}}{\sim} \text{Bernoulli}(p)$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">
+        <span>$\text{Bernoulli}(p)$</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="controls">
+        <div class="control-row">
+          <label>$p$</label>
+          <input type="range" id="p" min="0.05" max="0.95" step="0.05" value="0.5">
+          <input type="number" id="pNum" min="0.05" max="0.95" step="0.01" value="0.5">
+          <span class="param-note">(success prob)</span>
+        </div>
+        <div class="control-row">
+          <label>$n$</label>
+          <input type="range" id="n" min="1" max="20" step="1" value="10">
+          <input type="number" id="nNum" min="1" max="20" step="1" value="10">
+          <span class="param-note">(number of trials)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="bernoulliChart"></canvas>
+      </div>
+      <div class="stats">
+        $E[X_i] = p = $ <strong id="bernoulliMean">0.500</strong>, 
+        $\text{Var}[X_i] = p(1-p) = $ <strong id="bernoulliVar">0.250</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>$Y = \sum_{i=1}^n X_i \sim \text{Binomial}(n, p)$</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="binomialChart"></canvas>
+      </div>
+      <div class="stats">
+        $E[Y] = np = $ <strong id="binomialMean">5.000</strong>, 
+        $\text{Var}[Y] = np(1-p) = $ <strong id="binomialVar">2.500</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-demo">
+    <h3>🎲 Interactive Demo: Generate $n$ Bernoulli Trials</h3>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">
+      Click "Generate" to simulate $n$ independent $\text{Bernoulli}(p)$ trials. 
+      Green = Success (1), Gray = Failure (0). The sum gives one sample from $\text{Binomial}(n, p)$.
+    </p>
+    <div class="bernoulli-trials" id="trialsContainer"></div>
+    <div class="sum-display">Sum $Y = $ <span id="sumDisplay">-</span></div>
+    <div class="demo-controls">
+      <button class="btn btn-primary" id="generateBtn">🎲 Generate Trials</button>
+      <button class="btn btn-secondary" id="resetBtn">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Mathematical Relationship</h3>
+    <p>
+      If $X_1, X_2, \ldots, X_n$ are <strong>$n$ independent</strong> $\text{Bernoulli}(p)$ random variables, 
+      then their sum $Y = X_1 + X_2 + \cdots + X_n$ follows a <strong>$\text{Binomial}(n, p)$</strong> distribution.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>PMF:</strong>
+      $$P(Y = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad k = 0, 1, \ldots, n$$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Intuition:</strong> Each Bernoulli trial represents a single success/failure experiment 
+      (like flipping a biased coin). The Binomial distribution counts the total number of successes 
+      in $n$ independent trials.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Properties (by independence):</strong><br>
+      • $E[Y] = E[X_1] + \cdots + E[X_n] = np$<br>
+      • $\text{Var}[Y] = \text{Var}[X_1] + \cdots + \text{Var}[X_n] = np(1-p)$
+    </p>
+  </div>
+</div>
+
+<script>
+let p = 0.5, n = 10;
+const pSlider = document.getElementById('p');
+const pNum = document.getElementById('pNum');
+const nSlider = document.getElementById('n');
+const nNum = document.getElementById('nNum');
+const bernoulliCanvas = document.getElementById('bernoulliChart');
+const binomialCanvas = document.getElementById('binomialChart');
+const trialsContainer = document.getElementById('trialsContainer');
+const sumDisplay = document.getElementById('sumDisplay');
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function comb(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  k = Math.min(k, n - k);
+  let res = 1;
+  for (let i = 0; i < k; i++) res = res * (n - i) / (i + 1);
+  return res;
+}
+
+function binomPmf(k, n, p) { return comb(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k); }
+
+function drawBernoulli() {
+  const ctx = setupCanvas(bernoulliCanvas);
+  const rect = bernoulliCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+  const L = 60, R = 20, T = 20, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+  const p0 = 1 - p, p1 = p;
+  const ymax = Math.max(p0, p1) * 1.2;
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+  ctx.font = '12px system-ui'; ctx.fillStyle = '#6b7280'; ctx.fillText('P(X=x)', 5, T + plotH / 2);
+  const barW = 50;
+  const positions = [{ x: L + plotW * 0.3, val: p0, label: '0' }, { x: L + plotW * 0.7, val: p1, label: '1' }];
+  positions.forEach(pos => {
+    const barH = pos.val / ymax * plotH;
+    ctx.fillStyle = '#3b82f6';
+    ctx.fillRect(pos.x - barW / 2, yBase - barH, barW, barH);
+    ctx.fillStyle = '#1f2937'; ctx.font = '13px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(pos.val.toFixed(3), pos.x, yBase - barH - 5);
+    ctx.fillStyle = '#6b7280'; ctx.fillText(pos.label, pos.x, h - 10);
+  });
+  ctx.fillStyle = '#6b7280'; ctx.font = '12px system-ui'; ctx.textAlign = 'right'; ctx.fillText('x', w - 10, yBase + 4);
+}
+
+function drawBinomial() {
+  const ctx = setupCanvas(binomialCanvas);
+  const rect = binomialCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+  const L = 50, R = 10, T = 20, B = 30;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+  const probs = [];
+  let maxP = 0;
+  for (let k = 0; k <= n; k++) { const pval = binomPmf(k, n, p); probs.push(pval); if (pval > maxP) maxP = pval; }
+  const ymax = maxP * 1.15;
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+  ctx.font = '12px system-ui'; ctx.fillStyle = '#6b7280';
+  ctx.save(); ctx.translate(12, T + plotH / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('P(Y=k)', 0, 0); ctx.restore();
+  const m = n + 1, barW = Math.min(25, plotW / (m * 1.5));
+  for (let k = 0; k <= n; k++) {
+    const xCenter = L + (k + 0.5) * plotW / m;
+    const barH = probs[k] / ymax * plotH;
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(xCenter - barW / 2, yBase - barH, barW, barH);
+    ctx.font = '11px system-ui'; ctx.fillStyle = '#6b7280'; ctx.textAlign = 'center';
+    if (n <= 15 || k % 2 === 0) ctx.fillText(String(k), xCenter, h - 10);
+  }
+  ctx.fillStyle = '#6b7280'; ctx.font = '12px system-ui'; ctx.textAlign = 'right'; ctx.fillText('k', w - 5, yBase + 4);
+}
+
+function updateStats() {
+  document.getElementById('bernoulliMean').textContent = p.toFixed(3);
+  document.getElementById('bernoulliVar').textContent = (p * (1 - p)).toFixed(3);
+  document.getElementById('binomialMean').textContent = (n * p).toFixed(3);
+  document.getElementById('binomialVar').textContent = (n * p * (1 - p)).toFixed(3);
+}
+
+function update() { drawBernoulli(); drawBinomial(); updateStats(); initTrials(); }
+
+function initTrials() {
+  trialsContainer.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const trial = document.createElement('div');
+    trial.className = 'trial failure';
+    trial.textContent = '?';
+    trialsContainer.appendChild(trial);
+  }
+  sumDisplay.textContent = '-';
+}
+
+function generateTrials() {
+  const trials = trialsContainer.querySelectorAll('.trial');
+  let sum = 0;
+  trials.forEach((trial, i) => {
+    setTimeout(() => {
+      const success = Math.random() < p;
+      if (success) { trial.className = 'trial success'; trial.textContent = '1'; sum++; }
+      else { trial.className = 'trial failure'; trial.textContent = '0'; }
+      if (i === trials.length - 1) setTimeout(() => { sumDisplay.textContent = sum; }, 100);
+    }, i * 80);
+  });
+}
+
+pSlider.addEventListener('input', e => { p = parseFloat(e.target.value); pNum.value = p.toFixed(2); update(); });
+pNum.addEventListener('change', e => { p = Math.max(0.05, Math.min(0.95, parseFloat(e.target.value))); pSlider.value = p; pNum.value = p.toFixed(2); update(); });
+nSlider.addEventListener('input', e => { n = parseInt(e.target.value); nNum.value = n; update(); });
+nNum.addEventListener('change', e => { n = Math.max(1, Math.min(20, parseInt(e.target.value))); nSlider.value = n; nNum.value = n; update(); });
+document.getElementById('generateBtn').addEventListener('click', generateTrials);
+document.getElementById('resetBtn').addEventListener('click', initTrials);
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

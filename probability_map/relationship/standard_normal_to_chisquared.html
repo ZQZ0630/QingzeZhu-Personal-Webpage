@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Standard Normal → Chi-Squared</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #10b981; --accent2: #059669; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent2); font-weight: 500; }
+    .sum-badge { display: inline-block; background: #d1fae5; color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+    .control-row label { min-width: 24px; font-weight: 600; }
+    input[type="range"] { flex: 1; max-width: 200px; min-width: 100px; }
+    .param-value { font-weight: 600; color: var(--accent2); min-width: 40px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; }
+    canvas { width: 100%; height: 280px; display: block; }
+    .legend { display: flex; justify-content: center; gap: 24px; margin-top: 10px; font-size: 13px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 12px; background: #f8fafc; border-radius: 6px; margin-top: 12px; }
+    .explanation-box { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border: 1px solid #6ee7b7; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #047857; margin-bottom: 10px; }
+    .explanation-box p { font-size: 14px; color: #065f46; line-height: 1.7; }
+    .transform-box { background: var(--panel); border: 2px solid var(--accent); border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center; }
+    .transform-box h3 { color: var(--accent2); margin-bottom: 15px; }
+    .transform-arrow { font-size: 24px; margin: 10px 0; color: var(--accent); }
+    .z-squares { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 15px 0; }
+    .z-square { background: #fef3c7; border: 2px solid #f59e0b; padding: 8px 12px; border-radius: 8px; font-weight: 600; color: #92400e; }
+    .simulation-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .simulation-box h3 { color: #b45309; margin-bottom: 10px; }
+    .sim-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-right: 10px; }
+    .sim-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+    .sim-result { margin-top: 12px; padding: 12px; background: white; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 150px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Standard Normal → Chi-Squared <span class="sum-badge">Sum of Squares</span></h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/standard_normal_distribution.html">Standard Normal</a>
+    <a href="../distribution/chi_square_distribution.html">Chi-Squared</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Sum of Squared Standard Normals</h2>
+    <div class="relation-formula">
+      If $Z_1, Z_2, \ldots, Z_\nu \overset{\text{iid}}{\sim} N(0,1)$, then $\displaystyle\sum_{i=1}^{\nu} Z_i^2 \sim \chi^2(\nu)$
+    </div>
+  </div>
+
+  <div class="transform-box">
+    <h3>🔄 The Sum of Squares Transform</h3>
+    <div style="font-size: 16px; margin: 10px 0; color: var(--muted);">
+      Take $\nu$ independent standard normal random variables:
+    </div>
+    <div class="z-squares" id="zSquares">
+      <div class="z-square">$Z_1^2$</div>
+      <div class="z-square">$Z_2^2$</div>
+      <div class="z-square">$Z_3^2$</div>
+    </div>
+    <div class="transform-arrow">↓ Sum</div>
+    <div style="font-size: 20px; margin: 15px 0;">
+      $X = Z_1^2 + Z_2^2 + \cdots + Z_\nu^2$
+    </div>
+    <div class="transform-arrow">↓</div>
+    <div style="font-size: 20px; color: var(--accent2);">
+      $X \sim \chi^2(\nu)$
+    </div>
+  </div>
+
+  <div class="main-content" style="margin-top: 20px;">
+    <div class="card">
+      <div class="card-title">Parameters</div>
+      <div class="control-row">
+        <label>$\nu$</label>
+        <input type="range" id="nu" min="1" max="15" step="1" value="3">
+        <span class="param-value" id="nuVal">3</span>
+        <span class="param-note">(degrees of freedom = number of $Z_i^2$ terms)</span>
+      </div>
+      <div class="stats">
+        <strong>Chi-Squared$(\nu)$:</strong><br>
+        $E[X] = \nu = $ <strong id="meanX">3</strong><br>
+        $\text{Var}[X] = 2\nu = $ <strong id="varX">6</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Building Blocks</div>
+      <div style="padding: 15px; text-align: center;">
+        <div style="font-size: 14px; color: var(--muted); margin-bottom: 10px;">
+          Each $Z_i \sim N(0,1)$ contributes $Z_i^2$ to the sum
+        </div>
+        <div style="font-size: 16px; margin: 10px 0;">
+          $Z^2 \sim \chi^2(1)$ (Chi-squared with 1 df)
+        </div>
+        <div style="font-size: 14px; color: var(--muted); margin-top: 15px;">
+          This is the fundamental building block!
+        </div>
+      </div>
+      <div class="stats">
+        $E[Z^2] = 1$, $\text{Var}[Z^2] = 2$
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 20px;">
+    <div class="card-title">PDF: Chi-Squared Distribution</div>
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #10b981;"></div>
+        <span>$\chi^2(\nu)$ PDF</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #f59e0b;"></div>
+        <span>Mean $= \nu$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="simulation-box">
+    <h3>🎲 Monte Carlo Simulation</h3>
+    <p style="font-size: 13px; color: #92400e; margin-bottom: 10px;">
+      Generate $\nu$ standard normal values, square them, and sum. Repeat to see the Chi-squared distribution emerge!
+    </p>
+    <button class="sim-btn" onclick="runSimulation()">Run 1000 Simulations</button>
+    <button class="sim-btn" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);" onclick="clearSimulation()">Clear</button>
+    <div class="sim-result" id="simResult">Click "Run 1000 Simulations" to see results...</div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Why This Matters</h3>
+    <p>
+      The <strong>Chi-squared distribution</strong> arises naturally when analyzing variance in normally distributed data:
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>1. Sample Variance:</strong> For a sample from $N(\mu, \sigma^2)$, the statistic 
+      $\dfrac{(n-1)S^2}{\sigma^2} \sim \chi^2(n-1)$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>2. Goodness-of-Fit Tests:</strong> The test statistic $\sum \dfrac{(O_i - E_i)^2}{E_i}$ follows $\chi^2$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>3. Connection to Gamma:</strong> $\chi^2(\nu) = \text{Gamma}(\nu/2, 1/2)$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>PDF:</strong> 
+      $$f(x; \nu) = \frac{1}{2^{\nu/2}\Gamma(\nu/2)} x^{\nu/2 - 1} e^{-x/2}, \quad x > 0$$
+    </p>
+  </div>
+</div>
+
+<script>
+let nu = 3;
+let simData = [];
+
+function updateZSquares() {
+  const container = document.getElementById('zSquares');
+  let html = '';
+  for (let i = 1; i <= Math.min(nu, 6); i++) {
+    html += `<div class="z-square">$Z_${i}^2$</div>`;
+  }
+  if (nu > 6) {
+    html += `<div class="z-square">$\\cdots$</div>`;
+    html += `<div class="z-square">$Z_{${nu}}^2$</div>`;
+  }
+  container.innerHTML = html;
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(container, {delimiters: [{left: '$', right: '$', display: false}]});
+  }
+}
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function gamma(z) {
+  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+  z -= 1;
+  const g = 7;
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+    771.32342877765313, -176.61502916214059, 12.507343278686905,
+    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  let x = c[0];
+  for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
+  const t = z + g + 0.5;
+  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+}
+
+function chiSquaredPdf(x, k) {
+  if (x <= 0) return 0;
+  const halfK = k / 2;
+  return Math.pow(x, halfK - 1) * Math.exp(-x / 2) / (Math.pow(2, halfK) * gamma(halfK));
+}
+
+function draw() {
+  const canvas = document.getElementById('chart');
+  const ctx = setupCanvas(canvas);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 20, T = 20, B = 40;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+
+  const xMin = 0;
+  const xMax = Math.max(nu * 3, 15);
+  
+  // Find max PDF value
+  let ymax = 0;
+  for (let x = 0.01; x <= xMax; x += 0.1) {
+    ymax = Math.max(ymax, chiSquaredPdf(x, nu));
+  }
+  ymax *= 1.15;
+
+  // Draw histogram of simulation data if exists
+  if (simData.length > 0) {
+    const binWidth = xMax / 30;
+    const bins = new Array(30).fill(0);
+    simData.forEach(v => {
+      const binIdx = Math.min(Math.floor(v / binWidth), 29);
+      if (binIdx >= 0) bins[binIdx]++;
+    });
+    const maxBin = Math.max(...bins);
+    const scale = (ymax * 0.8) / (maxBin / simData.length / binWidth);
+    
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';
+    bins.forEach((count, i) => {
+      const binX = i * binWidth;
+      const barHeight = (count / simData.length / binWidth) / ymax * plotH;
+      const x = L + (binX - xMin) / (xMax - xMin) * plotW;
+      const barW = binWidth / (xMax - xMin) * plotW;
+      ctx.fillRect(x, yBase - barHeight, barW - 1, barHeight);
+    });
+  }
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+
+  // X labels
+  ctx.font = '11px system-ui';
+  ctx.fillStyle = '#6b7280';
+  ctx.textAlign = 'center';
+  for (let x = 0; x <= xMax; x += Math.ceil(xMax / 10)) {
+    const px = L + (x - xMin) / (xMax - xMin) * plotW;
+    ctx.fillText(String(x), px, h - 15);
+  }
+
+  // Draw PDF curve
+  ctx.beginPath();
+  for (let i = 0; i <= 300; i++) {
+    const xVal = xMin + (xMax - xMin) * i / 300;
+    const x = L + (xVal - xMin) / (xMax - xMin) * plotW;
+    const y = yBase - chiSquaredPdf(xVal, nu) / ymax * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Draw mean line
+  ctx.setLineDash([5, 5]);
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  const meanX = L + (nu - xMin) / (xMax - xMin) * plotW;
+  ctx.beginPath();
+  ctx.moveTo(meanX, T);
+  ctx.lineTo(meanX, yBase);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Label mean
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = 'bold 12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('μ = ' + nu, meanX, T - 5);
+}
+
+function update() {
+  updateZSquares();
+  draw();
+  document.getElementById('nuVal').textContent = nu;
+  document.getElementById('meanX').textContent = nu;
+  document.getElementById('varX').textContent = 2 * nu;
+}
+
+function boxMuller() {
+  let u1, u2;
+  do { u1 = Math.random(); } while (u1 === 0);
+  u2 = Math.random();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+function runSimulation() {
+  simData = [];
+  const results = [];
+  for (let i = 0; i < 1000; i++) {
+    let sum = 0;
+    for (let j = 0; j < nu; j++) {
+      const z = boxMuller();
+      sum += z * z;
+    }
+    simData.push(sum);
+    if (i < 5) results.push(sum.toFixed(3));
+  }
+  
+  const mean = simData.reduce((a, b) => a + b, 0) / simData.length;
+  const variance = simData.reduce((a, b) => a + (b - mean) ** 2, 0) / simData.length;
+  
+  document.getElementById('simResult').textContent = 
+    `First 5 samples: ${results.join(', ')}...\n\n` +
+    `Simulated Mean: ${mean.toFixed(3)} (Theory: ${nu})\n` +
+    `Simulated Var:  ${variance.toFixed(3)} (Theory: ${2 * nu})`;
+  
+  draw();
+}
+
+function clearSimulation() {
+  simData = [];
+  document.getElementById('simResult').textContent = 'Click "Run 1000 Simulations" to see results...';
+  draw();
+}
+
+document.getElementById('nu').addEventListener('input', e => { 
+  nu = parseInt(e.target.value); 
+  simData = [];
+  update(); 
+});
+
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

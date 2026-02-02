@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Relation: Binomial → Poisson (Limit)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root { --bg: #f5f7f9; --panel: #ffffff; --ink: #111; --muted: #555; --border: #dcdcdc; --accent: #6366f1; --accent2: #8b5cf6; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: var(--bg); }
+    header { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.15); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .relation-header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--panel); border-radius: 12px; border: 1px solid var(--border); }
+    .relation-header h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .relation-formula { font-size: 18px; color: var(--accent); font-weight: 500; }
+    .limit-badge { display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; }
+    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .card-title .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+    .badge-discrete { background: #dbeafe; color: #1d4ed8; }
+    .controls { margin-bottom: 16px; }
+    .control-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .control-row label { min-width: 24px; font-weight: 600; color: #333; }
+    input[type="range"] { flex: 1; max-width: 180px; }
+    input[type="number"] { width: 80px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+    .param-note { font-size: 12px; color: var(--muted); }
+    .param-value { font-weight: 600; color: var(--accent); min-width: 60px; }
+    .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; margin-bottom: 12px; position: relative; }
+    canvas { width: 100%; height: 250px; display: block; }
+    .stats { text-align: center; font-size: 14px; color: var(--muted); padding: 8px; background: #f8fafc; border-radius: 6px; }
+    .comparison-chart { margin-top: 20px; }
+    .comparison-chart canvas { height: 300px; }
+    .legend { display: flex; justify-content: center; gap: 24px; margin-top: 10px; font-size: 13px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; }
+    .explanation-box { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border: 1px solid #a78bfa; border-radius: 10px; padding: 16px; margin-top: 20px; }
+    .explanation-box h3 { font-size: 15px; color: #5b21b6; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .explanation-box p { font-size: 14px; color: #6d28d9; line-height: 1.7; }
+    .convergence-meter { margin-top: 20px; padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+    .convergence-meter h3 { font-size: 15px; margin-bottom: 12px; }
+    .meter-bar { height: 24px; background: #e5e7eb; border-radius: 12px; overflow: hidden; position: relative; }
+    .meter-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #10b981); border-radius: 12px; transition: width 0.5s ease; }
+    .meter-label { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 600; color: #374151; }
+    .meter-text { text-align: center; margin-top: 8px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Relation: Binomial → Poisson <span class="limit-badge">Limiting Case</span></h1>
+  <nav class="nav-links">
+    <a href="../probability_distributions_map.html">← Back to Map</a>
+    <a href="../distribution/binomial_distribution.html">Binomial</a>
+    <a href="../distribution/poisson_distribution.html">Poisson</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="relation-header">
+    <h2>Poisson Limit Theorem</h2>
+    <div class="relation-formula">
+      As $n \to \infty$ and $p \to 0$ with $np = \lambda$ fixed: $\text{Binomial}(n, p) \to \text{Poisson}(\lambda)$
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">
+        <span>$\text{Binomial}(n, p)$</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="controls">
+        <div class="control-row">
+          <label>$\lambda$</label>
+          <input type="range" id="lambda" min="1" max="15" step="0.5" value="5">
+          <span class="param-value" id="lambdaVal">5.0</span>
+          <span class="param-note">(fixed: $np = \lambda$)</span>
+        </div>
+        <div class="control-row">
+          <label>$n$</label>
+          <input type="range" id="n" min="5" max="200" step="5" value="20">
+          <span class="param-value" id="nVal">20</span>
+          <span class="param-note">(trials)</span>
+        </div>
+        <div class="control-row">
+          <label>$p$</label>
+          <span class="param-value" id="pVal">$= \lambda/n = 0.250$</span>
+          <span class="param-note">(computed)</span>
+        </div>
+      </div>
+      <div class="stats">
+        $E[X] = np = $ <strong id="binomialMean">5.000</strong>, 
+        $\text{Var}[X] = np(1-p) = $ <strong id="binomialVar">3.750</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>$\text{Poisson}(\lambda)$ — Limiting Distribution</span>
+        <span class="badge badge-discrete">Discrete</span>
+      </div>
+      <div class="controls" style="padding: 20px 0;">
+        <div style="text-align: center; font-size: 16px; color: var(--accent);">
+          $\lambda = $ <strong id="poissonLambda">5.0</strong>
+        </div>
+      </div>
+      <div class="stats">
+        $E[Y] = \lambda = $ <strong id="poissonMean">5.000</strong>, 
+        $\text{Var}[Y] = \lambda = $ <strong id="poissonVar">5.000</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="card comparison-chart">
+    <div class="card-title">PMF Comparison: Binomial vs Poisson</div>
+    <div class="chart-container">
+      <canvas id="comparisonChart"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #6366f1;"></div>
+        <span>$\text{Binomial}(n, \lambda/n)$</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #f59e0b;"></div>
+        <span>$\text{Poisson}(\lambda)$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="convergence-meter">
+    <h3>📊 Convergence Quality</h3>
+    <div class="meter-bar">
+      <div class="meter-fill" id="meterFill" style="width: 60%;"></div>
+      <span class="meter-label" id="meterLabel">Good</span>
+    </div>
+    <div class="meter-text" id="meterText">n = 20 is moderate. Increase n for better approximation.</div>
+  </div>
+
+  <div class="explanation-box">
+    <h3>📘 Poisson Limit Theorem</h3>
+    <p>
+      When the number of trials $n$ is <strong>large</strong> and the success probability $p$ is <strong>small</strong>, 
+      with the product $np = \lambda$ held constant, the $\text{Binomial}(n, p)$ distribution converges to $\text{Poisson}(\lambda)$.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Mathematical statement:</strong>
+      $$\lim_{n \to \infty} \binom{n}{k} p^k (1-p)^{n-k} = \frac{\lambda^k e^{-\lambda}}{k!} \quad \text{where } p = \frac{\lambda}{n}$$
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Intuition:</strong> Consider counting rare events in many trials — e.g., typos per page, 
+      radioactive decays, or insurance claims.
+    </p>
+    <p style="margin-top: 10px;">
+      <strong>Key difference in variance:</strong><br>
+      • Binomial: $\text{Var}[X] = np(1-p) = \lambda(1 - \lambda/n)$<br>
+      • Poisson: $\text{Var}[Y] = \lambda$<br>
+      As $n \to \infty$: $\lambda(1 - \lambda/n) \to \lambda$
+    </p>
+  </div>
+</div>
+
+<script>
+let lambda = 5, n = 20;
+const lambdaSlider = document.getElementById('lambda');
+const nSlider = document.getElementById('n');
+const comparisonCanvas = document.getElementById('comparisonChart');
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+const factorialCache = [1, 1];
+function factorial(n) {
+  if (n < factorialCache.length) return factorialCache[n];
+  for (let i = factorialCache.length; i <= n; i++) factorialCache[i] = factorialCache[i - 1] * i;
+  return factorialCache[n];
+}
+
+function logComb(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  if (k === 0 || k === n) return 0;
+  let result = 0;
+  for (let i = 0; i < k; i++) result += Math.log(n - i) - Math.log(i + 1);
+  return result;
+}
+
+function binomPmf(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
+  return Math.exp(logComb(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+}
+
+function poissonPmf(k, lambda) {
+  if (k < 0 || lambda <= 0) return 0;
+  return Math.exp(k * Math.log(lambda) - lambda - Math.log(factorial(k)));
+}
+
+function drawComparison() {
+  const ctx = setupCanvas(comparisonCanvas);
+  const rect = comparisonCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const L = 50, R = 20, T = 20, B = 40;
+  const plotW = w - L - R, plotH = h - T - B, yBase = h - B;
+  const p = lambda / n;
+  const maxK = Math.min(Math.ceil(lambda + 4 * Math.sqrt(lambda)), n, 40);
+  const m = maxK + 1;
+
+  const binomProbs = [], poissonProbs = [];
+  let maxP = 0;
+  for (let k = 0; k <= maxK; k++) {
+    const bp = binomPmf(k, n, p), pp = poissonPmf(k, lambda);
+    binomProbs.push(bp); poissonProbs.push(pp);
+    maxP = Math.max(maxP, bp, pp);
+  }
+  const ymax = maxP * 1.15;
+
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(w - R, yBase); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, yBase); ctx.stroke();
+
+  ctx.font = '12px system-ui';
+  ctx.fillStyle = '#6b7280';
+  ctx.save();
+  ctx.translate(15, T + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('P(X=k)', 0, 0);
+  ctx.restore();
+  ctx.fillText('k', w - 15, yBase + 4);
+
+  const groupW = plotW / m;
+  const barW = Math.min(12, groupW * 0.35);
+  const gap = 2;
+
+  for (let k = 0; k <= maxK; k++) {
+    const xCenter = L + (k + 0.5) * groupW;
+    ctx.fillStyle = '#6366f1';
+    ctx.fillRect(xCenter - barW - gap/2, yBase - binomProbs[k] / ymax * plotH, barW, binomProbs[k] / ymax * plotH);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(xCenter + gap/2, yBase - poissonProbs[k] / ymax * plotH, barW, poissonProbs[k] / ymax * plotH);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'center';
+    if (m <= 20 || k % 2 === 0) ctx.fillText(String(k), xCenter, h - 15);
+  }
+}
+
+function updateStats() {
+  const p = lambda / n;
+  document.getElementById('lambdaVal').textContent = lambda.toFixed(1);
+  document.getElementById('nVal').textContent = n;
+  document.getElementById('pVal').textContent = `= λ/n = ${p.toFixed(4)}`;
+  document.getElementById('binomialMean').textContent = (n * p).toFixed(3);
+  document.getElementById('binomialVar').textContent = (n * p * (1 - p)).toFixed(3);
+  document.getElementById('poissonLambda').textContent = lambda.toFixed(1);
+  document.getElementById('poissonMean').textContent = lambda.toFixed(3);
+  document.getElementById('poissonVar').textContent = lambda.toFixed(3);
+
+  const quality = Math.min(100, (n / lambda) * 5);
+  document.getElementById('meterFill').style.width = quality + '%';
+  const meterLabel = document.getElementById('meterLabel');
+  const meterText = document.getElementById('meterText');
+  if (quality >= 80) { meterLabel.textContent = 'Excellent'; meterText.textContent = `n = ${n} is large enough. Binomial ≈ Poisson very closely!`; }
+  else if (quality >= 50) { meterLabel.textContent = 'Good'; meterText.textContent = `n = ${n} gives a reasonable approximation. Try larger n.`; }
+  else { meterLabel.textContent = 'Weak'; meterText.textContent = `n = ${n} is too small. Increase n for better convergence.`; }
+}
+
+function update() { drawComparison(); updateStats(); }
+
+lambdaSlider.addEventListener('input', e => { lambda = parseFloat(e.target.value); update(); });
+nSlider.addEventListener('input', e => { n = parseInt(e.target.value); update(); });
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>
