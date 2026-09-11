@@ -5,21 +5,23 @@ permalink: /research/
 author_profile: true
 ---
 
-## 1. Research Assistant: Smart Agriculture Survey & GM Crop Commercialization
+## 1. Research Assistant: Marketization of Agricultural Technology and Farmer Income Differentiation
 
-**Duration:** *Jan 2026 – Aug 2026* **Role:** Research Assistant (supervised by Song Yujing)  
+**Duration:** *Jan 2026 – Aug 2026* **Role:** Research Assistant (supervised by Prof. Jikun Huang)  
 **Affiliation:** Institute of Advanced Agricultural Sciences, Peking University (PKU-IAAS)
 
-- Cleaned and harmonized a multi-module household panel from a smart-agriculture survey in Shouguang, Shandong; built reproducible outlier-detection and validation routines in Python/pandas and documented the data-handling decisions for downstream users.
-- Contributed to a 30-year assessment of GM crop commercialization (1996–2026) built on two empirical pillars: a meta-analysis of peer-reviewed studies of yield, pesticide quantity, and pesticide cost across Bt cotton, Bt maize, and herbicide-tolerant soybean; and a farmer panel on Bt maize in Northeast China (Liaoning and Jilin; 8 waves, 2013–2024).
-- Assembled and coded the meta-analysis sample, including a Python retrieval pipeline for full-text sources, and helped trace how the measured advantage of Bt over conventional varieties changes as target-pest populations decline.
-- Examined how the timing of regulatory approval in China shaped adoption patterns among smallholders.
+- Coordinated fieldwork for a multi-round household panel survey across three prefectures in Shandong Province: trained enumerators and supervised data-quality protocols covering 40+ villages and 1,000+ greenhouse-farming households on smart-device adoption, labor allocation, marketing channels, risk preferences, and social trust.
+- Cleaned and processed panel data for 587 households and 1,295 greenhouse observations (16,000+ variables) using Python and Stata; performed outlier verification, per-mu standardization, and descriptive statistics.
+- Led a systematic review and meta-analysis of 30 years of commercialized Bt cotton and maize, providing quantitative evidence on the erosion of technology dividends and its implications for smallholder welfare.
+- Completed the cotton module to date: screened 319 papers, cleaned and harmonized 47 studies with 218 yield observations; preliminary findings show an average yield gain of 33.7% from Bt cotton, but a statistically significant annual decline of ~1.3% (p<0.05) in the yield advantage over time since commercialization.
+
+**In progress:** *Thirty Years of GM Crop Variety Commercialization: A Reassessment* (转基因作物品种商业化30年评估) — manuscript in preparation.
 
 ---
 
 ## 2. Faculty-Supervised Research: Computational and Interactive Visualization Tools for Statistical Instruction
 
-**Duration:** *Sep 2025 – Dec 2025* **Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
+**Duration:** *Sep 2025 – Dec 2025* **Role:** Research Assistant (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
 **Affiliation:** Department of Statistics, UW-Madison
 
 **View:** [Results in Visualization Page]({{ site.baseurl }}/visualization/)
