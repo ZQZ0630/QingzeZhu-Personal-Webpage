@@ -14,9 +14,9 @@ My work sits between **economic sociology** and **labor sociology**, and it is o
 
 I am currently pursuing three directions:
 
-- **Platform capitalism and agricultural e-commerce** — how platform governance extracts value from and transfers risk to smallholder farmers, and what that does to their bargaining power and price realization.
-- **Labor-market intermediaries** — the paid job-search intermediaries international students turn to in the United States, and the constraints that shape their entry into the labor market.
-- **Labor organization in small cross-border trading firms** — why experienced foreign-trade salespeople rarely strike out on their own, and how micro-firms coordinate labor without expanding.
+- **Labor-market intermediaries and international students.** Paid job-search agencies charge international students $5,000–20,000 to drill coding tests and coach interview performance. I ask what these agencies actually sell, who turns to them, and what constrains international students in the U.S. labor market — where a referral that carries visa sponsorship becomes a reputational stake that weak ties will not take on.
+- **Why foreign-trade salespeople do not go solo.** In Yiwu, a salesperson runs an order almost end to end and keeps three percent of the profit, yet very few leave to trade on their own account. Interviews with former colleagues point to clients who stay with the firm rather than the person, the leverage a firm buys by carrying production risk, and the weight that visible failures carry.
+- **Platforms, pricing power, and dependency among smallholder farmers.** After e-commerce reached a citrus-growing town, gross revenue rose while net income barely moved. I trace where the difference goes — promotion fees, transit loss, returns — and how algorithmic visibility and buyer-side price comparison leave growers unable to set their own prices, or to leave.
 
 Methodologically I pair **ethnographic fieldwork and semi-structured interviews** with quantitative analysis of survey and panel data. I work in **Python**, **R**, and **JavaScript**.
 

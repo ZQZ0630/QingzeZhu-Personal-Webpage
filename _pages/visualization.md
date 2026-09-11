@@ -7,30 +7,21 @@ author_profile: true
 
 This page presents the deliverables from my faculty-supervised research on teaching technology, demonstrating my ability to translate statistical concepts into interactive computational tools
 
-## Probability Distributions Map
+## Unified Distribution Explorer
 
-<figure style="text-align: center;">
-  <a href="{{ site.baseurl }}/probability_map/">
-    <img src="{{ site.baseurl }}/images/probability-map-preview.png"
-         alt="Preview of the Probability Distributions Map interface"
-         style="max-width: 100%; border: 1px solid #ddd; border-radius: 6px;">
-  </a>
-  <figcaption style="margin-top: 8px; font-size: 0.9rem; color: #666;">
-    Click the image to open the Probability Distributions Map.
-  </figcaption>
-</figure>
-
-**What it is.**  
-An interactive “map” of common probability distributions (e.g., Bernoulli, Binomial, Poisson, Normal). Each node links to a small page with formulas, parameter meanings, and typical use cases.
+**What it is.**
+An interactive explorer for the common probability distributions (Bernoulli, Binomial, Poisson, Normal, and others). Each distribution shows its PMF/PDF formula, parameters and support, a live plot of the density and CDF, a probability table, and a calculator that prints the matching R code for every quantity it returns — so the tool doubles as a code reference for students.
 
 **How to use it.**
 
-1. Start on the map and **click a distribution node** (for example, *Normal*, *Binomial*, or *Poisson*).  
-2. On the distribution page, **read the short description** of when the distribution is used and what its parameters mean.  
-3. Where available, use **sliders or input boxes** to change parameters and see how the graph and notation change.  
-4. Use the navigation links to **go back to the map** and compare another distribution.
+1. Pick a distribution from the **Distributions** menu.
+2. Move the **parameter** sliders and watch the plot, the properties panel, and the probability table update together.
+3. Use the **Calculator** to evaluate P(X = x), P(X ≤ x), or a quantile; each result is shown alongside the R call that produces it.
+4. Where a distribution has a process view — Poisson, for instance — switch to the second tab to see it.
 
-👉 [Open the Probability Distributions Map]({{ site.baseurl }}/probability_map/){: .btn .btn--primary}
+👉 [Open the Unified Distribution Explorer](https://pages.stat.wisc.edu/~byang/STAT311/unified_distribution_explorer.html){: .btn .btn--primary}
+
+*Deployed on the STAT 311 course site at UW–Madison.*
 
 ---
 

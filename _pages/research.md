@@ -7,7 +7,7 @@ author_profile: true
 
 ## 1. Research Assistant: Marketization of Agricultural Technology and Farmer Income Differentiation
 
-**Duration:** *Jan 2026 – Aug 2026* **Role:** Research Assistant (supervised by Prof. Jikun Huang)  
+**Duration:** *Jan 2026 – Aug 2026* **Role:** Research Assistant (supervised by Prof. Ruifa Hu)  
 **Affiliation:** Institute of Advanced Agricultural Sciences, Peking University (PKU-IAAS)
 
 - Coordinated fieldwork for a multi-round household panel survey across three prefectures in Shandong Province: trained enumerators and supervised data-quality protocols covering 40+ villages and 1,000+ greenhouse-farming households on smart-device adoption, labor allocation, marketing channels, risk preferences, and social trust.
@@ -49,17 +49,7 @@ author_profile: true
 
 ---
 
-## 4. Data Analysis Project: Agricultural Development Patterns & Farmers' Income
-
-**Duration:** *Jul 2025 – Sep 2025* **Affiliation:** University of Wisconsin–Madison
-
-- Assembled a multi-decade panel dataset (≈30 years) for 266 World Bank countries for farmers' incomes; harmonized series and handled missing values for cross-country comparison.
-- Built an interactive dashboard with world maps, time-series plots, and dumbbell charts comparing top vs. bottom countries and ratios of farmer income to national averages.
-- Analyzed relationships between mechanization, value added, and farmer incomes, showing cases where higher aggregate value or mechanization does not translate into proportional gains for farm households.
-
----
-
-## 5. Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot
+## 4. Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot
 
 **Duration:** *Jul 2021 – Aug 2022* **Role:** Fieldwork Lead  
 **Affiliation:** Majiaba Village, Zigui County, Hubei, China
