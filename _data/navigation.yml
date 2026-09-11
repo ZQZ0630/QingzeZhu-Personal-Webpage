@@ -3,6 +3,8 @@ main:
     url: /cv/
   - title: "Research Experience"
     url: /research/
+  - title: "Publications"
+    url: /publications/
   - title: "Visualization"
     url: /visualization/
   - title: "Courses"

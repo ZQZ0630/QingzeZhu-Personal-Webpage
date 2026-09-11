@@ -12,8 +12,9 @@ author_profile: true
 
 - Coordinated fieldwork for a multi-round household panel survey across three prefectures in Shandong Province: trained enumerators and supervised data-quality protocols covering 40+ villages and 1,000+ greenhouse-farming households on smart-device adoption, labor allocation, marketing channels, risk preferences, and social trust.
 - Cleaned and processed panel data for 587 households and 1,295 greenhouse observations (16,000+ variables) using Python and Stata; performed outlier verification, per-mu standardization, and descriptive statistics.
-- Led a systematic review and meta-analysis of 30 years of commercialized Bt cotton and maize, providing quantitative evidence on the erosion of technology dividends and its implications for smallholder welfare.
-- Completed the cotton module to date: screened 319 papers, cleaned and harmonized 47 studies with 218 yield observations; preliminary findings show an average yield gain of 33.7% from Bt cotton, but a statistically significant annual decline of ~1.3% (p<0.05) in the yield advantage over time since commercialization.
+- Built the evidence base for a 30-year meta-analysis of commercialized GM crops: screened 44,340 identified records down to 26,009 after de-duplication, obtained full text for all 268 reports sought, and assembled a final analytic set of 188 studies covering 1,511 observation–outcome records from 136 independent data sources.
+- Estimated average advantages of GM over conventional varieties of +23.9% in yield, −36.9% in pesticide quantity, and −39.2% in pesticide cost, with insect-resistant traits (+26.1% yield, −41.7% pesticide) outperforming herbicide-tolerant ones (+9.7% yield); documented erosion of that advantage over time, the pesticide reduction for insect-resistant varieties decaying roughly 2.8% per additional year since commercialization.
+- Supported a 12-year farmer panel on Bt maize in Northeast China (Liaoning and Jilin; 4 counties, 160 households, 560 plots, 8 waves between 2013 and 2024), which shows adoption peaking at 87.4% of sown area in 2019 and falling to 58.6% by 2024 — after legalization, not before — as target-pest pressure collapsed and the Bt yield advantage narrowed from +14.6% in 2013 to −2.8% in 2024.
 
 **In progress:** *Thirty Years of GM Crop Variety Commercialization: A Reassessment* (转基因作物品种商业化30年评估) — manuscript in preparation.
 
@@ -24,7 +25,7 @@ author_profile: true
 **Duration:** *Sep 2025 – Dec 2025* **Role:** Research Assistant (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
 **Affiliation:** Department of Statistics, UW-Madison
 
-**View:** [Results in Visualization Page]({{ site.baseurl }}/visualization/)
+**View:** [Unified Distribution Explorer](https://pages.stat.wisc.edu/~byang/STAT311/unified_distribution_explorer.html) — deployed for STAT 311 · [Other visualizations]({{ site.baseurl }}/visualization/)
 
 - Built interactive course tools and use handouts with JavaScript/Python, including an animated derivation from discrete random walk to Brownian motion; developed a probability knowledge map with hover highlights and click-through links to notes.
 - Standardized R Markdown/Quarto outputs: added chunk options, code folding, and show/hide controls to improve HTML readability and reproducibility.
