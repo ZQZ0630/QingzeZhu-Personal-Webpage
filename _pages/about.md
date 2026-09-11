@@ -18,7 +18,7 @@ I work in three directions:
 - **Labor organization in small cross-border trading firms** — in Yiwu, a salesperson runs an order almost end to end but keeps three percent of the profit, and still very few leave.
 - **Platform capitalism and agricultural e-commerce** — how platform governance extracts value and transfers risk, and why gross revenue can rise while net income barely moves.
 
-Methodologically I pair **ethnographic fieldwork and semi-structured interviews** with quantitative analysis of survey and panel data. I work in **Python**, **R**, and **JavaScript**.
+I work with **mixed methods**, and code in **Python**, **R**, and **JavaScript**.
 
 Before graduate school I spent several years in **supply chain operations and cross-border e-commerce**, which is where most of my empirical questions came from.
 
