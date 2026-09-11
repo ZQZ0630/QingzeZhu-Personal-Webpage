@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-I am **Qingze Zhu**, an M.A. student in **Sociology** at **Columbia University**. I hold a B.S. in Statistics from the **University of Wisconsin–Madison**.
+I am **Qingze Zhu** — you can also call me **Zed**. I am an M.A. student in **Sociology** at **Columbia University**, and I hold a B.S. in Statistics from the **University of Wisconsin–Madison**.
 
 My work sits between **economic sociology** and **labor sociology**, and it is organized around one question: *how does the weaker party in an economic exchange enter a market, and what constrains them once inside?*
 

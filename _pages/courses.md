@@ -30,8 +30,8 @@ Coursework from my graduate study in sociology at Columbia University, my underg
 |--------|----------------|
 | **SOCI GR5062: Proseminar I** | Research design, professionalization, and current work in the department |
 | **SOCI GR5064: Field Work I** | Supervised field research practicum; site access, observation, and data collection |
-| **Sociological Theory** | Classical and contemporary sociological theory and its use in current research |
-| **Thesis Seminar I** | Developing the M.A. thesis: research question, proposal, and IRB review |
+| **SOCI GR5051: Sociological Theory** | Classical and contemporary sociological theory and its use in current research |
+| **SOCI GR5066: Thesis Seminar I** | Developing the M.A. thesis: research question, proposal, and IRB review |
 | **SOCI GR8201: New Directions in Economic Sociology** | New forms of sociality in the age of generative AI; actor-network theory, algorithmic management, valuation and organizations |
 | **ANTH GR6070: Making Ethnography — Method & Writing** | Ethnographic method, fieldnotes, interviewing, and the craft of ethnographic writing |
 

@@ -9,19 +9,30 @@ This page presents the deliverables from my faculty-supervised research on teach
 
 ## Unified Distribution Explorer
 
+<figure style="text-align: center;">
+  <a href="https://pages.stat.wisc.edu/~byang/STAT311/unified_distribution_explorer.html">
+    <img src="{{ site.baseurl }}/images/distribution-explorer-preview.png"
+         alt="The Unified Distribution Explorer showing the binomial distribution"
+         style="max-width: 100%; border: 1px solid #ddd; border-radius: 6px;">
+  </a>
+  <figcaption style="margin-top: 8px; font-size: 0.9rem; color: #666;">
+    Click the image to open the Unified Distribution Explorer.
+  </figcaption>
+</figure>
+
 **What it is.**
-An interactive explorer for the common probability distributions (Bernoulli, Binomial, Poisson, Normal, and others). Each distribution shows its PMF/PDF formula, parameters and support, a live plot of the density and CDF, a probability table, and a calculator that prints the matching R code for every quantity it returns — so the tool doubles as a code reference for students.
+A single-page explorer for the common probability distributions, deployed on the STAT 311 course site at UW–Madison. One screen holds everything a student needs for a given distribution: its formula, its properties evaluated at the current parameters, a plot, a probability table, and a calculator that shows the R code behind every number it returns.
 
 **How to use it.**
 
-1. Pick a distribution from the **Distributions** menu.
-2. Move the **parameter** sliders and watch the plot, the properties panel, and the probability table update together.
-3. Use the **Calculator** to evaluate P(X = x), P(X ≤ x), or a quantile; each result is shown alongside the R call that produces it.
-4. Where a distribution has a process view — Poisson, for instance — switch to the second tab to see it.
+1. Choose a distribution from the **Distributions** menu at the top left. A one-line description tells you what it models.
+2. Set the **parameters** with the sliders, or type exact values into the boxes beside them. Everything else on the page recomputes as you move them.
+3. Read the **Properties** panel for support, mean, variance, and — where they exist — special cases and approximations (for example, that Bin(n, p) approaches Pois(np) when n is large and np small). The **Reset** button returns the defaults.
+4. Use the **Visualization** checkboxes to overlay the PMF/PDF and the CDF on the same axes, and lock the axes when you want two parameter settings to be visually comparable.
+5. In **Calculator with R code**, move the *Cutoff* slider for P(X = x) and P(X ≤ x), or the *Left prob* slider for quantiles. Each result is printed with the R call that produces it — `dbinom`, `pbinom`, `qbinom`, and so on — so the page works as a code reference as well as a visual one.
+6. The **PMF table** lists the distribution term by term; *Pop out* opens it in its own window for side-by-side reading.
 
 👉 [Open the Unified Distribution Explorer](https://pages.stat.wisc.edu/~byang/STAT311/unified_distribution_explorer.html){: .btn .btn--primary}
-
-*Deployed on the STAT 311 course site at UW–Madison.*
 
 ---
 
