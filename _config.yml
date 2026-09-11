@@ -12,7 +12,7 @@ locale                   : "en-US"
 title                    : "Qingze Zhu"
 title_separator          : "-"
 name                     : &name "Qingze Zhu"
-description              : &description "Statistics @ UW–Madison"
+description              : &description "M.A. Sociology @ Columbia University | Economic & Development Sociology"
 url                      : "https://ZQZ0630.github.io"
 baseurl                  : "/QingzeZhu-Personal-Webpage"
 repository               : "ZQZ0630/QingzeZhu-Personal-Webpage"
@@ -21,20 +21,20 @@ repository               : "ZQZ0630/QingzeZhu-Personal-Webpage"
 # The following control what appear as part of the author content on the side bar.
 author:
   name             : *name
-  # 注意：请确保你的仓库里有这张图片，或者改回之前的 "/files/profile.png"
-  avatar           : "profile.jpg"   
-  bio              : "Undergraduate in Statistics at UW–Madison"
-  location         : "Madison, WI"
-  employer         : "University of Wisconsin–Madison"
+  # Make sure this image exists in the repository (images/profile.jpg).
+  avatar           : "profile.jpg"
+  bio              : "M.A. student in Sociology, Columbia University"
+  location         : "New York, NY"
+  employer         : "Columbia University"
   email            : "qzhu237@wisc.edu"
   
-  # 下面的链接都已隐藏（加了 # 号）。如果你想显示，把前面的 # 去掉即可。
+  # The links below are hidden. Uncomment a line to show that icon in the sidebar.
   # github           : "ZQZ0630"
   # linkedin         : ""
   # orcid            : ""
   # website          : ""
 
-  # Academic websites (全部隐藏)
+  # Academic websites (all hidden)
   # academia         : # URL
   # arxiv            : # URL 
   # googlescholar    : "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"

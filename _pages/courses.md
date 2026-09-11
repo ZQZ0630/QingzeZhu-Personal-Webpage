@@ -4,6 +4,7 @@ title: "Courses"
 permalink: /courses/
 author_profile: true
 ---
+
 <style>
 table {
   width: 100%;
@@ -16,7 +17,26 @@ table th:last-child, table td:last-child {
   width: 55%;
 }
 </style>
+
+Coursework from my graduate study in sociology at Columbia University, my undergraduate degree in statistics at UW–Madison, and additional online programs.
+
 ---
+
+# Columbia University — M.A. Sociology
+
+## Fall 2026 (in progress)
+
+| Course | Topics Covered |
+|--------|----------------|
+| **SOCI GR5062: Proseminar I** | Research design, professionalization, and current work in the department |
+| **SOCI GR5064: Field Work I** | Supervised field research practicum; site access, observation, and data collection |
+| **Thesis Seminar I** | Developing the M.A. thesis: research question, proposal, and IRB review |
+| **SOCI GR8201: New Directions in Economic Sociology** | New forms of sociality in the age of generative AI; actor-network theory, algorithmic management, valuation and organizations |
+| **ANTH GR6070: Making Ethnography — Method & Writing** | Ethnographic method, fieldnotes, interviewing, and the craft of ethnographic writing |
+
+---
+
+# University of Wisconsin–Madison — B.S. Statistics
 
 ## Statistics
 
@@ -30,8 +50,6 @@ table th:last-child, table td:last-child {
 | **STAT 461: Financial Statistics** | Time series analysis, ARMA models, GARCH models, volatility modeling |
 | **STAT 525: Linear Optimization** | Linear programming, simplex method, duality theory, network flows |
 
----
-
 ## Mathematics
 
 | Course | Topics Covered |
@@ -40,8 +58,6 @@ table th:last-child, table td:last-child {
 | **MATH 222: Calculus & Analytic Geometry II** | Integration techniques, sequences, series, Taylor expansions |
 | **MATH 234: Calculus - Functions of Several Variables** | Partial derivatives, multiple integrals, vector calculus |
 | **MATH 320: Linear Algebra & Differential Equations** | Matrix operations, eigenvalues, vector spaces, ODEs |
-
----
 
 ## Programming
 
@@ -70,9 +86,9 @@ table th:last-child, table td:last-child {
 
 ---
 
-## Supply Chain Management
+# Online Programs & Certificates
 
-### MITx MicroMasters in Supply Chain Management (edX)
+## MITx MicroMasters in Supply Chain Management (edX)
 
 | Course | Topics Covered |
 |--------|----------------|
@@ -82,9 +98,7 @@ table th:last-child, table td:last-child {
 | **CTL.SC3x: Supply Chain Dynamics** | Bullwhip effect, system dynamics, supply chain coordination |
 | **CTL.SC4x: Supply Chain Technology and Systems** | ERP, information systems, e-commerce, emerging technologies |
 
----
-
-## Online Other Certificates
+## Other Certificates
 
 | Provider | Certificate |
 |----------|-------------|

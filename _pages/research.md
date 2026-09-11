@@ -5,23 +5,32 @@ permalink: /research/
 author_profile: true
 ---
 
-## 1. Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot
+## 1. Research Assistant: Smart Agriculture Survey & GM Crop Commercialization
 
-**Duration:** *Jul 2021 – Aug 2022* **Role:** Fieldwork Lead  
-**Affiliation:** Majiaba Village, Zigui County, Hubei, China
+**Duration:** *Jan 2026 – Aug 2026* **Role:** Research Assistant (supervised by Song Yujing)  
+**Affiliation:** Institute of Advanced Agricultural Sciences, Peking University (PKU-IAAS)
 
-**Year 1:**
-- Conducted mixed-methods research on income drivers among ~200 citrus-farming households (stratified survey + semi-structured interviews); produced anonymized datasets and interview transcripts.
-- Identified dependence on single sales channels and long intermediary chains as key constraints on bargaining power, price realization, and income stability.
-- Interviewed Supply & Marketing Cooperative staff and township officials to compile a 30-year oral history of marketing-channel changes and to assess shifting forms of state and cooperative support.
-
-**Year 2:**
-- Designed and implemented the "Orange Warms the Countryside" WeChat Mini Program to pilot direct sales and basic vendor-managed inventory for local households.
-- Introduced ABC supplier tiering and simple stock-management practices; over six months, reduced spoilage by ≈25% and helped 10 farmers achieve a collective income increase of ≈¥100,000.
+- Cleaned and harmonized a multi-module household panel from a smart-agriculture survey in Shouguang, Shandong; built reproducible outlier-detection and validation routines in Python/pandas and documented the data-handling decisions for downstream users.
+- Contributed to a 30-year assessment of GM crop commercialization (1996–2026) built on two empirical pillars: a meta-analysis of peer-reviewed studies of yield, pesticide quantity, and pesticide cost across Bt cotton, Bt maize, and herbicide-tolerant soybean; and a farmer panel on Bt maize in Northeast China (Liaoning and Jilin; 8 waves, 2013–2024).
+- Assembled and coded the meta-analysis sample, including a Python retrieval pipeline for full-text sources, and helped trace how the measured advantage of Bt over conventional varieties changes as target-pest populations decline.
+- Examined how the timing of regulatory approval in China shaped adoption patterns among smallholders.
 
 ---
 
-## 2. Independent Research: Processing Location and Value Capture in Cross-Border Agricultural Supply Chains
+## 2. Faculty-Supervised Research: Computational and Interactive Visualization Tools for Statistical Instruction
+
+**Duration:** *Sep 2025 – Dec 2025* **Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
+**Affiliation:** Department of Statistics, UW-Madison
+
+**View:** [Results in Visualization Page]({{ site.baseurl }}/visualization/)
+
+- Built interactive course tools and use handouts with JavaScript/Python, including an animated derivation from discrete random walk to Brownian motion; developed a probability knowledge map with hover highlights and click-through links to notes.
+- Standardized R Markdown/Quarto outputs: added chunk options, code folding, and show/hide controls to improve HTML readability and reproducibility.
+- Developed a Brownian-motion–based classroom model to illustrate income volatility for smallholder farmers under different intermediary and price regimes, using visualizations to prompt discussion about rural risk and inequality.
+
+---
+
+## 3. Independent Research: Processing Location and Value Capture in Cross-Border Agricultural Supply Chains
 
 **Duration:** *May 2025 – Sep 2025* **Role:** Independent Researcher (supervised by [Prof. Sinan Tas](https://bus.wisc.edu/faculty/sinan-tas))  
 **Affiliation:** University of Wisconsin–Madison
@@ -37,19 +46,6 @@ author_profile: true
 
 ---
 
-## 3. Faculty-Supervised Research: Computational and Interactive Visualization Tools for Statistical Instruction
-
-**Duration:** *Sep 2025 – Dec 2025* **Role:** Undergraduate Researcher (supervised by [Prof. Bo Yang](https://stat.wisc.edu/staff/yang-bo/))  
-**Affiliation:** Department of Statistics, UW-Madison
-
-**View:** [Results in Visualization Page]({{ site.baseurl }}/visualization/)
-
-- Built interactive course tools and use handouts with JavaScript/Python, including an animated derivation from discrete random walk to Brownian motion; developed a probability knowledge map with hover highlights and click-through links to notes.
-- Standardized R Markdown/Quarto outputs: added chunk options, code folding, and show/hide controls to improve HTML readability and reproducibility.
-- Developed a Brownian-motion–based classroom model to illustrate income volatility for smallholder farmers under different intermediary and price regimes, using visualizations to prompt discussion about rural risk and inequality.
-
----
-
 ## 4. Data Analysis Project: Agricultural Development Patterns & Farmers' Income
 
 **Duration:** *Jul 2025 – Sep 2025* **Affiliation:** University of Wisconsin–Madison
@@ -57,3 +53,19 @@ author_profile: true
 - Assembled a multi-decade panel dataset (≈30 years) for 266 World Bank countries for farmers' incomes; harmonized series and handled missing values for cross-country comparison.
 - Built an interactive dashboard with world maps, time-series plots, and dumbbell charts comparing top vs. bottom countries and ratios of farmer income to national averages.
 - Analyzed relationships between mechanization, value added, and farmer incomes, showing cases where higher aggregate value or mechanization does not translate into proportional gains for farm households.
+
+---
+
+## 5. Fieldwork Lead: Rural Livelihoods & Direct-Sales Pilot
+
+**Duration:** *Jul 2021 – Aug 2022* **Role:** Fieldwork Lead  
+**Affiliation:** Majiaba Village, Zigui County, Hubei, China
+
+**Year 1:**
+- Conducted mixed-methods research on income drivers among ~200 citrus-farming households (stratified survey + semi-structured interviews); produced anonymized datasets and interview transcripts.
+- Identified dependence on single sales channels and long intermediary chains as key constraints on bargaining power, price realization, and income stability.
+- Interviewed Supply & Marketing Cooperative staff and township officials to compile a 30-year oral history of marketing-channel changes and to assess shifting forms of state and cooperative support.
+
+**Year 2:**
+- Designed and implemented the "Orange Warms the Countryside" WeChat Mini Program to pilot direct sales and basic vendor-managed inventory for local households.
+- Introduced ABC supplier tiering and simple stock-management practices; over six months, reduced spoilage by ≈25% and helped 10 farmers achieve a collective income increase of ≈¥100,000.
