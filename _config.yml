@@ -22,7 +22,7 @@ repository               : "ZQZ0630/QingzeZhu-Personal-Webpage"
 author:
   name             : *name
   # Make sure this image exists in the repository (images/profile.jpg).
-  avatar           : "profile.jpg"
+  avatar           : "profile-2026.jpg"
   bio              : "M.A. student in Sociology, Columbia University"
   location         : "New York, NY"
   employer         : "Columbia University"
