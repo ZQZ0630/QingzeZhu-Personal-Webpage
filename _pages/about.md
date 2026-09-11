@@ -12,11 +12,11 @@ I am **Qingze Zhu** — you can also call me **Zed**. I am an M.A. student in **
 
 My work sits between **economic sociology** and **labor sociology**, and it is organized around one question: *how does the weaker party in an economic exchange enter a market, and what constrains them once inside?*
 
-I am currently pursuing three directions:
+I work in three directions:
 
-- **Labor-market intermediaries and international students.** Paid job-search agencies charge international students $5,000–20,000 to drill coding tests and coach interview performance. I ask what these agencies actually sell, who turns to them, and what constrains international students in the U.S. labor market — where a referral that carries visa sponsorship becomes a reputational stake that weak ties will not take on.
-- **Why foreign-trade salespeople do not go solo.** In Yiwu, a salesperson runs an order almost end to end and keeps three percent of the profit, yet very few leave to trade on their own account. Interviews with former colleagues point to clients who stay with the firm rather than the person, the leverage a firm buys by carrying production risk, and the weight that visible failures carry.
-- **Platforms, pricing power, and dependency among smallholder farmers.** After e-commerce reached a citrus-growing town, gross revenue rose while net income barely moved. I trace where the difference goes — promotion fees, transit loss, returns — and how algorithmic visibility and buyer-side price comparison leave growers unable to set their own prices, or to leave.
+- **Labor-market intermediaries and international students** — why students pay $5,000–20,000 to job-search agencies, what those agencies actually sell, and what constrains international students in the U.S. labor market.
+- **Labor organization in small cross-border trading firms** — in Yiwu, a salesperson runs an order almost end to end but keeps three percent of the profit, and still very few leave.
+- **Platform capitalism and agricultural e-commerce** — how platform governance extracts value and transfers risk, and why gross revenue can rise while net income barely moves.
 
 Methodologically I pair **ethnographic fieldwork and semi-structured interviews** with quantitative analysis of survey and panel data. I work in **Python**, **R**, and **JavaScript**.
 
